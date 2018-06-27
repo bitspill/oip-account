@@ -61,3 +61,4 @@ typings/
 .next
 lib/*
 localStorage/*
+.DS_Store
