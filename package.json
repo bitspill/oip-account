@@ -1,0 +1,46 @@
+{
+  "name": "oip-account",
+  "version": "1.0.0",
+  "description": "Create and Manage an OIP Account",
+  "main": "lib/index.js",
+  "dependencies": {
+    "axios": "^0.18.0",
+    "crypto-js": "^3.1.9-1",
+    "isemail": "^3.1.2",
+    "node-localstorage": "^1.3.1",
+    "oip-hdmw": "^1.0.2"
+  },
+  "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-preset-es2015": "^6.24.1",
+    "jest": "^23.2.0",
+    "jsdoc": "^3.5.5",
+    "jsdoc-template": "git+https://github.com/oipwg/jsdoc-template.git"
+  },
+  "scripts": {
+    "test": "npm run compile && if [ -d `./localStorage`]; then rm -r ./localStorage; fi && jest",
+    "compile": "./node_modules/.bin/babel --presets es2015 -d lib/ src/",
+    "prepare": "npm run generate-docs && npm run compile",
+    "generate-docs": "node_modules/.bin/jsdoc --readme ./README.md -c jsdoc.json"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/oipwg/oip-account.git"
+  },
+  "keywords": [
+    "OIP",
+    "Account",
+    "HDMW",
+    "Flo",
+    "Bitcoin",
+    "Litecoin",
+    "Wallet",
+    "Keystore"
+  ],
+  "author": "Sky Young <sky@alexandria.io>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/oipwg/oip-account/issues"
+  },
+  "homepage": "https://github.com/oipwg/oip-account#readme"
+}
