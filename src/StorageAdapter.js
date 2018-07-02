@@ -33,7 +33,20 @@ class StorageAdapter {
 
 		return this.save(account_data, identifier)
 	}
-	save(account_data){}
+	async save(account_data, identifier){
+		if (identifier){
+			return await this._save(account_data, identifier)
+		} else {
+			try {
+				var id = await this.check()
+				return await this._save(account_data, id)
+			} catch(e) {
+				// No ID, generate new and save
+				var id = await this.create(account_data)
+				return await this._save(account_data, id)
+			}
+		}
+	}
 	load(){}
 	check(){}
 	/**
