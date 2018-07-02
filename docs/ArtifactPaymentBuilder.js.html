@@ -1,3 +1,5 @@
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -6,7 +8,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <title>
-      Home - Documentation
+      ArtifactPaymentBuilder.js - Documentation
   </title>
 
   <link href="https://www.braintreepayments.com/images/favicon-ccda0b14.png" rel="icon" type="image/png">
@@ -52,14 +54,14 @@
 
   <div class="top-nav-wrapper">
     <ul>
-      <li  class="active" >
+      <li >
         <a href="index.html">
           
-          
-            <svg fill="#0095dd" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg">
+            <svg fill="#6D6D6D" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg">
               <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
               <path d="M0 0h24v24H0z" fill="none"/>
             </svg>
+          
           
         </a>
       </li>
@@ -79,25 +81,60 @@
 
   <div id="main">
     
+      <h1 class="page-title">
+        ArtifactPaymentBuilder.js
+      </h1>
+    
 
     
       
 
+<section>
+  <article>
+    <pre class="prettyprint source linenums"><code>
 
+class ArtifactPaymentBuilder {
+	/**
+	 * Create a new ArtifactPaymentBuilder
+	 * @param  {Wallet} wallet   - A live OIP-HDMW logged in wallet
+	 * @param  {string} type     - The type of the purchase, either `tip`, `view`, or `buy`
+	 * @param  {Artifact} artifact - The Artifact related to the Payment you wish to make
+	 * @param  {ArtifactFile|number} amount	- The amount you wish to pay (`tip`), or the ArtifactFile you wish to pay for (`view` &amp; `buy`)
+	 * @param  {string} [fiat]   - The Fiat you wish to `tip` in (if amount was a number and NOT an ArtifactFile)
+	 * @return {ArtifactPaymentBuilder}          [description]
+	 */
+	constructor(wallet, type, artifact, amount, fiat){
 
-    
+	}
+	getPaymentAddresses(){
+		
+	}
+	/**
+	 * Pay for the item you requested
+	 * @return {Promise&lt;Transaction>} Returns a Promise that resolves to the payment transaction, or rejects if there was an error
+	 */
+	pay(){
+		return new Promise((resolve, reject) => {
+			// Get ArtifactFile Cost and Artifact Fiat
+			// Get percentages to be paid out to Platforms and Influencers (don't worry about this for now)
+			
+			// Calculate crypto cost based on the exchange rate for the Fiat (using oip-exchange-rate)
+				// Check Balances of Cryptocurrencies
+				// If not enough balance
+				reject(new Error("Not Enough Balance!"))
 
-      
+				// Select which cryptocurrency to use
+				
+				// Send the payment in that crypto to the User (using this.wallet)
+				
+				// Save Transaction to `paymentHistory` if payment went through successfully
+		})
+	}
+}
 
-
-  <section class="readme">
-    <article>
-      <p><a href="https://travis-ci.org/oipwg/oip-account"><img src="https://travis-ci.org/oipwg/oip-account.svg?branch=master" alt=""></a>
-<a href="https://www.npmjs.com/package/oip-account"><img src="https://img.shields.io/npm/v/oip-account.svg" alt=""></a></p>
-<h1>oip-account</h1><p>Manage OIP Account</p>
-    </article>
-  </section>
-
+module.exports = ArtifactPaymentBuilder</code></pre>
+  </article>
+</section>
 
     
 

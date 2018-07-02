@@ -98,7 +98,6 @@ class Account {
 	}
 	/**
 	 * Logout of the currently logged in Account
-	 * @return {[type]} [description]
 	 */
 	logout(){
 		this._wallet = undefined;
@@ -137,23 +136,10 @@ class Account {
 	 */
 	payForArtifactFile(artifact, artifact_file, purchase_type){
 		return new Promise((resolve, reject) => {
-			// If not logged in
-			reject(new Error("Not Logged In!"))
+			var builder = new ArtifactPaymentBuilder(this.wallet, purchase_type, artifact, artifact_file)
 
-			// Get ArtifactFile Cost and Artifact Fiat
-			// Get percentages to be paid out to Platforms and Influencers (don't worry about this for now)
-			
-			// Calculate crypto cost based on the exchange rate for the Fiat (using oip-exchange-rate)
-				// Check Balances of Cryptocurrencies
-				// If not enough balance
-				reject(new Error("Not Enough Balance!"))
-
-				// Select which cryptocurrency to use
-				
-				// Send the payment in that crypto to the User (using this.wallet)
-				
-				// Save Transaction to `paymentHistory` if payment went through successfully
-		})
+			builder.pay().then(resolve).catch(reject)
+		}) 
 	}
 	/**
 	 * Send a tip to the Publisher for a specific Artifact
@@ -164,7 +150,9 @@ class Account {
 	 */
 	sendArtifactTip(artifact, amount, fiat){
 		return new Promise((resolve, reject) => {
-
+			var builder = new ArtifactPaymentBuilder(this.wallet, 'tip', artifact, amount, fiat)
+			
+			builder.pay().then(resolve).catch(reject)
 		})
 	}
 }

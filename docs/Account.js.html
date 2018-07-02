@@ -76,7 +76,7 @@
       OIP HDMW
     </h3>
 
-    <h3>Classes</h3><ul><li id="Account-nav"><a href="Account.html">Account</a><ul class='methods'><li data-type="method" id="Account-create-nav"><a href="Account.html#create">create</a></li><li data-type="method" id="Account-login-nav"><a href="Account.html#login">login</a></li></ul></li></ul>
+    <h3>Classes</h3><ul><li id="Account-nav"><a href="Account.html">Account</a><ul class='methods'><li data-type="method" id="Account-create-nav"><a href="Account.html#create">create</a></li><li data-type="method" id="Account-getSettings-nav"><a href="Account.html#getSettings">getSettings</a></li><li data-type="method" id="Account-login-nav"><a href="Account.html#login">login</a></li><li data-type="method" id="Account-logout-nav"><a href="Account.html#logout">logout</a></li><li data-type="method" id="Account-payForArtifactFile-nav"><a href="Account.html#payForArtifactFile">payForArtifactFile</a></li><li data-type="method" id="Account-sendArtifactTip-nav"><a href="Account.html#sendArtifactTip">sendArtifactTip</a></li><li data-type="method" id="Account-setSetting-nav"><a href="Account.html#setSetting">setSetting</a></li><li data-type="method" id="Account-store-nav"><a href="Account.html#store">store</a></li></ul></li><li id="ArtifactPaymentBuilder-nav"><a href="ArtifactPaymentBuilder.html">ArtifactPaymentBuilder</a><ul class='methods'><li data-type="method" id="ArtifactPaymentBuilder-pay-nav"><a href="ArtifactPaymentBuilder.html#pay">pay</a></li></ul></li></ul>
   </nav>
 
   <div id="main">
@@ -105,7 +105,7 @@ class Account {
 	 * Create a new Account
 	 * @param  {string} username - Pass in your Email, Account ID, or a BIP39 Mnemonic
 	 * @param  {string} password - Your Accounts password
-	 * @param  {Object} options  - Options about the Account being spawned
+	 * @param  {Object} [options]  - Options about the Account being spawned
 	 * @param  {Boolean} [options.store_local=false] - If the wallet should be stored locally or on a Keystore server
 	 * @param  {string} [options.keystore_url="https://keystore.oip.li/"] - Keystore to use to store the Account
 	 * @return {Account}
@@ -124,6 +124,9 @@ class Account {
 
 			},
 			history: {
+
+			},
+			paymentHistory: {
 
 			}
 		}
@@ -186,16 +189,88 @@ class Account {
 			}).catch(reject)
 		})
 	}
+	/**
+	 * Logout of the currently logged in Account
+	 */
 	logout(){
 		this._wallet = undefined;
 		this._account = undefined;
 	}
+	/**
+	 * Store changed information about the account to the StorageAdapter
+	 * @return {Promise} Returns a Promise that will resolve if the account is saved successfully, or rejects if there was an error storing.
+	 */
 	store(){
 		return this._storageAdapter.save(this._account)
 	}
+	/**
+	 * Set a setting on the Account
+	 * @param {string} setting_node - The Setting you wish to set
+	 * @param {Object} setting_info - What you wish to set the setting to
+	 * @return {Promise} Returns a Promise that will resolve with the setting is saved to the StorageAdapter
+	 */
+	setSetting(setting_node, setting_info){
+
+	}
+	/**
+	 * Get a specific setting
+	 * @param {string} setting_node - The Setting you wish to get
+	 * @return {Promise&lt;Object>} Returns a Promise that will resolve to the requested setting
+	 */
+	getSettings(setting_node){
+
+	}
+	/**
+	 * Pay to View or Buy and Artifact File. This makes the purchase as well as saving that info to the wallet.
+	 * @param  {Artifact} artifact      - The Artifact from which you got the ArtifactFile from. This is used to lookup payment percentage information.
+	 * @param  {ArtifactFile} artifact_file - The specific ArtifactFile that you wish to pay for
+	 * @param  {string} purchase_type - Either `view` or `buy`
+	 * @return {Promise&lt;Transaction>} Returns a Promise that will resolve to the payment transaction, or rejects if there is a payment error.
+	 */
+	payForArtifactFile(artifact, artifact_file, purchase_type){
+		return new Promise((resolve, reject) => {
+			var builder = new ArtifactPaymentBuilder(this.wallet, purchase_type, artifact, artifact_file)
+
+			builder.pay().then(resolve).catch(reject)
+		}) 
+	}
+	/**
+	 * Send a tip to the Publisher for a specific Artifact
+	 * @param  {Artifact} artifact - The Artifact you wish to tip
+	 * @param  {number} amount   - The Amount in `fiat` you wish to tip
+	 * @param  {string} fiat     - A string containing information about the users source currency (i.e. "usd")
+	 * @return {Promise&lt;Transaction>} Returns a Promise that will resolve to the payment transaction, or rejects if there is a payment error.
+	 */
+	sendArtifactTip(artifact, amount, fiat){
+		return new Promise((resolve, reject) => {
+			var builder = new ArtifactPaymentBuilder(this.wallet, 'tip', artifact, amount, fiat)
+			
+			builder.pay().then(resolve).catch(reject)
+		})
+	}
 }
 
-module.exports = Account</code></pre>
+module.exports = Account
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</code></pre>
   </article>
 </section>
 
