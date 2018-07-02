@@ -12,7 +12,7 @@ class Account {
 	 * Create a new Account
 	 * @param  {string} username - Pass in your Email, Account ID, or a BIP39 Mnemonic
 	 * @param  {string} password - Your Accounts password
-	 * @param  {Object} options  - Options about the Account being spawned
+	 * @param  {Object} [options]  - Options about the Account being spawned
 	 * @param  {Boolean} [options.store_local=false] - If the wallet should be stored locally or on a Keystore server
 	 * @param  {string} [options.keystore_url="https://keystore.oip.li/"] - Keystore to use to store the Account
 	 * @return {Account}
@@ -31,6 +31,9 @@ class Account {
 
 			},
 			history: {
+
+			},
+			paymentHistory: {
 
 			}
 		}
@@ -93,12 +96,76 @@ class Account {
 			}).catch(reject)
 		})
 	}
+	/**
+	 * Logout of the currently logged in Account
+	 * @return {[type]} [description]
+	 */
 	logout(){
 		this._wallet = undefined;
 		this._account = undefined;
 	}
+	/**
+	 * Store changed information about the account to the StorageAdapter
+	 * @return {Promise} Returns a Promise that will resolve if the account is saved successfully, or rejects if there was an error storing.
+	 */
 	store(){
 		return this._storageAdapter.save(this._account)
+	}
+	/**
+	 * Set a setting on the Account
+	 * @param {string} setting_node - The Setting you wish to set
+	 * @param {Object} setting_info - What you wish to set the setting to
+	 * @return {Promise} Returns a Promise that will resolve with the setting is saved to the StorageAdapter
+	 */
+	setSetting(setting_node, setting_info){
+
+	}
+	/**
+	 * Get a specific setting
+	 * @param {string} setting_node - The Setting you wish to get
+	 * @return {Promise<Object>} Returns a Promise that will resolve to the requested setting
+	 */
+	getSettings(setting_node){
+
+	}
+	/**
+	 * Pay to View or Buy and Artifact File. This makes the purchase as well as saving that info to the wallet.
+	 * @param  {Artifact} artifact      - The Artifact from which you got the ArtifactFile from. This is used to lookup payment percentage information.
+	 * @param  {ArtifactFile} artifact_file - The specific ArtifactFile that you wish to pay for
+	 * @param  {string} purchase_type - Either `view` or `buy`
+	 * @return {Promise<Transaction>} Returns a Promise that will resolve to the payment transaction, or rejects if there is a payment error.
+	 */
+	payForArtifactFile(artifact, artifact_file, purchase_type){
+		return new Promise((resolve, reject) => {
+			// If not logged in
+			reject(new Error("Not Logged In!"))
+
+			// Get ArtifactFile Cost and Artifact Fiat
+			// Get percentages to be paid out to Platforms and Influencers (don't worry about this for now)
+			
+			// Calculate crypto cost based on the exchange rate for the Fiat
+				// Check Balances of Cryptocurrencies
+				// If not enough balance
+				reject(new Error("Not Enough Balance!"))
+
+				// Select which cryptocurrency to use
+				
+				// Send the payment in that crypto to the User (using this.wallet)
+				
+				// Save Transaction to `paymentHistory` if payment went through successfully
+		})
+	}
+	/**
+	 * Send a tip to the Publisher for a specific Artifact
+	 * @param  {Artifact} artifact - The Artifact you wish to tip
+	 * @param  {number} amount   - The Amount in `fiat` you wish to tip
+	 * @param  {string} fiat     - A string containing information about the users source currency (i.e. "usd")
+	 * @return {Promise<Transaction>} Returns a Promise that will resolve to the payment transaction, or rejects if there is a payment error.
+	 */
+	sendArtifactTip(artifact, amount, fiat){
+		return new Promise((resolve, reject) => {
+
+		})
 	}
 }
 
