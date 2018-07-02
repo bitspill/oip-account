@@ -4,6 +4,7 @@
   "description": "Create and Manage an OIP Account",
   "main": "lib/index.js",
   "dependencies": {
+    "@babel/polyfill": "^7.0.0-beta.51",
     "axios": "^0.18.0",
     "crypto-js": "^3.1.9-1",
     "isemail": "^3.1.2",
@@ -11,8 +12,10 @@
     "oip-hdmw": "^1.0.2"
   },
   "devDependencies": {
-    "babel-cli": "^6.26.0",
-    "babel-preset-es2015": "^6.24.1",
+    "@babel/cli": "^7.0.0-beta.51",
+    "@babel/core": "^7.0.0-beta.51",
+    "@babel/preset-env": "^7.0.0-beta.51",
+    "babel-core": "^7.0.0-bridge.0",
     "jest": "^23.2.0",
     "jsdoc": "^3.5.5",
     "jsdoc-template": "git+https://github.com/oipwg/jsdoc-template.git",
@@ -20,7 +23,7 @@
   },
   "scripts": {
     "test": "npm run compile && node ./test/rm-test-data.js && jest",
-    "compile": "./node_modules/.bin/babel --presets es2015 -d lib/ src/",
+    "compile": "npx babel src --out-dir lib",
     "prepare": "npm run generate-docs && npm run compile",
     "generate-docs": "node_modules/.bin/jsdoc --readme ./README.md -c jsdoc.json"
   },
@@ -43,5 +46,8 @@
   "bugs": {
     "url": "https://github.com/oipwg/oip-account/issues"
   },
-  "homepage": "https://github.com/oipwg/oip-account#readme"
+  "homepage": "https://github.com/oipwg/oip-account#readme",
+  "resolutions": {
+    "babel-core": "7.0.0-bridge.0"
+  }
 }
