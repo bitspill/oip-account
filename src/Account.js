@@ -143,7 +143,7 @@ class Account {
 			// Get ArtifactFile Cost and Artifact Fiat
 			// Get percentages to be paid out to Platforms and Influencers (don't worry about this for now)
 			
-			// Calculate crypto cost based on the exchange rate for the Fiat
+			// Calculate crypto cost based on the exchange rate for the Fiat (using oip-exchange-rate)
 				// Check Balances of Cryptocurrencies
 				// If not enough balance
 				reject(new Error("Not Enough Balance!"))
