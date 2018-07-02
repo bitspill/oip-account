@@ -8,13 +8,13 @@ class FakeStorageAdapter extends StorageAdapter {
 	async load(){
 		return this._account
 	}
-	async save(account_data, identifier){
-		if (!identifier){
-			return await this.create(account_data)
-		} else {
-			this._account = account_data
-			return identifier
-		}
+	async _save(account_data, identifier){
+		if (!account_data.identifier)
+			account_data.identifier = identifier;
+
+		this._account = account_data
+		
+		return identifier
 	}
 	async check(){
 		throw new Error("Account Not Found!")
