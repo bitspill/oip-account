@@ -76,7 +76,7 @@
       OIP HDMW
     </h3>
 
-    <h3>Classes</h3><ul><li id="Account-nav"><a href="Account.html">Account</a><ul class='methods'><li data-type="method" id="Account-create-nav"><a href="Account.html#create">create</a></li><li data-type="method" id="Account-getSettings-nav"><a href="Account.html#getSettings">getSettings</a></li><li data-type="method" id="Account-login-nav"><a href="Account.html#login">login</a></li><li data-type="method" id="Account-logout-nav"><a href="Account.html#logout">logout</a></li><li data-type="method" id="Account-payForArtifactFile-nav"><a href="Account.html#payForArtifactFile">payForArtifactFile</a></li><li data-type="method" id="Account-sendArtifactTip-nav"><a href="Account.html#sendArtifactTip">sendArtifactTip</a></li><li data-type="method" id="Account-setSetting-nav"><a href="Account.html#setSetting">setSetting</a></li><li data-type="method" id="Account-store-nav"><a href="Account.html#store">store</a></li></ul></li><li id="ArtifactPaymentBuilder-nav"><a href="ArtifactPaymentBuilder.html">ArtifactPaymentBuilder</a><ul class='methods'><li data-type="method" id="ArtifactPaymentBuilder-pay-nav"><a href="ArtifactPaymentBuilder.html#pay">pay</a></li></ul></li></ul>
+    <h3>Classes</h3><ul><li id="Account-nav"><a href="Account.html">Account</a><ul class='methods'><li data-type="method" id="Account-create-nav"><a href="Account.html#create">create</a></li><li data-type="method" id="Account-getSettings-nav"><a href="Account.html#getSettings">getSettings</a></li><li data-type="method" id="Account-login-nav"><a href="Account.html#login">login</a></li><li data-type="method" id="Account-logout-nav"><a href="Account.html#logout">logout</a></li><li data-type="method" id="Account-payForArtifactFile-nav"><a href="Account.html#payForArtifactFile">payForArtifactFile</a></li><li data-type="method" id="Account-sendArtifactTip-nav"><a href="Account.html#sendArtifactTip">sendArtifactTip</a></li><li data-type="method" id="Account-setSetting-nav"><a href="Account.html#setSetting">setSetting</a></li><li data-type="method" id="Account-store-nav"><a href="Account.html#store">store</a></li></ul></li><li id="ArtifactPaymentBuilder-nav"><a href="ArtifactPaymentBuilder.html">ArtifactPaymentBuilder</a><ul class='methods'><li data-type="method" id="ArtifactPaymentBuilder-calculateCryptoExchangeRate-nav"><a href="ArtifactPaymentBuilder.html#calculateCryptoExchangeRate">calculateCryptoExchangeRate</a></li><li data-type="method" id="ArtifactPaymentBuilder-pay-nav"><a href="ArtifactPaymentBuilder.html#pay">pay</a></li></ul></li></ul>
   </nav>
 
   <div id="main">
@@ -94,7 +94,7 @@
     <pre class="prettyprint source linenums"><code>import CryptoJS from 'crypto-js';
 import crypto from 'crypto';
 
-import { isValidEmail } from './util'
+import { isValidEmail, isValidIdentifier } from './util'
 
 const AES_CONFIG = {
 	mode: CryptoJS.mode.CTR,
@@ -113,7 +113,7 @@ class StorageAdapter {
 			encrypted_data: ""
 		}
 
-		if (this._username &amp;&amp; isValidEmail(this._username))
+		if (this._username &amp;&amp; !isValidIdentifier(this._username) &amp;&amp; isValidEmail(this._username))
 			this.storage.email = this._username;
 	}
 	create(account_data, email){
