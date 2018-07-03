@@ -57,7 +57,13 @@ class ArtifactPaymentBuilder {
      * Calculate the exchange rate between a fiat currency and a cryptocurrency
      * @param  {array} coins    - An array of coins you want to get exchange rates for
      * @param  {string} fiat     - The fiat currency you wish to check against
-     * @return {object}          [An object: {[key][value] === [fiat][exchange rate],}]
+     * @return {object}          [An object: {[key]: [[fiat]: [exchange rate]],}]
+     * * @example
+     *  {
+            "flo": {"usd": expect.any(Number)},
+            "btc": {"usd": expect.any(Number)},
+            "ltc": {"usd": expect.any(Number)}
+        }
      */
     async calculateCryptoExchangeRate(coins, fiat) {
         let rates = {};
