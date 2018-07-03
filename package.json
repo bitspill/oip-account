@@ -20,6 +20,7 @@
     "jest": "^23.2.0",
     "jsdoc": "^3.5.5",
     "jsdoc-template": "git+https://github.com/oipwg/jsdoc-template.git",
+    "oip-keystore": "^2.0.1",
     "rimraf": "^2.6.2"
   },
   "scripts": {

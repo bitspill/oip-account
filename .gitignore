@@ -62,3 +62,4 @@ typings/
 lib/*
 localStorage/*
 .DS_Store
+db.json
