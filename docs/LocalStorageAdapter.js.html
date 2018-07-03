@@ -102,91 +102,70 @@ class LocalStorageAdapter extends StorageAdapter {
 	constructor(username, password){
 		super(username, password)		
 	}
-	load(){
-		return new Promise((resolve, reject) => {
-			this.check().then((id) => {
-				var stored_data = localStorage.getItem('oip_account');
+	async load(){
+		var id = await this.check()
 
-				stored_data = JSON.parse(stored_data)
+		var stored_data = localStorage.getItem('oip_account');
 
-				if (stored_data[id]){
-					var decrypted_data = this.decrypt(stored_data[id].encrypted_data);
+		stored_data = JSON.parse(stored_data)
 
-					if (decrypted_data){
+		if (stored_data[id]){
+			var decrypted_data = this.decrypt(stored_data[id].encrypted_data);
 
-						if (!decrypted_data.identifier)
-							decrypted_data.identifier = id;
+			if (decrypted_data){
+				if (!decrypted_data.identifier)
+					decrypted_data.identifier = id;
 
-						resolve(decrypted_data)
-					}
-				} else {
-					reject(new Error("Account Not Found for ID!"))
-				}
+				return decrypted_data
+			}
+		} else {
+			throw new Error("Account Not Found for ID!")
+		}
 
-				reject(new Error("Unable to Decrypt Account!"))
-			}).catch(reject)
-		})
+		throw new Error("Unable to Decrypt Account!")
 	}
-	save(account_data, identifier){
-		return new Promise((resolve, reject) => {
-			var saveAccountData = (acc_data, ident) => {
-				var stored_data = localStorage.getItem('oip_account');
+	async _save(account_data, identifier){
+		var stored_data = localStorage.getItem('oip_account');
 
-				if (stored_data) 
-					stored_data = JSON.parse(stored_data);
+		if (stored_data) 
+			stored_data = JSON.parse(stored_data);
 
-				if (!stored_data)
-					stored_data = {}
+		if (!stored_data)
+			stored_data = {}
 
-				this.encrypt(account_data);
+		this.encrypt(account_data);
 
-				stored_data[ident] = this.storage;
+		stored_data[identifier] = this.storage;
 
-				localStorage.setItem('oip_account', JSON.stringify(stored_data))
+		localStorage.setItem('oip_account', JSON.stringify(stored_data))
 
-				resolve(ident)
-			}
-
-			if (identifier){
-				saveAccountData(account_data, identifier)
-			} else {
-				this.check().then((id) => {
-					saveAccountData(account_data, id)
-				}).catch(() => {
-					this.create(account_data).then((iden) => {
-						resolve(iden)
-					}).catch(reject)
-				})
-			}
-		}) 
+		return identifier
 	}
 	/**
 	 * Check if the Account already exists
 	 * @return {Promise} Returns a Promise that will resolve to `true` if the account already exists and has been created, and `false` if the account doesn't exist
 	 */
-	check(){
-		return new Promise((resolve, reject) => {
-			var stored_data = localStorage.getItem('oip_account');
+	async check(){
+		var stored_data = localStorage.getItem('oip_account');
 
-			stored_data = JSON.parse(stored_data);
+		stored_data = JSON.parse(stored_data);
 
-			if (!stored_data)
-				reject(new Error("Account Not Found!"));
+		if (!stored_data)
+			throw new Error("Account Not Found!");
 
-			if (this.storage.identifier !== "" &amp;&amp; stored_data[this.storage.identifier])
-				resolve(this.storage.identifier);
+		if (this.storage.identifier !== "" &amp;&amp; stored_data[this.storage.identifier])
+			return this.storage.identifier
 
-			if (stored_data[this._username])
-				resolve(this._username);
+		if (stored_data[this._username])
+			return this._username
 
-			for (var data in stored_data){
-				// Check if the Email matches
-				if (stored_data[data].email &amp;&amp; stored_data[data].email !== "" &amp;&amp; stored_data[data].email === this._username &amp;&amp; this._username)
-					resolve(data)
-			}
+		for (var data in stored_data){
+			// Check if the Email matches
+			if (stored_data[data].email &amp;&amp; stored_data[data].email !== "" &amp;&amp; stored_data[data].email === this._username &amp;&amp; this._username)
+				return data
+		}
 
-			reject(new Error("Account Not Found!"))
-		})
+		throw new Error("Account Not Found!")
 	}
 }
 

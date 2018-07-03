@@ -91,7 +91,7 @@
 
 <section>
   <article>
-    <pre class="prettyprint source linenums"><code>
+    <pre class="prettyprint source linenums"><code>const Exchange = require("oip-exchange-rate");
 
 class ArtifactPaymentBuilder {
 	/**
@@ -104,32 +104,61 @@ class ArtifactPaymentBuilder {
 	 * @return {ArtifactPaymentBuilder}          [description]
 	 */
 	constructor(wallet, type, artifact, amount, fiat){
-
+        this._wallet = wallet;
+        this._type = type;
+        this._artifact = artifact;
+        this._amount = amount;
+        this._fiat = fiat;
+        this._exchange = new Exchange();
 	}
 	getPaymentAddresses(){
-		
+        return this._artifact.getPaymentAddresses();
 	}
 	/**
 	 * Pay for the item you requested
 	 * @return {Promise&lt;Transaction>} Returns a Promise that resolves to the payment transaction, or rejects if there was an error
 	 */
-	pay(){
-		return new Promise((resolve, reject) => {
+	async pay(){
 			// Get ArtifactFile Cost and Artifact Fiat
+        const artifactFileCost = this._amount;
+        const artifactFiat = this._fiat;
 			// Get percentages to be paid out to Platforms and Influencers (don't worry about this for now)
 			
 			// Calculate crypto cost based on the exchange rate for the Fiat (using oip-exchange-rate)
+        const rates = await this.calculateCryptoCost();
+
 				// Check Balances of Cryptocurrencies
 				// If not enough balance
-				reject(new Error("Not Enough Balance!"))
+				//reject(new Error("Not Enough Balance!"))
 
 				// Select which cryptocurrency to use
 				
 				// Send the payment in that crypto to the User (using this.wallet)
 				
 				// Save Transaction to `paymentHistory` if payment went through successfully
-		})
 	}
+
+	async getCryptoRate(coins, fiat) {
+
+    }
+    async calculateCryptoCost(coins, fiat) {
+        let rates = {};
+        let promiseArray = {};
+
+        for (const coin of coins) {
+            promiseArray[coin] = {};
+            promiseArray[coin].promise = this._exchange.getExchangeRate(coin, fiat)
+            promiseArray[coin].fiat = fiat
+        }
+
+        for (const p in promiseArray) {
+            let rate = await promiseArray[p].promise
+            rates[p] = {}
+            rates[p][promiseArray[p].fiat] = rate
+        }
+
+        return rates
+    }
 }
 
 module.exports = ArtifactPaymentBuilder</code></pre>
