@@ -1,7 +1,7 @@
 import CryptoJS from 'crypto-js';
 import crypto from 'crypto';
 
-import { isValidEmail } from './util'
+import { isValidEmail, isValidIdentifier } from './util'
 
 const AES_CONFIG = {
 	mode: CryptoJS.mode.CTR,
@@ -20,7 +20,7 @@ class StorageAdapter {
 			encrypted_data: ""
 		}
 
-		if (this._username && isValidEmail(this._username))
+		if (this._username && !isValidIdentifier(this._username) && isValidEmail(this._username))
 			this.storage.email = this._username;
 	}
 	create(account_data, email){
