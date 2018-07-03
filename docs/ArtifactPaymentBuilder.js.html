@@ -76,7 +76,7 @@
       OIP HDMW
     </h3>
 
-    <h3>Classes</h3><ul><li id="Account-nav"><a href="Account.html">Account</a><ul class='methods'><li data-type="method" id="Account-create-nav"><a href="Account.html#create">create</a></li><li data-type="method" id="Account-getSettings-nav"><a href="Account.html#getSettings">getSettings</a></li><li data-type="method" id="Account-login-nav"><a href="Account.html#login">login</a></li><li data-type="method" id="Account-logout-nav"><a href="Account.html#logout">logout</a></li><li data-type="method" id="Account-payForArtifactFile-nav"><a href="Account.html#payForArtifactFile">payForArtifactFile</a></li><li data-type="method" id="Account-sendArtifactTip-nav"><a href="Account.html#sendArtifactTip">sendArtifactTip</a></li><li data-type="method" id="Account-setSetting-nav"><a href="Account.html#setSetting">setSetting</a></li><li data-type="method" id="Account-store-nav"><a href="Account.html#store">store</a></li></ul></li><li id="ArtifactPaymentBuilder-nav"><a href="ArtifactPaymentBuilder.html">ArtifactPaymentBuilder</a><ul class='methods'><li data-type="method" id="ArtifactPaymentBuilder-pay-nav"><a href="ArtifactPaymentBuilder.html#pay">pay</a></li></ul></li></ul>
+    <h3>Classes</h3><ul><li id="Account-nav"><a href="Account.html">Account</a><ul class='methods'><li data-type="method" id="Account-create-nav"><a href="Account.html#create">create</a></li><li data-type="method" id="Account-getSettings-nav"><a href="Account.html#getSettings">getSettings</a></li><li data-type="method" id="Account-login-nav"><a href="Account.html#login">login</a></li><li data-type="method" id="Account-logout-nav"><a href="Account.html#logout">logout</a></li><li data-type="method" id="Account-payForArtifactFile-nav"><a href="Account.html#payForArtifactFile">payForArtifactFile</a></li><li data-type="method" id="Account-sendArtifactTip-nav"><a href="Account.html#sendArtifactTip">sendArtifactTip</a></li><li data-type="method" id="Account-setSetting-nav"><a href="Account.html#setSetting">setSetting</a></li><li data-type="method" id="Account-store-nav"><a href="Account.html#store">store</a></li></ul></li><li id="ArtifactPaymentBuilder-nav"><a href="ArtifactPaymentBuilder.html">ArtifactPaymentBuilder</a><ul class='methods'><li data-type="method" id="ArtifactPaymentBuilder-calculateCryptoExchangeRate-nav"><a href="ArtifactPaymentBuilder.html#calculateCryptoExchangeRate">calculateCryptoExchangeRate</a></li><li data-type="method" id="ArtifactPaymentBuilder-pay-nav"><a href="ArtifactPaymentBuilder.html#pay">pay</a></li></ul></li></ul>
   </nav>
 
   <div id="main">
@@ -114,6 +114,7 @@ class ArtifactPaymentBuilder {
 	getPaymentAddresses(){
         return this._artifact.getPaymentAddresses();
 	}
+
 	/**
 	 * Pay for the item you requested
 	 * @return {Promise&lt;Transaction>} Returns a Promise that resolves to the payment transaction, or rejects if there was an error
@@ -125,7 +126,7 @@ class ArtifactPaymentBuilder {
 			// Get percentages to be paid out to Platforms and Influencers (don't worry about this for now)
 			
 			// Calculate crypto cost based on the exchange rate for the Fiat (using oip-exchange-rate)
-        const rates = await this.calculateCryptoCost();
+        const rates = await this.calculateCryptoExchangeRate();
 
 				// Check Balances of Cryptocurrencies
 				// If not enough balance
@@ -138,22 +139,31 @@ class ArtifactPaymentBuilder {
 				// Save Transaction to `paymentHistory` if payment went through successfully
 	}
 
-	async getCryptoRate(coins, fiat) {
-
-    }
-    async calculateCryptoCost(coins, fiat) {
+    /**
+     * Calculate the exchange rate between a fiat currency and a cryptocurrency
+     * @param  {array} coins    - An array of coins you want to get exchange rates for
+     * @param  {string} fiat     - The fiat currency you wish to check against
+     * @return {object}
+     * @example
+     *   {
+     *      "flo": {"usd": expect.any(Number)},
+     *      "btc": {"usd": expect.any(Number)},
+     *      "ltc": {"usd": expect.any(Number)}
+     * }
+     */
+    async calculateCryptoExchangeRate(coins, fiat) {
         let rates = {};
         let promiseArray = {};
 
-        for (const coin of coins) {
+        for (let coin of coins) {
             promiseArray[coin] = {};
             promiseArray[coin].promise = this._exchange.getExchangeRate(coin, fiat)
             promiseArray[coin].fiat = fiat
         }
 
-        for (const p in promiseArray) {
-            let rate = await promiseArray[p].promise
-            rates[p] = {}
+        for (let p in promiseArray) {
+            let rate = await promiseArray[p].promise;
+            rates[p] = {};
             rates[p][promiseArray[p].fiat] = rate
         }
 
@@ -161,7 +171,7 @@ class ArtifactPaymentBuilder {
     }
 }
 
-module.exports = ArtifactPaymentBuilder</code></pre>
+module.exports = ArtifactPaymentBuilder;</code></pre>
   </article>
 </section>
 

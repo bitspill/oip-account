@@ -74,7 +74,7 @@
       OIP HDMW
     </h3>
 
-    <h3>Classes</h3><ul><li id="Account-nav"><a href="Account.html">Account</a><ul class='methods'><li data-type="method" id="Account-create-nav"><a href="Account.html#create">create</a></li><li data-type="method" id="Account-getSettings-nav"><a href="Account.html#getSettings">getSettings</a></li><li data-type="method" id="Account-login-nav"><a href="Account.html#login">login</a></li><li data-type="method" id="Account-logout-nav"><a href="Account.html#logout">logout</a></li><li data-type="method" id="Account-payForArtifactFile-nav"><a href="Account.html#payForArtifactFile">payForArtifactFile</a></li><li data-type="method" id="Account-sendArtifactTip-nav"><a href="Account.html#sendArtifactTip">sendArtifactTip</a></li><li data-type="method" id="Account-setSetting-nav"><a href="Account.html#setSetting">setSetting</a></li><li data-type="method" id="Account-store-nav"><a href="Account.html#store">store</a></li></ul></li><li id="ArtifactPaymentBuilder-nav"><a href="ArtifactPaymentBuilder.html">ArtifactPaymentBuilder</a><ul class='methods'><li data-type="method" id="ArtifactPaymentBuilder-pay-nav"><a href="ArtifactPaymentBuilder.html#pay">pay</a></li></ul></li></ul>
+    <h3>Classes</h3><ul><li id="Account-nav"><a href="Account.html">Account</a><ul class='methods'><li data-type="method" id="Account-create-nav"><a href="Account.html#create">create</a></li><li data-type="method" id="Account-getSettings-nav"><a href="Account.html#getSettings">getSettings</a></li><li data-type="method" id="Account-login-nav"><a href="Account.html#login">login</a></li><li data-type="method" id="Account-logout-nav"><a href="Account.html#logout">logout</a></li><li data-type="method" id="Account-payForArtifactFile-nav"><a href="Account.html#payForArtifactFile">payForArtifactFile</a></li><li data-type="method" id="Account-sendArtifactTip-nav"><a href="Account.html#sendArtifactTip">sendArtifactTip</a></li><li data-type="method" id="Account-setSetting-nav"><a href="Account.html#setSetting">setSetting</a></li><li data-type="method" id="Account-store-nav"><a href="Account.html#store">store</a></li></ul></li><li id="ArtifactPaymentBuilder-nav"><a href="ArtifactPaymentBuilder.html">ArtifactPaymentBuilder</a><ul class='methods'><li data-type="method" id="ArtifactPaymentBuilder-calculateCryptoExchangeRate-nav"><a href="ArtifactPaymentBuilder.html#calculateCryptoExchangeRate">calculateCryptoExchangeRate</a></li><li data-type="method" id="ArtifactPaymentBuilder-pay-nav"><a href="ArtifactPaymentBuilder.html#pay">pay</a></li></ul></li></ul>
   </nav>
 
   <div id="main">
@@ -473,6 +473,226 @@
   
 
   <span class='name-container'>
+    <a class="link-icon" href="#calculateCryptoExchangeRate">
+      <svg height="20" width="20" style="fill: black;">
+        <use xlink:href="#linkIcon"></use>
+      </svg>
+    </a>
+    <h4 class="name" id="calculateCryptoExchangeRate">
+      <span class="type-signature">(async) </span>calculateCryptoExchangeRate<span class="signature">(coins, fiat)</span><span class="type-signature"> &rarr; {object}</span>
+    </h4>
+  </span>
+
+  
+
+
+
+  <div class="description">
+    <p>Calculate the exchange rate between a fiat currency and a cryptocurrency</p>
+  </div>
+
+
+
+
+
+
+
+  <h5>Parameters:</h5>
+  
+
+<table class="params">
+  <thead>
+    <tr>
+      
+        <th>Name</th>
+      
+
+      <th>Type</th>
+
+      
+
+      
+
+      <th class="last">Description</th>
+    </tr>
+  </thead>
+
+  <tbody>
+    
+      <tr>
+        
+          <td class="name"><code>coins</code></td>
+        
+
+        <td class="type">
+          
+            
+    <span class="param-type">
+      array
+    </span>
+
+    
+
+
+          
+        </td>
+
+        
+
+        
+
+        <td class="description last">
+          <p>An array of coins you want to get exchange rates for</p>
+          
+        </td>
+      </tr>
+
+    
+      <tr>
+        
+          <td class="name"><code>fiat</code></td>
+        
+
+        <td class="type">
+          
+            
+    <span class="param-type">
+      string
+    </span>
+
+    
+
+
+          
+        </td>
+
+        
+
+        
+
+        <td class="description last">
+          <p>The fiat currency you wish to check against</p>
+          
+        </td>
+      </tr>
+
+    
+  </tbody>
+</table>
+
+
+
+
+
+<dl class="details">
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source">
+      <ul class="dummy">
+        <li>
+          <a href="ArtifactPaymentBuilder.js.html">ArtifactPaymentBuilder.js</a>, <a href="ArtifactPaymentBuilder.js.html#line61">line 61</a>
+        </li>
+      </ul>
+    </dd>
+  
+
+  
+
+  
+
+  
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <div class="example-container">
+    <a class="link-icon" href="#calculateCryptoExchangeRate-examples">
+      <svg height="20" width="20" style="fill: black;">
+        <use xlink:href="#linkIcon"></use>
+      </svg>
+    </a>
+    <h5 id="calculateCryptoExchangeRate-examples">Example</h5>
+    
+
+  <pre class="prettyprint"><code>{
+     "flo": {"usd": expect.any(Number)},
+     "btc": {"usd": expect.any(Number)},
+     "ltc": {"usd": expect.any(Number)}
+}</code></pre>
+
+
+  </div>
+
+
+
+<h5>Returns:</h5>
+
+        
+
+
+  <dl class="param-type">
+    <dt>Type: </dt>
+    <dd>
+      
+    <span class="param-type">
+      object
+    </span>
+
+    
+
+
+    </dd>
+  </dl>
+
+
+    
+
+      
+        
+
+<br />
+<br />
+<hr />
+
+
+  
+
+  <span class='name-container'>
     <a class="link-icon" href="#pay">
       <svg height="20" width="20" style="fill: black;">
         <use xlink:href="#linkIcon"></use>
@@ -531,7 +751,7 @@
     <dd class="tag-source">
       <ul class="dummy">
         <li>
-          <a href="ArtifactPaymentBuilder.js.html">ArtifactPaymentBuilder.js</a>, <a href="ArtifactPaymentBuilder.js.html#line28">line 28</a>
+          <a href="ArtifactPaymentBuilder.js.html">ArtifactPaymentBuilder.js</a>, <a href="ArtifactPaymentBuilder.js.html#line29">line 29</a>
         </li>
       </ul>
     </dd>

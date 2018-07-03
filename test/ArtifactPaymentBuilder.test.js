@@ -1,4 +1,5 @@
 var ArtifactPaymentBuilder = require("../lib/ArtifactPaymentBuilder");
+var { Wallet } = require("oip-hdmw");
 
 test("Get exchange rate with ONE COIN", async () => {
     expect.assertions(1);
@@ -20,4 +21,11 @@ test("Get exchange rate with MULTIPLE (3) COINS", async () => {
             "ltc": {"usd": expect.any(Number)}
         }
     )
+})
+
+test("get Coins from Wallet()", () => {
+    const wallet = new Wallet();
+    const APB = new ArtifactPaymentBuilder(wallet);
+    const walletAPB = APB._wallet
+    expect(walletAPB).toBe({})
 })
