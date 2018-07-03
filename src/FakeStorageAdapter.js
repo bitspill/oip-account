@@ -5,25 +5,19 @@ class FakeStorageAdapter extends StorageAdapter {
 		super(undefined, undefined)
 		this._account = account		
 	}
-	load(){
-		return new Promise((resolve, reject) => {
-			resolve(this._account)
-		})
+	async load(){
+		return this._account
 	}
-	save(account_data, identifier){
-		return new Promise((resolve, reject) => {
-			if (!identifier){
-				this.create(account_data).then(resolve).catch(reject)
-			} else {
-				this._account = account_data
-				resolve(identifier)
-			}
-		}) 
+	async _save(account_data, identifier){
+		if (!account_data.identifier)
+			account_data.identifier = identifier;
+
+		this._account = account_data
+		
+		return identifier
 	}
-	check(){
-		return new Promise((resolve, reject) => {
-			reject()
-		})
+	async check(){
+		throw new Error("Account Not Found!")
 	}
 }
 
