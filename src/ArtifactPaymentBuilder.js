@@ -33,7 +33,9 @@ class ArtifactPaymentBuilder {
 			// Get percentages to be paid out to Platforms and Influencers (don't worry about this for now)
 			
 			// Calculate crypto cost based on the exchange rate for the Fiat (using oip-exchange-rate)
-        const rates = await this.calculateCryptoExchangeRate();
+        const rates = await this.getExchangeRates();
+        const balances = await this.getBalances()
+
 
 				// Check Balances of Cryptocurrencies
 				// If not enough balance
@@ -47,6 +49,56 @@ class ArtifactPaymentBuilder {
 	}
 
     /**
+     * Get balances for each coin
+     * @return {object}
+     */
+     getBalances() {
+        return new Promise((resolve, reject) => {
+            const coins = this._wallet.getCoins();
+            let coinPromises = {};
+            let balances = {};
+
+            for (let coin in coins) {
+                coinPromises[coin] = {};
+                try {
+                    coinPromises[coin].promise = coins[coin].getBalance({discover: true})
+                } catch (err) {
+                    coinPromises[coin].error = err
+                }
+            }
+
+            async function fetchBalance(coin, promiseObject) {
+                balances[coin] = {};
+                try {
+                    const balance = await promiseObject[coin].promise;
+                    balances[coin].balance = balance
+                } catch (err) {
+                    balances[coin].error = err;
+                }
+            }
+
+            // function fetchBalance(coin, promiseObject) {
+            //     balances[coin] = {};
+            //     return (
+            //         promiseObject[coin].promise
+            //             .then((value) => {
+            //                 balances[coin].balance = value;
+            //             })
+            //             .catch((err) => {
+            //                 balances[coin].error = err;
+            //             })
+            //     )
+            // }
+
+            for (let coin in coinPromises) {
+                fetchBalance(coin, coinPromises);
+            }
+
+            resolve(balances);
+        })
+    }
+
+    /**
      * Calculate the exchange rate between a fiat currency and a cryptocurrency
      * @param  {array} coins    - An array of coins you want to get exchange rates for
      * @param  {string} fiat     - The fiat currency you wish to check against
@@ -58,7 +110,7 @@ class ArtifactPaymentBuilder {
      *      "ltc": {"usd": expect.any(Number)}
      * }
      */
-    async calculateCryptoExchangeRate(coins, fiat) {
+    async getExchangeRates(coins, fiat) {
         let rates = {};
         let promiseArray = {};
 

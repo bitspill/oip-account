@@ -50,5 +50,8 @@
   "homepage": "https://github.com/oipwg/oip-account#readme",
   "resolutions": {
     "babel-core": "7.0.0-bridge.0"
+  },
+  "jest": {
+    "testEnvironment": "node"
   }
 }
