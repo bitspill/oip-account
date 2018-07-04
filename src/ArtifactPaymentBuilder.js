@@ -77,19 +77,6 @@ class ArtifactPaymentBuilder {
                 }
             }
 
-            // function fetchBalance(coin, promiseObject) {
-            //     balances[coin] = {};
-            //     return (
-            //         promiseObject[coin].promise
-            //             .then((value) => {
-            //                 balances[coin].balance = value;
-            //             })
-            //             .catch((err) => {
-            //                 balances[coin].error = err;
-            //             })
-            //     )
-            // }
-
             for (let coin in coinPromises) {
                 fetchBalance(coin, coinPromises);
             }
