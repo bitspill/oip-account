@@ -1,4 +1,4 @@
-var StorageAdapter = require("../lib/StorageAdapter")
+var StorageAdapter = require("../src/StorageAdapter")
 
 var encrypted_string;
 var test_encrypt_password = "password"

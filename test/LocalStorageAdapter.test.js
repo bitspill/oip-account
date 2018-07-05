@@ -1,6 +1,6 @@
-var LocalStorageAdapter = require("../lib/LocalStorageAdapter")
+var LocalStorageAdapter = require("../src/LocalStorageAdapter")
 
-var isValidIdentifier = require("../lib/util").isValidIdentifier;
+var isValidIdentifier = require("../src/util").isValidIdentifier;
 
 var test_account_data = { wallet: "test data", something: { subthing: { hi: "hello!"}}}
 var test_account_data_2 = { wallet: "test data", something: { subthing: { hi: "hello!"}}}
@@ -10,11 +10,11 @@ var password = "password"
 test("Create new Account & Load (no email)", async (done) => {
 	var adapter = new LocalStorageAdapter(undefined, password)
 
-	var id = await adapter.create(test_account_data)
+	var account_data = await adapter.create(test_account_data)
 
-	test_account_data.identifier = id;
+	test_account_data.identifier = account_data.identifier;
 
-	var adapter2 = new LocalStorageAdapter(id, password)
+	var adapter2 = new LocalStorageAdapter(account_data.identifier, password)
 
 	var account_data = await adapter2.load()
 
@@ -28,6 +28,7 @@ test("Create new Account & Load (no email)", async (done) => {
 	var saved_data = await adapter2.save(test_account_data)
 	var saved_account_data = await adapter2.load()
 
+	expect(saved_data).toEqual(test_account_data)
 	expect(saved_account_data).toEqual(test_account_data)
 
 	done()
@@ -36,17 +37,17 @@ test("Create new Account & Load (no email)", async (done) => {
 test("Create new Account & Load (email)", async (done) => {
 	var adapter = new LocalStorageAdapter(undefined, password)
 
-	var id = await adapter.create(test_account_data_2, "test@example.com")
-	test_account_data_2.identifier = id;
+	var acc_data = await adapter.create(test_account_data_2, "test@example.com")
+	test_account_data_2.identifier = acc_data.identifier;
+	test_account_data_2.email = acc_data.email;
+
+	expect(acc_data).toEqual(test_account_data_2);
 
 	var adapter2 = new LocalStorageAdapter("test@example.com", password)
 
 	var account_data = await adapter2.load()
-
-	test_account_data_2.shared_key = account_data.shared_key;
-	test_account_data_2.email = account_data.email;
-
 	expect(account_data).toEqual(test_account_data_2);
+
 	expect(isValidIdentifier(account_data.identifier)).toBe(true);
 
 	test_account_data_2.wallet = { litecoin: "test-key" }
@@ -54,6 +55,7 @@ test("Create new Account & Load (email)", async (done) => {
 	var saved_data = await adapter2.save(test_account_data_2)
 	var saved_account_data = await adapter2.load()
 
+	expect(saved_data).toEqual(test_account_data_2)
 	expect(saved_account_data).toEqual(test_account_data_2)
 
 	done()

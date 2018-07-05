@@ -1,48 +1,31 @@
-var MemoryStorageAdapter = require("../lib/MemoryStorageAdapter")
+var MemoryStorageAdapter = require("../src/MemoryStorageAdapter")
 
-var isValidIdentifier = require("../lib/util").isValidIdentifier;
+var isValidIdentifier = require("../src/util").isValidIdentifier;
 
 var test_account_data = { wallet: "test data", something: { subthing: { hi: "hello!"}}}
+var test_account_data_2 = { wallet: "test data", something: { subthing: { hi: "hello!"}}}
 
-test("Create new Account & Load", (done) => {
-	var adapter = new MemoryStorageAdapter()
+var password = "password"
 
-	adapter.create(test_account_data).then((id) => {
-		test_account_data.identifier = id;
+test("Create new Account & Load", async (done) => {
+	var adapter = new MemoryStorageAdapter(undefined, undefined, password)
 
-		adapter.load().then((account_data) => {
-			expect(account_data).toEqual(test_account_data);
-			expect(isValidIdentifier(account_data.identifier)).toBe(true);
-			done()
-		})
-	})
-})
+	var account_data = await adapter.create(test_account_data)
 
-test("Check always returns false on MemoryStorageAdapter", (done) => {
-	var adapter = new MemoryStorageAdapter()
+	test_account_data.identifier = account_data.identifier;
 
-	adapter.check().catch((e) => {
-		expect(e).toEqual(new Error("Account Not Found!"))
-		done()
-	})
-})
+	expect(account_data).toEqual(test_account_data);
+	expect(isValidIdentifier(account_data.identifier)).toBe(true);
 
-test("Load should be undefined on create", (done) => {
-	var adapter = new MemoryStorageAdapter()
+	var account_data_2 = await adapter.load()
 
-	adapter.load().then((account_data) => {
-		expect(account_data).toBe(undefined)
-		done()
-	})
-})
+	expect(account_data_2).toEqual(test_account_data)
 
-test("Load should be defined after save on create", (done) => {
-	var adapter = new MemoryStorageAdapter()
+	test_account_data.wallet = { litecoin: "test-key" }
 
-	adapter.save({wallet: "test"}, "test-id").then(() => {
-		adapter.load().then((account_data) => {
-			expect(account_data).toEqual({identifier: "test-id", wallet: "test"})
-			done()
-		})
-	})
+	var saved_data = await adapter.save(test_account_data)
+
+	expect(saved_data).toEqual(test_account_data)
+
+	done()
 })
