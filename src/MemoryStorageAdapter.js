@@ -1,6 +1,6 @@
 import StorageAdapter from './StorageAdapter'
 
-class FakeStorageAdapter extends StorageAdapter {
+class MemoryStorageAdapter extends StorageAdapter {
 	constructor(account){
 		super(undefined, undefined)
 		this._account = account		
@@ -21,4 +21,4 @@ class FakeStorageAdapter extends StorageAdapter {
 	}
 }
 
-module.exports = FakeStorageAdapter;
+module.exports = MemoryStorageAdapter;

@@ -1,7 +1,7 @@
 import { Wallet, util } from 'oip-hdmw';
 import { isValidEmail, isValidIdentifier, isValidSharedKey } from './util';
 
-import FakeStorageAdapter from './FakeStorageAdapter';
+import MemoryStorageAdapter from './MemoryStorageAdapter';
 import LocalStorageAdapter from './LocalStorageAdapter';
 import KeystoreStorageAdapter from './KeystoreStorageAdapter';
 
@@ -49,9 +49,9 @@ class Account {
 			}
 		} else if (util.isMnemonic(this._username)){
 			this._account.wallet.mnemonic = this._username;
-			this._storageAdapter = new FakeStorageAdapter(this._account);
+			this._storageAdapter = new MemoryStorageAdapter(this._account);
 		} else if (!this._username && !this._password) {
-			this._storageAdapter = new FakeStorageAdapter(this._account);
+			this._storageAdapter = new MemoryStorageAdapter(this._account);
 		}
 
 		this.discover = true
