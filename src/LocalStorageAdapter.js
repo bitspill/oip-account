@@ -53,7 +53,7 @@ class LocalStorageAdapter extends StorageAdapter {
 	 * @async
 	 * @param  {Object} account_data - The new Account Data you wish to save
 	 * @param  {Identifier} identifier - The Identifier of the account you wish to save
-	 * @return {Promise<Identifier>} Returns a Promise that will resolve to the Identifier of the updated account if successful
+	 * @return {Promise<Object>} Returns a Promise that will resolve to the Account Data of the updated account if successful
 	 */
 	async _save(account_data, identifier){
 		var stored_data = localStorage.getItem('oip_account');
@@ -70,7 +70,7 @@ class LocalStorageAdapter extends StorageAdapter {
 
 		localStorage.setItem('oip_account', JSON.stringify(stored_data))
 
-		return identifier
+		return account_data
 	}
 	/**
 	 * Check if the Account exists in LocalStorage. 

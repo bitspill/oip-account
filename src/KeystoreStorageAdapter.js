@@ -31,7 +31,7 @@ class KeystoreStorageAdapter extends StorageAdapter {
 	 * @async
 	 * @param  {Object} account_data - The Account Data you wish to save to your new accouny
 	 * @param  {string} [email]      - An Email if you would like to attach an email to your account
-	 * @return {Promise<Identifier>} Returns a Promise that will resolve to the Identifier of the new account if successful
+	 * @return {Promise<Object>} Returns a Promise that will resolve to the Account Data of the new account if successful
 	 */
 	async create(account_data, email){
 		var clonedAccountData = JSON.parse(JSON.stringify(account_data));
@@ -85,7 +85,7 @@ class KeystoreStorageAdapter extends StorageAdapter {
 	 * @async
 	 * @param  {Object} account_data - The new Account Data you wish to save
 	 * @param  {Identifier} identifier - The Identifier of the account you wish to save
-	 * @return {Promise<Identifier>} Returns a Promise that will resolve to the Identifier of the updated account if successful
+	 * @return {Promise<Object>} Returns a Promise that will resolve to the saved Account Data of the updated account if successful
 	 */
 	async _save(account_data, identifier){
 		this.encrypt(account_data);
@@ -98,7 +98,7 @@ class KeystoreStorageAdapter extends StorageAdapter {
 			throw new Error(e.response.data.type)
 		}
 
-		return saved.data.identifier
+		return saved.data
 	}
 	/**
 	 * Check if the Account exists on the Keystore server. This matches an email to an identifier if the username being used is an email.

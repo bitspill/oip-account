@@ -20,6 +20,7 @@ class MemoryStorageAdapter extends StorageAdapter {
 	 * Load an Account from the Memory
 	 *
 	 * @async
+	 * @param {Object} account_data - The Account Data if you are "logging" in and not just "refreshing"
 	 * @return {Promise<Object>} Returns a Promise that will resolve to the Account Data
 	 */
 	async load(){
@@ -31,15 +32,12 @@ class MemoryStorageAdapter extends StorageAdapter {
 	 * @async
 	 * @param  {Object} account_data - The new Account Data you wish to save
 	 * @param  {Identifier} identifier - The Identifier of the account you wish to save
-	 * @return {Promise<Identifier>} Returns a Promise that will resolve to the Identifier of the updated account
+	 * @return {Promise<Object>} Returns a Promise that will resolve to the Account Data of the updated account
 	 */
 	async _save(account_data, identifier){
-		if (!account_data.identifier)
-			account_data.identifier = identifier;
-
 		this._account = account_data
 		
-		return identifier
+		return this._account
 	}
 	/**
 	 * Check if the Account exists in Memory. It will never exists, so it always will return an error 
