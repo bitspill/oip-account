@@ -2,6 +2,8 @@ import axios from 'axios'
 
 import StorageAdapter from './StorageAdapter'
 
+const DEFAULT_KEYSTORE_SERVER = "https://keystore.oip.li/v2/"
+
 /**
  * The KeystoreStorageAdapter class is built on top of StorageAdapter to provide saving to an [OIP Keystore](https://github.com/oipwg/oip-keystore) server
  * @extends {StorageAdapter}
@@ -14,10 +16,10 @@ class KeystoreStorageAdapter extends StorageAdapter {
 	 * @param  {string} [keystore_url="https://keystore.oip.li/v2/"] - The URL of the [OIP Keystore](https://github.com/oipwg/oip-keystore) server to use
 	 * @return {KeystoreStorageServer}
 	 */
-	constructor(username, password, keystore_url = "https://keystore.oip.li/v2/"){
+	constructor(username, password, keystore_url){
 		super(username, password)
 
-		this._url = keystore_url;
+		this._url = keystore_url || DEFAULT_KEYSTORE_SERVER;
 
 		this._keystore = axios.create({
 			baseURL: this._url

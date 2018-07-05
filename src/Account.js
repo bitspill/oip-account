@@ -5,8 +5,6 @@ import MemoryStorageAdapter from './MemoryStorageAdapter';
 import LocalStorageAdapter from './LocalStorageAdapter';
 import KeystoreStorageAdapter from './KeystoreStorageAdapter';
 
-const DEFAULT_KEYSTORE_SERVER = "https://keystore.oip.li/"
-
 class Account {
 	/**
 	 * Create a new Account
