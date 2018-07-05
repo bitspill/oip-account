@@ -20,8 +20,7 @@ class Account {
 		this._password = password
 
 		this._account = {
-			identifier: "",
-			email: "",
+			identifier: undefined,
 			wallet: {
 
 			},
