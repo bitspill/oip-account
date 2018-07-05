@@ -13,11 +13,13 @@ class KeystoreStorageAdapter extends StorageAdapter {
 		})
 	}
 	async create(account_data, email){
-		var create = await this._keystore.post("/create", { email: email })
 		var clonedAccountData = JSON.parse(JSON.stringify(account_data));
 
-		if (create.data.error)
-			throw new Error(create.data.error.type)
+		try {
+			var create = await this._keystore.post("/create", { email: email })
+		} catch(e) {
+			throw new Error(e.response.data.type)
+		}
 
 		if (create.data.shared_key){
 			this.storage.shared_key = create.data.shared_key
@@ -30,10 +32,11 @@ class KeystoreStorageAdapter extends StorageAdapter {
 		return this._save(clonedAccountData, this.storage.identifier)
 	}
 	async load(){
-		var load = await this._keystore.post("/load", { identifier: this.storage.identifier || this._username })
-
-		if (load.data.error)
-			throw new Error(load.data.error.type)
+		try {
+			var load = await this._keystore.post("/load", { identifier: this.storage.identifier || this._username })
+		} catch(e) {
+			throw new Error(e.response.data.type)
+		}
 
 		var decrypted = this.decrypt(load.data.encrypted_data)
 
@@ -44,21 +47,26 @@ class KeystoreStorageAdapter extends StorageAdapter {
 	}
 	async _save(account_data, identifier){
 		this.encrypt(account_data);
-		
-		var saved = await this._keystore.post("/update", this.storage);
 
-		if (saved.data.error)
-			throw new Error(saved.data.error.type)
+		this.storage.identifier = identifier
+		
+		try {
+			var saved = await this._keystore.post("/update", this.storage);
+		} catch(e) {
+			throw new Error(e.response.data.type)
+		}
 
 		return saved.data.identifier
 	}
 	async check(){
-		var exists = await this._keystore.post("/checkload", { identifier: this._username });
+		// If the username is not a valid identifier, try to match it to an email
+		try {
+			var exists = await this._keystore.post("/checkload", { identifier: this._username });
+		} catch (e) {
+			throw new Error(e.response.data.type)
+		}
 
-		if (exists.error)
-			throw new Error(exists.error.type)
-
-		return exists
+		return exists.data.identifier
 	}
 }
 
