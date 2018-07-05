@@ -14,16 +14,20 @@ class KeystoreStorageAdapter extends StorageAdapter {
 	}
 	async create(account_data, email){
 		var create = await this._keystore.post("/create", { email: email })
+		var clonedAccountData = JSON.parse(JSON.stringify(account_data));
 
 		if (create.data.error)
 			throw new Error(create.data.error.type)
 
-		if (create.data.shared_key)
+		if (create.data.shared_key){
 			this.storage.shared_key = create.data.shared_key
+			clonedAccountData.shared_key = create.data.shared_key
+		}
 
+		clonedAccountData.identifier = create.data.identifier
 		this.storage.identifier = create.data.identifier
 
-		return this.save(account_data, this.storage.identifier)
+		return this._save(clonedAccountData, this.storage.identifier)
 	}
 	async load(){
 		var load = await this._keystore.post("/load", { identifier: this.storage.identifier || this._username })
