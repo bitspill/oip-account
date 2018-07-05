@@ -98,7 +98,7 @@ class KeystoreStorageAdapter extends StorageAdapter {
 			throw new Error(e.response.data.type)
 		}
 
-		return saved.data
+		return account_data
 	}
 	/**
 	 * Check if the Account exists on the Keystore server. This matches an email to an identifier if the username being used is an email.
