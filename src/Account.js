@@ -112,20 +112,33 @@ class Account {
 	}
 	/**
 	 * Set a setting on the Account
+	 *
+	 * @async
 	 * @param {string} setting_node - The Setting you wish to set
 	 * @param {Object} setting_info - What you wish to set the setting to
-	 * @return {Promise} Returns a Promise that will resolve with the setting is saved to the StorageAdapter
+	 * @return {Promise<Object>} Returns a Promise that will resolve with the Account Data after the new setting is saved to the StorageAdapter
 	 */
-	setSetting(setting_node, setting_info){
+	async setSetting(setting_node, setting_info){
+		if (!setting_node)
+			throw new Error("setting_node is a required parameter!")
 
+		if (!setting_info && setting_info !== false)
+			throw new Error("setting_info is a required parameter!")
+
+		this._account.settings[setting_node] = setting_info
+
+		return JSON.parse(JSON.stringify(await this.store()));
 	}
 	/**
 	 * Get a specific setting
 	 * @param {string} setting_node - The Setting you wish to get
-	 * @return {Promise<Object>} Returns a Promise that will resolve to the requested setting
+	 * @return {Object} Returns the requested setting_info
 	 */
-	getSettings(setting_node){
+	getSetting(setting_node){
+		if (!setting_node)
+			throw new Error("setting_node is a required parameter!")
 
+		return this._account.settings[setting_node]
 	}
 	/**
 	 * Pay to View or Buy and Artifact File. This makes the purchase as well as saving that info to the wallet.
