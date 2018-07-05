@@ -23,8 +23,8 @@ class MemoryStorageAdapter extends StorageAdapter {
 	 * @param {Object} account_data - The Account Data if you are "logging" in and not just "refreshing"
 	 * @return {Promise<Object>} Returns a Promise that will resolve to the Account Data
 	 */
-	async load(){
-		return this._account
+	async load(account_data){
+		return await this.create(account_data)
 	}
 	/**
 	 * Internal Save function to Save an Account to the Memory
