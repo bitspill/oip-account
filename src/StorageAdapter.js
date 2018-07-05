@@ -89,7 +89,7 @@ class StorageAdapter {
 
 				return await this._save(account_data, id)
 			} catch(e) {
-				if (this.storage.identifier)
+				if (this.storage.identifier && e.response && e.response.data && e.response.data.type)
 					throw new Error(e.response.data.type)
 
 				// No ID, generate new and save
