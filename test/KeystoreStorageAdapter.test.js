@@ -74,6 +74,7 @@ test("Create new Account & Load (email)", async (done) => {
 	var account_data = await adapter2.load()
 
 	test_account_data_2.shared_key = account_data.shared_key;
+	test_account_data_2.email = account_data.email;
 
 	expect(account_data).toEqual(test_account_data_2);
 	expect(isValidIdentifier(account_data.identifier)).toBe(true);
