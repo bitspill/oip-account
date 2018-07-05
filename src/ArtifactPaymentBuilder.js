@@ -27,20 +27,23 @@ class ArtifactPaymentBuilder {
 	 * @return {Promise<Transaction>} Returns a Promise that resolves to the payment transaction, or rejects if there was an error
 	 */
 	async pay(){
-			// Get ArtifactFile Cost and Artifact Fiat
-        const artifactFiat = this._fiat;
-        let artifactFileCost;
-        this._amount instanceof ArtifactFile ?  artifactFileCost = this._amount.getSuggestedBuyCost()
-            : artifactFileCost = this._amount;
+	    let rates, balances;
+        // Get ArtifactFile Cost and Artifact Fiat
+	    let artifactFileCost = this._amount;
+        let fiat = this._fiat;
 
-			// Get percentages to be paid out to Platforms and Influencers (don't worry about this for now)
+        // Get percentages to be paid out to Platforms and Influencers (don't worry about this for now)
 			
 			// Calculate crypto cost based on the exchange rate for the Fiat (using oip-exchange-rate)
-        const rates = await this.getExchangeRates();
-        console.log("RATES: ", rates)
+        try {rates = await this.getExchangeRates(this._fiat);}
+        catch (err) {console.log(`Error on getExchangeRates: ${err}`)};
+
         // Check Balances of Cryptocurrencies
-        const balances = await this.getBalances()
-        console.log("BALANCES: ", balances)
+
+        try {balances = await this.getBalances()}
+        catch (err) {console.log(`Error on getBalances: ${err}`)};
+
+
         // If not enough balance
 
 				//reject(new Error("Not Enough Balance!"))
@@ -50,7 +53,7 @@ class ArtifactPaymentBuilder {
 				// Send the payment in that crypto to the User (using this.wallet)
 				
 				// Save Transaction to `paymentHistory` if payment went through successfully
-        return true
+
 	}
 
     /**
@@ -95,8 +98,8 @@ class ArtifactPaymentBuilder {
 
     /**
      * Calculate the exchange rate between a fiat currency and a cryptocurrency
-     * @param  {array} coins    - An array of coins you want to get exchange rates for
      * @param  {string} fiat     - The fiat currency you wish to check against
+     * @param  {array} [coinArray]    - An array of coins you want to get exchange rates for. If no coins are given, an array of all available coins will be used.
      * @return {object}
      * @example
      * {
@@ -105,13 +108,14 @@ class ArtifactPaymentBuilder {
      *      "ltc": {"usd": expect.any(Number)}
      * }
      */
-    async getExchangeRates(coins, fiat) {
+    async getExchangeRates(fiat, coinArray) {
+        let coins =  coinArray || Object.keys(this._wallet.getCoins());
         let rates = {};
         let promiseArray = {};
 
         for (let coin of coins) {
             promiseArray[coin] = {};
-            promiseArray[coin].promise = this._exchange.getExchangeRate(coin, fiat)
+            promiseArray[coin].promise = this._exchange.getExchangeRate(coin, fiat);
             promiseArray[coin].fiat = fiat
         }
 
@@ -119,12 +123,12 @@ class ArtifactPaymentBuilder {
             try {
                 let rate = await promiseArray[p].promise;
                 rates[p] = {};
-                rates[p][promiseArray[p].fiat] = rate
+                rates[p][promiseArray[p].fiat] = rate;
             } catch (err) {
                 rates[p] = {};
-                rates[p][promiseArray[p].err] = err.response.statusText
-            }
+                rates[p][promiseArray[p].err] = err.response.statusText;
 
+            }
         }
 
         return rates
