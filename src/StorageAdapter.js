@@ -93,10 +93,10 @@ class StorageAdapter {
 	 * @return {string} Returns the Encrypted Data as a String
 	 */
 	encrypt(decrypted_data){
-		if (decrypted_data && !decrypted_data.email && this.storage.email !== "")
+		if (decrypted_data && !decrypted_data.email && this.storage.email && this.storage.email !== "")
 			decrypted_data.email = this.storage.email
 
-		if (decrypted_data && !decrypted_data.identifier && this.storage.identifier !== ""){
+		if (decrypted_data && !decrypted_data.identifier && this.storage.identifier && this.storage.identifier !== ""){
 			decrypted_data.identifier = this.storage.identifier
 		}
 
