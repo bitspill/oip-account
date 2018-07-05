@@ -48,21 +48,29 @@ class StorageAdapter {
 	 * @return {Promise<Identifier>} The Identifier of the Created Account
 	 */
 	async create(account_data, email){
+		var account_data_copy = JSON.parse(JSON.stringify(account_data));
+
 		if (email){
 			this.storage.email = email
+			account_data_copy.email = email;
 
 			if (!this._username)
 				this._username = email
+		} else {
+			if (isValidEmail(this._username)){
+				this.storage.email = this._username
+				account_data_copy.email = this._username
+			}
 		}
 
 		var identifier = this.generateIdentifier();
 
-		account_data.identifier = identifier;
+		account_data_copy.identifier = identifier;
 
 		if (!this._username)
 			this._username = identifier
 
-		return await this.save(account_data, identifier)
+		return await this.save(account_data_copy, identifier)
 	}
 	/**
 	 * Save an Account using the StorageAdapter
