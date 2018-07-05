@@ -39,11 +39,14 @@ class StorageAdapter {
 		} else {
 			try {
 				var id = await this.check()
+
 				return await this._save(account_data, id)
 			} catch(e) {
+				if (this.storage.identifier)
+					throw new Error(e.response.data.type)
+
 				// No ID, generate new and save
-				var id = await this.create(account_data)
-				return await this._save(account_data, id)
+				return await this.create(account_data)
 			}
 		}
 	}
