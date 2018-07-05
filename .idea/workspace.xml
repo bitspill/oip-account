@@ -2,17 +2,6 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="80224f43-2aa0-4196-ad31-d5973ca4e269" name="Default" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/Account.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/Account.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/Account.js.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/Account.js.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/ArtifactPaymentBuilder.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/ArtifactPaymentBuilder.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/ArtifactPaymentBuilder.js.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/ArtifactPaymentBuilder.js.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/LocalStorageAdapter.js.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/LocalStorageAdapter.js.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/StorageAdapter.js.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/StorageAdapter.js.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/index.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/ArtifactPaymentBuilder.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/ArtifactPaymentBuilder.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/test/ArtifactPaymentBuilder.test.js" beforeDir="false" afterPath="$PROJECT_DIR$/test/ArtifactPaymentBuilder.test.js" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/.tmp/" />
@@ -39,8 +28,8 @@
       <file leaf-file-name="ArtifactPaymentBuilder.test.js" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/test/ArtifactPaymentBuilder.test.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="400">
-              <caret line="42" column="5" selection-start-line="42" selection-start-column="5" selection-end-line="42" selection-end-column="5" />
+            <state relative-caret-position="109">
+              <caret line="31" column="4" selection-start-line="31" selection-start-column="4" selection-end-line="31" selection-end-column="4" />
             </state>
           </provider>
         </entry>
@@ -168,7 +157,7 @@
       <workItem from="1530632268703" duration="3574000" />
       <workItem from="1530669828082" duration="1253000" />
       <workItem from="1530714073310" duration="3941000" />
-      <workItem from="1530731663769" duration="7150000" />
+      <workItem from="1530731663769" duration="7256000" />
     </task>
     <task id="LOCAL-00001" summary="tests for calculateCryptoExchangeRate &lt;&lt; ArtifactPaymentBuilder()">
       <created>1530635550088</created>
@@ -181,7 +170,7 @@
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="40710000" />
+    <option name="totallyTimeSpent" value="40816000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="23" width="1280" height="737" extended-state="0" />
@@ -482,8 +471,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/test/ArtifactPaymentBuilder.test.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="400">
-          <caret line="42" column="5" selection-start-line="42" selection-start-column="5" selection-end-line="42" selection-end-column="5" />
+        <state relative-caret-position="109">
+          <caret line="31" column="4" selection-start-line="31" selection-start-column="4" selection-end-line="31" selection-end-column="4" />
         </state>
       </provider>
     </entry>
