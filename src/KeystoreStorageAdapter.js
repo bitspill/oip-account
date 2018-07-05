@@ -2,8 +2,19 @@ import axios from 'axios'
 
 import StorageAdapter from './StorageAdapter'
 
+/**
+ * The KeystoreStorageAdapter class is built on top of StorageAdapter to provide saving to an [OIP Keystore](https://github.com/oipwg/oip-keystore) server
+ * @extends {StorageAdapter}
+ */
 class KeystoreStorageAdapter extends StorageAdapter {
-	constructor(username, password, keystore_url){
+	/**
+	 * Create a new KeystoreStorageAdapter
+	 * @param  {string} username     - The username of the account you wish to use
+	 * @param  {string} password     - The password of the account you wish to use
+	 * @param  {string} [keystore_url="https://keystore.oip.li/v2/"] - The URL of the [OIP Keystore](https://github.com/oipwg/oip-keystore) server to use
+	 * @return {KeystoreStorageServer}
+	 */
+	constructor(username, password, keystore_url = "https://keystore.oip.li/v2/"){
 		super(username, password)
 
 		this._url = keystore_url;
@@ -12,6 +23,14 @@ class KeystoreStorageAdapter extends StorageAdapter {
 			baseURL: this._url
 		})
 	}
+	/**
+	 * Create a new Account on the Keystore Server
+	 *
+	 * @async
+	 * @param  {Object} account_data - The Account Data you wish to save to your new accouny
+	 * @param  {string} [email]      - An Email if you would like to attach an email to your account
+	 * @return {Promise<Identifier>} Returns a Promise that will resolve to the Identifier of the new account if successful
+	 */
 	async create(account_data, email){
 		var clonedAccountData = JSON.parse(JSON.stringify(account_data));
 
@@ -25,12 +44,25 @@ class KeystoreStorageAdapter extends StorageAdapter {
 			this.storage.shared_key = create.data.shared_key
 			clonedAccountData.shared_key = create.data.shared_key
 		}
+		if (create.data.email){
+			this.storage.email = create.data.email
+			clonedAccountData.email = create.data.email
+		}
 
 		clonedAccountData.identifier = create.data.identifier
 		this.storage.identifier = create.data.identifier
 
+		if (!this._username)
+			this._username = create.data.identifier
+
 		return this._save(clonedAccountData, this.storage.identifier)
 	}
+	/**
+	 * Load an Account from the Keystore Server
+	 *
+	 * @async
+	 * @return {Promise<Object>} Returns a Promise that will resolve to the Decrypted Account Data if successful
+	 */
 	async load(){
 		try {
 			var load = await this._keystore.post("/load", { identifier: this.storage.identifier || this._username })
@@ -45,6 +77,14 @@ class KeystoreStorageAdapter extends StorageAdapter {
 
 		return decrypted
 	}
+	/**
+	 * Internal Save function to Save an Account to the Keystore Server
+	 *
+	 * @async
+	 * @param  {Object} account_data - The new Account Data you wish to save
+	 * @param  {Identifier} identifier - The Identifier of the account you wish to save
+	 * @return {Promise<Identifier>} Returns a Promise that will resolve to the Identifier of the updated account if successful
+	 */
 	async _save(account_data, identifier){
 		this.encrypt(account_data);
 
@@ -58,6 +98,12 @@ class KeystoreStorageAdapter extends StorageAdapter {
 
 		return saved.data.identifier
 	}
+	/**
+	 * Check if the Account exists on the Keystore server. This matches an email to an identifier if the username being used is an email.
+	 *
+	 * @async
+	 * @return {Promise<Identifier>} Returns a Promsie that will resolve to the Accounts Identifier if set
+	 */
 	async check(){
 		// If the username is not a valid identifier, try to match it to an email
 		try {
