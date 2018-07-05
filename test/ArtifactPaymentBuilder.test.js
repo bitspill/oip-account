@@ -29,23 +29,23 @@ test("APB, check to see whether promise resolved for getBalances()", async () =>
     expect.assertions(3);
     const APB = new ArtifactPaymentBuilder(wallet);
     let balances = await APB.getBalances({discover: false});
-    
+
     let bitcoinResolved = false;
     let floResolved = false;
     let ltcResolved = false;
 
-    if (typeof balances.bitcoin.balance === "number" || typeof balances["bitcoin"].err === "string") {
+    if (typeof balances["bitcoin"].balance === "number" || typeof balances["bitcoin"].err === "string") {
         bitcoinResolved = true;
     }
-    if (typeof balances.flo.balance === "number" || typeof balances["flo"].err === "string") {
+    if (typeof balances["flo"].balance === "number" || typeof balances["flo"].err === "string") {
         floResolved = true;
     }
-    if (typeof balances.litecoin.balance === "number" || typeof balances["litecoin"].err === "string") {
+    if (typeof balances["litecoin"].balance === "number" || typeof balances["litecoin"].err === "string") {
         ltcResolved = true;
     }
 
     expect(bitcoinResolved).toBeTruthy();
     expect(floResolved).toBeTruthy();
     expect(ltcResolved).toBeTruthy();
-});
+}, 10000);
 

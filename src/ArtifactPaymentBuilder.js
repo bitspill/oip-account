@@ -81,6 +81,7 @@ class ArtifactPaymentBuilder {
             return balances
     }
 
+
     /**
      * Calculate the exchange rate between a fiat currency and a cryptocurrency
      * @param  {array} coins    - An array of coins you want to get exchange rates for
