@@ -52,9 +52,9 @@ class ArtifactPaymentBuilder {
      * Get balances for each coin
      * @return {object}
      */
-     getBalances() {
-        return new Promise((resolve, reject) => {
+     async getBalances() {
             const coins = this._wallet.getCoins();
+
             let coinPromises = {};
             let balances = {};
 
@@ -64,25 +64,21 @@ class ArtifactPaymentBuilder {
                     coinPromises[coin].promise = coins[coin].getBalance({discover: true})
                 } catch (err) {
                     coinPromises[coin].error = err
-                }
-            }
-
-            async function fetchBalance(coin, promiseObject) {
-                balances[coin] = {};
-                try {
-                    const balance = await promiseObject[coin].promise;
-                    balances[coin].balance = balance
-                } catch (err) {
-                    balances[coin].error = err;
+                    console.log(`Error on ${coin}: ${err}`)
                 }
             }
 
             for (let coin in coinPromises) {
-                fetchBalance(coin, coinPromises);
+                try {
+                    let balance = await coinPromises[coin].promise
+                    balances[coin] = {};
+                    balances[coin].balance = balance
+                } catch (err) {
+                    balances[coin] = {};
+                    balances[coin].err = err.response.statusText
+                }
             }
-
-            resolve(balances);
-        })
+            return balances
     }
 
     /**
@@ -108,9 +104,15 @@ class ArtifactPaymentBuilder {
         }
 
         for (let p in promiseArray) {
-            let rate = await promiseArray[p].promise;
-            rates[p] = {};
-            rates[p][promiseArray[p].fiat] = rate
+            try {
+                let rate = await promiseArray[p].promise;
+                rates[p] = {};
+                rates[p][promiseArray[p].fiat] = rate
+            } catch (err) {
+                rates[p] = {};
+                rates[p][promiseArray[p].err] = err.response.statusText
+            }
+
         }
 
         return rates

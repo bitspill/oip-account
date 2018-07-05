@@ -76,7 +76,7 @@
       OIP HDMW
     </h3>
 
-    <h3>Classes</h3><ul><li id="Account-nav"><a href="Account.html">Account</a><ul class='methods'><li data-type="method" id="Account-create-nav"><a href="Account.html#create">create</a></li><li data-type="method" id="Account-getSettings-nav"><a href="Account.html#getSettings">getSettings</a></li><li data-type="method" id="Account-login-nav"><a href="Account.html#login">login</a></li><li data-type="method" id="Account-logout-nav"><a href="Account.html#logout">logout</a></li><li data-type="method" id="Account-payForArtifactFile-nav"><a href="Account.html#payForArtifactFile">payForArtifactFile</a></li><li data-type="method" id="Account-sendArtifactTip-nav"><a href="Account.html#sendArtifactTip">sendArtifactTip</a></li><li data-type="method" id="Account-setSetting-nav"><a href="Account.html#setSetting">setSetting</a></li><li data-type="method" id="Account-store-nav"><a href="Account.html#store">store</a></li></ul></li><li id="ArtifactPaymentBuilder-nav"><a href="ArtifactPaymentBuilder.html">ArtifactPaymentBuilder</a><ul class='methods'><li data-type="method" id="ArtifactPaymentBuilder-calculateCryptoExchangeRate-nav"><a href="ArtifactPaymentBuilder.html#calculateCryptoExchangeRate">calculateCryptoExchangeRate</a></li><li data-type="method" id="ArtifactPaymentBuilder-pay-nav"><a href="ArtifactPaymentBuilder.html#pay">pay</a></li></ul></li></ul>
+    <h3>Classes</h3><ul><li id="Account-nav"><a href="Account.html">Account</a><ul class='methods'><li data-type="method" id="Account-create-nav"><a href="Account.html#create">create</a></li><li data-type="method" id="Account-getSettings-nav"><a href="Account.html#getSettings">getSettings</a></li><li data-type="method" id="Account-login-nav"><a href="Account.html#login">login</a></li><li data-type="method" id="Account-logout-nav"><a href="Account.html#logout">logout</a></li><li data-type="method" id="Account-payForArtifactFile-nav"><a href="Account.html#payForArtifactFile">payForArtifactFile</a></li><li data-type="method" id="Account-sendArtifactTip-nav"><a href="Account.html#sendArtifactTip">sendArtifactTip</a></li><li data-type="method" id="Account-setSetting-nav"><a href="Account.html#setSetting">setSetting</a></li><li data-type="method" id="Account-store-nav"><a href="Account.html#store">store</a></li></ul></li><li id="ArtifactPaymentBuilder-nav"><a href="ArtifactPaymentBuilder.html">ArtifactPaymentBuilder</a><ul class='methods'><li data-type="method" id="ArtifactPaymentBuilder-getBalances-nav"><a href="ArtifactPaymentBuilder.html#getBalances">getBalances</a></li><li data-type="method" id="ArtifactPaymentBuilder-getExchangeRates-nav"><a href="ArtifactPaymentBuilder.html#getExchangeRates">getExchangeRates</a></li><li data-type="method" id="ArtifactPaymentBuilder-pay-nav"><a href="ArtifactPaymentBuilder.html#pay">pay</a></li></ul></li></ul>
   </nav>
 
   <div id="main">
@@ -126,7 +126,9 @@ class ArtifactPaymentBuilder {
 			// Get percentages to be paid out to Platforms and Influencers (don't worry about this for now)
 			
 			// Calculate crypto cost based on the exchange rate for the Fiat (using oip-exchange-rate)
-        const rates = await this.calculateCryptoExchangeRate();
+        const rates = await this.getExchangeRates();
+        const balances = await this.getBalances()
+
 
 				// Check Balances of Cryptocurrencies
 				// If not enough balance
@@ -140,18 +142,67 @@ class ArtifactPaymentBuilder {
 	}
 
     /**
+     * Get balances for each coin
+     * @return {object}
+     */
+     getBalances() {
+        return new Promise((resolve, reject) => {
+            const coins = this._wallet.getCoins();
+            let coinPromises = {};
+            let balances = {};
+
+            for (let coin in coins) {
+                coinPromises[coin] = {};
+                try {
+                    coinPromises[coin].promise = coins[coin].getBalance({discover: true})
+                } catch (err) {
+                    coinPromises[coin].error = err
+                    console.log(`Error on ${coin}: ${err}`)
+                }
+            }
+
+            // async function fetchBalance(coin, promiseObject) {
+            //     balances[coin] = {};
+            //     try {
+            //         const balance = await promiseObject[coin].promise;
+            //         balances[coin].balance = balance
+            //         console.log("BALANCES: ", coin, balances[coin])
+            //     } catch (err) {
+            //         balances[coin].error = err;
+            //         console.log(`Error on ${coin}: ${err}`)
+            //
+            //     }
+            // }
+
+            function fetchBalance(coin, promiseObject) {
+                balances[coin] = {};
+                promiseObject[coin].promise
+                    .then( val => {console.log(`I returned the value: ${val}`)})
+                    .catch( err => {
+                        console.log(`I caught the err: ${err}`)
+                    })
+            }
+
+            for (let coin in coinPromises) {
+                fetchBalance(coin, coinPromises);
+            }
+            resolve(balances);
+        })
+    }
+
+    /**
      * Calculate the exchange rate between a fiat currency and a cryptocurrency
      * @param  {array} coins    - An array of coins you want to get exchange rates for
      * @param  {string} fiat     - The fiat currency you wish to check against
      * @return {object}
      * @example
-     *   {
+     * {
      *      "flo": {"usd": expect.any(Number)},
      *      "btc": {"usd": expect.any(Number)},
      *      "ltc": {"usd": expect.any(Number)}
      * }
      */
-    async calculateCryptoExchangeRate(coins, fiat) {
+    async getExchangeRates(coins, fiat) {
         let rates = {};
         let promiseArray = {};
 
