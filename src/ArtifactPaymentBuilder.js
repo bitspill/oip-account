@@ -1,4 +1,5 @@
 const Exchange = require("oip-exchange-rate");
+// var { ArtifactFile } = require("oip-index");
 
 class ArtifactPaymentBuilder {
 	/**
@@ -14,8 +15,8 @@ class ArtifactPaymentBuilder {
         this._wallet = wallet;
         this._type = type;
         this._artifact = artifact;
-        this._amount = amount; //or ArtifactFile?
-        this._fiat = fiat;
+        this._amount = amount;
+        this._fiat = fiat || "usd";
         this._exchange = new Exchange();
 	}
 	getPaymentAddresses(){
@@ -27,22 +28,60 @@ class ArtifactPaymentBuilder {
 	 * @return {Promise<Transaction>} Returns a Promise that resolves to the payment transaction, or rejects if there was an error
 	 */
 	async pay(){
-	    let rates, balances;
-        // Get ArtifactFile Cost and Artifact Fiat
-	    let artifactFileCost = this._amount;
+	    let rates, balances, artifactFileCost;
         let fiat = this._fiat;
+
+        // Get ArtifactFile Cost and Artifact Fiat
+	    if (this._amount instanceof ArtifactFile) {
+	        console.log(this._amount)
+	        switch (this._type) {
+                case "buy":
+                    artifactFileCost = this._amount.getSuggestedBuyCost();
+                    break;
+                case "play":
+                    artifactFileCost = this._amount.getSuggestedPlayCost();
+                    break;
+                case "tip":
+                    artifactFileCost = this._amount;
+                    break;
+            }
+        } else {artifactFileCost = this._amount}
+
 
         // Get percentages to be paid out to Platforms and Influencers (don't worry about this for now)
 			
-			// Calculate crypto cost based on the exchange rate for the Fiat (using oip-exchange-rate)
-        try {rates = await this.getExchangeRates(this._fiat);}
-        catch (err) {console.log(`Error on getExchangeRates: ${err}`)};
+		// Calculate crypto cost based on the exchange rate for the Fiat (using oip-exchange-rate)
+        try {
+	        rates = await this.getExchangeRates(this._fiat);
+	    } catch (err) {
+	        console.log(`Error on getExchangeRates: ${err}`)
+	    };
 
         // Check Balances of Cryptocurrencies
+        try {
+            balances = await this.getBalances()
+        } catch (err) {
+            console.log(`Error on getBalances: ${err}`)
+        };
 
-        try {balances = await this.getBalances()}
-        catch (err) {console.log(`Error on getBalances: ${err}`)};
+        //exchange rate / file cost
+        let fileCosts = {};
+        for (let coin in rates) {
+            if (rates[coin].fiat) {
+                fileCosts[coin] = rates[coin].fiat / artifactFileCost
+            } else if (rates[coin].error) {
+                fileCosts[coin] = `Error finding rate: ${rates[coin].error}`
+            }
+        }
+        console.log("fileCosts: ", fileCosts)
 
+        fileCosts, balances
+        for (var coin of balances) {
+
+            if (balances[coin].balance < fileCosts[coin]) {
+
+            }
+        }
 
         // If not enough balance
 
@@ -63,7 +102,7 @@ class ArtifactPaymentBuilder {
      * {
      *      "flo": {balance: 216},
      *      "btc": {error: "Error text"},
-     *      "ltc": {"usd": 333}
+     *      "ltc": {balance: 333}
      * }
      */
      async getBalances() {
@@ -75,21 +114,24 @@ class ArtifactPaymentBuilder {
             for (let coin in coins) {
                 coinPromises[coin] = {};
                 try {
-                    coinPromises[coin].promise = coins[coin].getBalance({discover: true})
+                    coinPromises[coin] = coins[coin].getBalance({discover: true})
                 } catch (err) {
-                    coinPromises[coin].error = err
+                    coinPromises[coin] = "error fetching promise";
                     console.log(`Error on ${coin}: ${err}`)
                 }
             }
 
             for (let coin in coinPromises) {
                 try {
-                    let balance = await coinPromises[coin].promise
+                    let balance = await coinPromises[coin]
                     balances[coin] = {};
-                    balances[coin].balance = balance
+                    balances[coin] = balance
                 } catch (err) {
                     balances[coin] = {};
-                    balances[coin].err = err.response.statusText
+                    balances[coin] = "error fetching balance";
+                    if (err.response && err.response.statusText) {
+                        console.log("error fetching balance: ", err.response.statusText)
+                    }
                 }
             }
             return balances
@@ -126,7 +168,7 @@ class ArtifactPaymentBuilder {
                 rates[p][promiseArray[p].fiat] = rate;
             } catch (err) {
                 rates[p] = {};
-                rates[p][promiseArray[p].err] = err.response.statusText;
+                rates[p][promiseArray[p].fiat] = "error fetching rate";
 
             }
         }
