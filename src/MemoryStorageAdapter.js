@@ -12,9 +12,24 @@ class MemoryStorageAdapter extends StorageAdapter {
 	 * @param  {string} [keystore_url="https://keystore.oip.li/v2/"] - The URL of the [OIP Keystore](https://github.com/oipwg/oip-keystore) server to use
 	 * @return {MemoryStorageServer}
 	 */
-	constructor(account){
-		super(undefined, undefined)
-		this._account = account		
+	constructor(account, username, password){
+		super(username, password)
+
+		this._account = account
+	}
+	async create(account_data){
+		var account_data_copy = JSON.parse(JSON.stringify(account_data));
+
+		var identifier = this.generateIdentifier();
+
+		this.storage.identifier = identifier
+
+		account_data_copy.identifier = identifier;
+
+		if (!this._username)
+			this._username = identifier
+
+		return await this._save(account_data_copy, identifier)
 	}
 	/**
 	 * Load an Account from the Memory
@@ -24,6 +39,9 @@ class MemoryStorageAdapter extends StorageAdapter {
 	 * @return {Promise<Object>} Returns a Promise that will resolve to the Account Data
 	 */
 	async load(account_data){
+		if (!account_data)
+			return this._account
+
 		return await this.create(account_data)
 	}
 	/**
@@ -47,6 +65,9 @@ class MemoryStorageAdapter extends StorageAdapter {
 	 * @return {Promise<Identifier>} Returns a Promsie that will resolve to the Accounts Identifier if set
 	 */
 	async check(){
+		if (this._account.identifier)
+			return this._account.identifier
+		
 		throw new Error("Account Not Found!")
 	}
 }
