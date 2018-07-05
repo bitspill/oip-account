@@ -35,20 +35,18 @@ class Account {
 			}
 		}
 
-		// Detect what kind of Username we are being passed.
-		if (options && options.store_local) {
-			this._storageAdapter = new LocalStorageAdapter(this._username, this._password);
-		} else if (options && options.store_in_keystore) {
-			if (options.keystore_url){
-				this._storageAdapter = new KeystoreStorageAdapter(options.keystore_url, this._username, this._password);
-			} else {
-				this._storageAdapter = new KeystoreStorageAdapter(DEFAULT_KEYSTORE_SERVER, this._username, this._password);
-			}
-		} else if (util.isMnemonic(this._username)){
+		if (util.isMnemonic(this._username)){
 			this._account.wallet.mnemonic = this._username;
+			this._username = undefined
+		}
+
+		// Detect what kind of Username we are being passed.
+		if (options && options.store_memory) {
 			this._storageAdapter = new MemoryStorageAdapter(this._account);
-		} else if (!this._username && !this._password) {
-			this._storageAdapter = new MemoryStorageAdapter(this._account);
+		} else if (options && options.store_in_keystore) {
+			this._storageAdapter = new KeystoreStorageAdapter(options.keystore_url, this._username, this._password);
+		} else {
+			this._storageAdapter = new LocalStorageAdapter(this._username, this._password);
 		}
 
 		this.discover = true
