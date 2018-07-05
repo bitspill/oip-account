@@ -2,10 +2,11 @@ var ArtifactPaymentBuilder = require("../lib/ArtifactPaymentBuilder");
 var { Wallet } = require("oip-hdmw");
 
 const wallet = new Wallet("00000000000000000000000000000000", {discover: false})
+const APB = new ArtifactPaymentBuilder(wallet);
+
 
 test("APB, Get exchange rate with ONE COIN", async () => {
     expect.assertions(1);
-    const APB = new ArtifactPaymentBuilder();
     await expect(APB.getExchangeRates(["flo"],"usd")).resolves.toMatchObject(
         {
             "flo": {"usd": expect.any(Number)}
@@ -15,7 +16,6 @@ test("APB, Get exchange rate with ONE COIN", async () => {
 
 test("APB, Get exchange rate with MULTIPLE COINS", async () => {
     expect.assertions(1);
-    const APB = new ArtifactPaymentBuilder();
     await expect(APB.getExchangeRates(["flo", "btc", "ltc"],"usd")).resolves.toMatchObject(
         {
             "flo": {"usd": expect.any(Number)},
@@ -27,7 +27,6 @@ test("APB, Get exchange rate with MULTIPLE COINS", async () => {
 
 test("APB, check to see whether promise resolved for getBalances()", async () => {
     expect.assertions(3);
-    const APB = new ArtifactPaymentBuilder(wallet);
     let balances = await APB.getBalances({discover: false});
 
     let bitcoinResolved = false;
@@ -48,4 +47,8 @@ test("APB, check to see whether promise resolved for getBalances()", async () =>
     expect(floResolved).toBeTruthy();
     expect(ltcResolved).toBeTruthy();
 }, 10000);
+
+// test("APB, pay function", () => {
+//
+// })
 

@@ -14,7 +14,7 @@ class ArtifactPaymentBuilder {
         this._wallet = wallet;
         this._type = type;
         this._artifact = artifact;
-        this._amount = amount;
+        this._amount = amount; //or ArtifactFile?
         this._fiat = fiat;
         this._exchange = new Exchange();
 	}
@@ -28,17 +28,21 @@ class ArtifactPaymentBuilder {
 	 */
 	async pay(){
 			// Get ArtifactFile Cost and Artifact Fiat
-        const artifactFileCost = this._amount;
         const artifactFiat = this._fiat;
+        let artifactFileCost;
+        this._amount instanceof ArtifactFile ?  artifactFileCost = this._amount.getSuggestedBuyCost()
+            : artifactFileCost = this._amount;
+
 			// Get percentages to be paid out to Platforms and Influencers (don't worry about this for now)
 			
 			// Calculate crypto cost based on the exchange rate for the Fiat (using oip-exchange-rate)
         const rates = await this.getExchangeRates();
+        console.log("RATES: ", rates)
+        // Check Balances of Cryptocurrencies
         const balances = await this.getBalances()
+        console.log("BALANCES: ", balances)
+        // If not enough balance
 
-
-				// Check Balances of Cryptocurrencies
-				// If not enough balance
 				//reject(new Error("Not Enough Balance!"))
 
 				// Select which cryptocurrency to use
@@ -46,11 +50,18 @@ class ArtifactPaymentBuilder {
 				// Send the payment in that crypto to the User (using this.wallet)
 				
 				// Save Transaction to `paymentHistory` if payment went through successfully
+        return true
 	}
 
     /**
      * Get balances for each coin
      * @return {object}
+     *   @example
+     * {
+     *      "flo": {balance: 216},
+     *      "btc": {error: "Error text"},
+     *      "ltc": {"usd": 333}
+     * }
      */
      async getBalances() {
             const coins = this._wallet.getCoins();
