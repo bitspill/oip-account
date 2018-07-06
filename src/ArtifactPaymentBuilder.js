@@ -160,7 +160,7 @@ class ArtifactPaymentBuilder {
     /**
      * Gets the coins with a sufficient balance to pay crpyto amount after price conversion
      * @param  {string} paymentAmount     - The amount in fiat you wish to send or the cost of an item
-     * @param  {array} [paymentAddresses]     - Array of keyVal pairs: [coin][coin address]
+     * @param  {array} [paymentAddresses]     - Array of keyVal pair objects: [{[coin][coin address]},]
      * @return {object}
      * @example
      *
@@ -186,16 +186,22 @@ class ArtifactPaymentBuilder {
      * }
      *
      */
-    
+
     async superFunction(paymentAmount, paymentAddresses) {
+        // let addressPairs = paymentAddresses || false
         let coinsToFetch = [];
         // ------ @ToDo: use this when you get a valid 42 artifact
-        addrs = this.getPaymentAddresses();
-        // for (let coin in addrs) {
-        //    for (let coin in addrs[coin]) {
-        //         coinsToFetch.push(coin)
-        //     }
-        // }
+        if (!paymentAddresses) {
+            addressPairs = this.getPaymentAddresses();
+            if (!addressPairs) {
+                for (let coin in addressPairs) {
+                    for (let coin in addressPairs[coin]) {
+                        coinsToFetch.push(coin)
+                    }
+                }
+            } else return new Error("could not get payment addresses")
+
+        }
 
         // ------ @ToDo: then delete this
         let addressPairs = [{flo: "FLZXRaHzVPxJJfaoM32CWT4GZHuj2rx63k"}];
@@ -208,6 +214,7 @@ class ArtifactPaymentBuilder {
         console.log(`Coins to fetch: ${coinsToFetch}`)
 
         // @ToDO: Get percentages to be paid out to Platforms and Influencers
+        let platformCut, influencerCut;
 
         // Calculate crypto cost based on the exchange rate for the Fiat (using oip-exchange-rate)
         let exchangeRates;
