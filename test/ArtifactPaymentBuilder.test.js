@@ -31,7 +31,7 @@ var artifact = new Artifact({
     }
 })
 const wallet = new Wallet("00000000000000000000000000000000", {discover: false})
-const APB = new ArtifactPaymentBuilder(wallet, artifact, "view", .00012);
+const APB = new ArtifactPaymentBuilder(wallet, artifact, .00012, "view", "usd");
 
 test("APB, getExchangeRates(): No Coin Parameters", async () => {
     expect.assertions(1);
@@ -123,7 +123,7 @@ test("APB, getBalances(): check to see if balances resolved", async () => {
 }, 10000);
 
 test("APB, superFunction: ", async () => {
-    let superFunc = await APB.superFunction(APB._amount, "usd");
+    let superFunc = await APB.superFunction(APB._amount);
     expect(superFunc["usableCoins"]).toEqual(expect.arrayContaining(["flo"]));
     expect(superFunc["conversionPrices"]).toEqual(expect.objectContaining({"flo": expect.any(Number)}));
 

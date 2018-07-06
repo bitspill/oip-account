@@ -6,12 +6,12 @@ class ArtifactPaymentBuilder {
 	 * Create a new ArtifactPaymentBuilder
 	 * @param  {Wallet} wallet   - A live OIP-HDMW logged in wallet
 	 * @param  {Artifact} artifact - The Artifact related to the Payment you wish to make
-     * @param  {string} type     - The type of the purchase, either `tip`, `view`, or `buy`
      * @param  {ArtifactFile|number} amount	- The amount you wish to pay (`tip`), or the ArtifactFile you wish to pay for (`view` & `buy`)
-	 * @param  {string} [fiat]   - The Fiat you wish to `tip` in (if amount was a number and NOT an ArtifactFile)
+     * @param  {string} type     - The type of the purchase, either `tip`, `view`, or `buy`
+     * @param  {string} [fiat]   - The Fiat you wish to `tip` in (if amount was a number and NOT an ArtifactFile) default: "usd"
 	 * @return {ArtifactPaymentBuilder}          [description]
 	 */
-	constructor(wallet, artifact, type, amount, fiat){
+	constructor(wallet, artifact, amount, type, fiat){
         this._wallet = wallet;
         this._type = type;
         this._artifact = artifact;
@@ -145,19 +145,36 @@ class ArtifactPaymentBuilder {
     }
 
     /**
-     * Get coins with sufficient balance to pay or tip given an initial payment amount
-     * @param  {string} paymentAmount     - The amount you wish to send or the cost of an item
+     * Gets the coins with a sufficient balance to pay crpyto amount after price conversion
+     * @param  {string} paymentAmount     - The amount in fiat you wish to send or the cost of an item
+     * @param  {array} [paymentAddresses]     - Array of keyVal pairs: [coin][coin address]
      * @return {object}
      * @example
-     * {
-     *      usableCoins: ["flo"],
-     *      conversionPrices: {
-     *          flo: 216
-     *      }
+     *
+     * const APB = new APB(wallet, artifact, 00.00012, "view");
+     * APB.superFunction(00.00012)
+     *
+     * //returns
+     *{
+     *    "usableCoins": [
+     *         "flo"
+     *     ],
+     *     "conversionPrices": {
+     *         "flo": 0.0024994844813257264
+     *     },
+     *     "coinBalances": {
+     *         "flo": 0.00302368
+     *     },
+     *     "exchangeRates": {
+     *         "flo": {
+     *             "usd": 0.0480099
+     *         }
+     *     }
      * }
+     *
      */
 
-    async superFunction(paymentAmount, fiat) {
+    async superFunction(paymentAmount, paymentAddresses) {
         let coinsToFetch = [];
         // ------ @ToDo: use this when you get a valid 42 artifact
         // for (let coin of this.getPaymentAddresses()) {
@@ -181,7 +198,7 @@ class ArtifactPaymentBuilder {
         // Calculate crypto cost based on the exchange rate for the Fiat (using oip-exchange-rate)
         let exchangeRates;
         try {
-            exchangeRates = await this.getExchangeRates(fiat, coinsToFetch);
+            exchangeRates = await this.getExchangeRates(this._fiat, coinsToFetch);
             console.log(`exchangeRates: ${JSON.stringify(exchangeRates, null, 4)}`)
         } catch (err) {
             console.log(`Error on getExchangeRates: ${err}`)
@@ -200,9 +217,9 @@ class ArtifactPaymentBuilder {
         //exchange rate / file cost
         let conversionPrices = {};
         for (let coin in exchangeRates) {
-            if (typeof exchangeRates[coin][fiat] === "number") {
-                conversionPrices[coin] = paymentAmount / exchangeRates[coin][fiat];
-                console.log(`${conversionPrices[coin]} = ${paymentAmount} / ${exchangeRates[coin][fiat]}`)
+            if (typeof exchangeRates[coin][this._fiat] === "number") {
+                conversionPrices[coin] = paymentAmount / exchangeRates[coin][this._fiat];
+                console.log(`${conversionPrices[coin]} = ${paymentAmount} / ${exchangeRates[coin][this._fiat]}`)
             }
         }
         console.log("conversionPrices: ", conversionPrices);
@@ -223,7 +240,9 @@ class ArtifactPaymentBuilder {
 
         return {
             usableCoins,
-            conversionPrices
+            conversionPrices,
+            coinBalances,
+            exchangeRates
         }
     }
 }

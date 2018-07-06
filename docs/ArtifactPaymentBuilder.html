@@ -118,7 +118,7 @@
       </svg>
     </a>
     <h4 class="name" id="ArtifactPaymentBuilder">
-      <span class="type-signature"></span>new ArtifactPaymentBuilder<span class="signature">(wallet, artifact, type, amount, fiat<span class="signature-attributes">opt</span>)</span><span class="type-signature"> &rarr; {<a href="ArtifactPaymentBuilder.html">ArtifactPaymentBuilder</a>}</span>
+      <span class="type-signature"></span>new ArtifactPaymentBuilder<span class="signature">(wallet, artifact, amount, type, fiat<span class="signature-attributes">opt</span>)</span><span class="type-signature"> &rarr; {<a href="ArtifactPaymentBuilder.html">ArtifactPaymentBuilder</a>}</span>
     </h4>
   </span>
 
@@ -236,43 +236,6 @@
     
       <tr>
         
-          <td class="name"><code>type</code></td>
-        
-
-        <td class="type">
-          
-            
-    <span class="param-type">
-      string
-    </span>
-
-    
-
-
-          
-        </td>
-
-        
-          <td class="attributes">
-            
-
-            
-
-            
-          </td>
-        
-
-        
-
-        <td class="description last">
-          <p>The type of the purchase, either <code>tip</code>, <code>view</code>, or <code>buy</code></p>
-          
-        </td>
-      </tr>
-
-    
-      <tr>
-        
           <td class="name"><code>amount</code></td>
         
 
@@ -316,6 +279,43 @@
     
       <tr>
         
+          <td class="name"><code>type</code></td>
+        
+
+        <td class="type">
+          
+            
+    <span class="param-type">
+      string
+    </span>
+
+    
+
+
+          
+        </td>
+
+        
+          <td class="attributes">
+            
+
+            
+
+            
+          </td>
+        
+
+        
+
+        <td class="description last">
+          <p>The type of the purchase, either <code>tip</code>, <code>view</code>, or <code>buy</code></p>
+          
+        </td>
+      </tr>
+
+    
+      <tr>
+        
           <td class="name"><code>fiat</code></td>
         
 
@@ -347,7 +347,7 @@
         
 
         <td class="description last">
-          <p>The Fiat you wish to <code>tip</code> in (if amount was a number and NOT an ArtifactFile)</p>
+          <p>The Fiat you wish to <code>tip</code> in (if amount was a number and NOT an ArtifactFile) default: &quot;usd&quot;</p>
           
         </td>
       </tr>
@@ -1048,7 +1048,7 @@
       </svg>
     </a>
     <h4 class="name" id="superFunction">
-      <span class="type-signature">(async) </span>superFunction<span class="signature">(paymentAmount)</span><span class="type-signature"> &rarr; {object}</span>
+      <span class="type-signature">(async) </span>superFunction<span class="signature">(paymentAmount, paymentAddresses<span class="signature-attributes">opt</span>)</span><span class="type-signature"> &rarr; {object}</span>
     </h4>
   </span>
 
@@ -1057,7 +1057,7 @@
 
 
   <div class="description">
-    <p>Get coins with sufficient balance to pay or tip given an initial payment amount</p>
+    <p>Gets the coins with a sufficient balance to pay crpyto amount after price conversion</p>
   </div>
 
 
@@ -1078,6 +1078,8 @@
 
       <th>Type</th>
 
+      
+        <th>Attributes</th>
       
 
       
@@ -1107,11 +1109,58 @@
         </td>
 
         
+          <td class="attributes">
+            
+
+            
+
+            
+          </td>
+        
 
         
 
         <td class="description last">
-          <p>The amount you wish to send or the cost of an item</p>
+          <p>The amount in fiat you wish to send or the cost of an item</p>
+          
+        </td>
+      </tr>
+
+    
+      <tr>
+        
+          <td class="name"><code>paymentAddresses</code></td>
+        
+
+        <td class="type">
+          
+            
+    <span class="param-type">
+      array
+    </span>
+
+    
+
+
+          
+        </td>
+
+        
+          <td class="attributes">
+            
+              &lt;optional><br>
+            
+
+            
+
+            
+          </td>
+        
+
+        
+
+        <td class="description last">
+          <p>Array of keyVal pairs: [coin][coin address]</p>
           
         </td>
       </tr>
@@ -1155,7 +1204,7 @@
     <dd class="tag-source">
       <ul class="dummy">
         <li>
-          <a href="ArtifactPaymentBuilder.js.html">ArtifactPaymentBuilder.js</a>, <a href="ArtifactPaymentBuilder.js.html#line160">line 160</a>
+          <a href="ArtifactPaymentBuilder.js.html">ArtifactPaymentBuilder.js</a>, <a href="ArtifactPaymentBuilder.js.html#line177">line 177</a>
         </li>
       </ul>
     </dd>
@@ -1189,11 +1238,25 @@
     <h5 id="superFunction-examples">Example</h5>
     
 
-  <pre class="prettyprint"><code>{
-     usableCoins: ["flo"],
-     conversionPrices: {
-         flo: 216
-     }
+  <pre class="prettyprint"><code>const APB = new APB(wallet, artifact, 00.00012, "view");
+APB.superFunction(00.00012)
+
+//returns
+{
+   "usableCoins": [
+        "flo"
+    ],
+    "conversionPrices": {
+        "flo": 0.0024994844813257264
+    },
+    "coinBalances": {
+        "flo": 0.00302368
+    },
+    "exchangeRates": {
+        "flo": {
+            "usd": 0.0480099
+        }
+    }
 }</code></pre>
 
 
