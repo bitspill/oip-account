@@ -1,11 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="80224f43-2aa0-4196-ad31-d5973ca4e269" name="Default" comment="">
-      <change beforePath="$PROJECT_DIR$/src/Account.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/Account.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/ArtifactPaymentBuilder.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/ArtifactPaymentBuilder.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/test/ArtifactPaymentBuilder.test.js" beforeDir="false" afterPath="$PROJECT_DIR$/test/ArtifactPaymentBuilder.test.js" afterDir="false" />
-    </list>
+    <list default="true" id="80224f43-2aa0-4196-ad31-d5973ca4e269" name="Default" comment="" />
     <ignored path="$PROJECT_DIR$/.tmp/" />
     <ignored path="$PROJECT_DIR$/temp/" />
     <ignored path="$PROJECT_DIR$/tmp/" />
@@ -183,7 +179,7 @@
       <workItem from="1530669828082" duration="1253000" />
       <workItem from="1530714073310" duration="3941000" />
       <workItem from="1530731663769" duration="7340000" />
-      <workItem from="1530809158109" duration="42751000" />
+      <workItem from="1530809158109" duration="43068000" />
     </task>
     <task id="LOCAL-00001" summary="tests for calculateCryptoExchangeRate &lt;&lt; ArtifactPaymentBuilder()">
       <created>1530635550088</created>
@@ -196,11 +192,10 @@
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="83651000" />
+    <option name="totallyTimeSpent" value="83968000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="23" width="1280" height="737" extended-state="0" />
-    <editor active="true" />
     <layout>
       <window_info active="true" content_ui="combo" id="Project" order="3" visible="true" weight="0.15546875" />
       <window_info anchor="bottom" id="TODO" order="10" />
@@ -530,17 +525,17 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/ArtifactPaymentBuilder.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="128">
-          <caret line="77" lean-forward="true" selection-start-line="77" selection-end-line="77" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/test/ArtifactPaymentBuilder.test.js">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="594">
           <caret line="128" lean-forward="true" selection-start-line="128" selection-end-line="128" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/ArtifactPaymentBuilder.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="128">
+          <caret line="77" lean-forward="true" selection-start-line="77" selection-end-line="77" />
         </state>
       </provider>
     </entry>
