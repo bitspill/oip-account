@@ -14,8 +14,10 @@ class Account {
 	 * @param  {string} password - Your Accounts password
 	 * @param  {Object} [options]  - Options about the Account being spawned
 	 * @param  {Boolean} [options.store_local=false] - If the wallet should be stored locally or on a Keystore server
+     * @param  {Boolean} [options.store_in_keystore=false] - If the wallet should be stored on a Keystore server
 	 * @param  {string} [options.keystore_url="https://keystore.oip.li/"] - Keystore to use to store the Account
-	 * @return {Account}
+     * @param  {Boolean} [options.discover=false] - set discovery
+     * @return {Account}
 	 */
 	constructor(username, password, options){
 		this._username = username
@@ -36,7 +38,7 @@ class Account {
 			paymentHistory: {
 
 			}
-		}
+		};
 
 		// Detect what kind of Username we are being passed.
 		if (options && options.store_local) {
@@ -54,7 +56,7 @@ class Account {
 			this._storageAdapter = new FakeStorageAdapter(this._account);
 		}
 
-		this.discover = true
+		this.discover = true;
 
 		if (options && options.discover !== undefined)
 			this.discover = options.discover
@@ -100,7 +102,7 @@ class Account {
 	 * Logout of the currently logged in Account
 	 */
 	logout(){
-		this._wallet = undefined;
+		this._account.wallet = undefined;
 		this._account = undefined;
 	}
 	/**
@@ -117,6 +119,10 @@ class Account {
 	 * @return {Promise} Returns a Promise that will resolve with the setting is saved to the StorageAdapter
 	 */
 	setSetting(setting_node, setting_info){
+	    this._account.settings[setting_node] = setting_info;
+	    if (this._account.settings && this._account.settings[setting_node] !== null) {
+	        return 1
+        } else console.log("could not save settings!")
 
 	}
 	/**
@@ -125,7 +131,7 @@ class Account {
 	 * @return {Promise<Object>} Returns a Promise that will resolve to the requested setting
 	 */
 	getSettings(setting_node){
-
+        return this._account.settings[setting_node];
 	}
 	/**
 	 * Pay to View or Buy and Artifact File. This makes the purchase as well as saving that info to the wallet.
@@ -137,7 +143,7 @@ class Account {
 	 */
 	payForArtifactFile(artifact, artifact_file, purchase_type, fiat){
 		return new Promise((resolve, reject) => {
-			var builder = new ArtifactPaymentBuilder(this.wallet, artifact, purchase_type, artifact_file, fiat);
+			var builder = new ArtifactPaymentBuilder(this.wallet, artifact, artifact_file, purchase_type, fiat);
 
 			builder.pay().then(resolve).catch(reject)
 		}) 
@@ -151,7 +157,7 @@ class Account {
 	 */
 	sendArtifactTip(artifact, amount, fiat){
 		return new Promise((resolve, reject) => {
-			var builder = new ArtifactPaymentBuilder(this.wallet, artifact, 'tip', amount, fiat)
+			var builder = new ArtifactPaymentBuilder(this.wallet, artifact, amount, 'tip', fiat)
 			
 			builder.pay().then(resolve).catch(reject)
 		})

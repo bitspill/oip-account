@@ -66,10 +66,14 @@ class ArtifactPaymentBuilder {
      * @param  {array} [coinArray]    - An array of coins you want to get balances for. If no coins are given, an array of all available coins will be used.
      * @return {object}
      * @example
+     * let APB = new ArtifactPaymentBuilder(...)
+     * APB.getBalances(["flo", "bitcoin", "litecoin"])
+     *
+     * //returns
      * {
-     *      "flo": 216,
-     *      "btc": "error fetching balance",
-     *      "ltc": 333
+     *      "flo": 2.16216,
+     *      "bitcoin": "error fetching balance",
+     *      "litecoin": 3.32211
      * }
      */
      async getBalances(coinArray) {
@@ -112,10 +116,14 @@ class ArtifactPaymentBuilder {
      * @param  {array} [coinArray]    - An array of coins you want to get exchange rates for. If no coins are given, an array of all available coins will be used.
      * @return {object} rates
      * @example
+     * let APB = new ArtifactPaymentBuilder(...)
+     * APB.getExchangeRates("usd", ["flo", "bitcoin", "litecoin"])
+     *
+     * //returns
      * {
-     *      "flo": {"usd": expect.any(Number)},
-     *      "btc": {"usd": expect.any(Number)},
-     *      "ltc": {"usd": expect.any(Number)}
+     *      "flo": {"usd": expect.any(Number) || "error},
+     *      "bitcoin": {"usd": expect.any(Number) || "error},
+     *      "litecoin": {"usd": expect.any(Number) || "error"}
      * }
      */
     async getExchangeRates(fiat, coinArray) {
