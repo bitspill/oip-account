@@ -19,6 +19,21 @@ class ArtifactPaymentBuilder {
         this._fiat = fiat || "usd";
         this._exchange = new Exchange();
 	}
+
+    // Sky Young (July 6, 2018)
+    // Step 1: Get Artifact Payment Addresses (to know what coins are supported)
+    // Step 2: Calculate Exchange Rate (only for the supported coins) (this is so that we can know how much to pay in the cryptocurrency to the Artifact/ArtifactFile)
+    // Step 3: Calculate Payment Amounts for each cryptocurrency for all the supported coins (this uses the exchange rate along with the fiat amount defined in the Artifact/ArtifactFile)
+    // Step 4: Get Balances from our wallet for each coin that is supported (The supported coins that the Artifact accepts, gotten in step 1)
+    // Step 5: Choose a coin with enough balance in our wallet to spend (default to Flo, then Litecoin, then Bitcoin last)
+    // 
+    // (For now, only do Steps 1-5 and Step 9, we will add Steps 6-8 later :D)
+    // Step 6: Get the Payment Addresses for the selected coin for both the Platform we are on, as well as the Influencer
+    // Step 7: Get the Payment Percentages to be sent to the Platform and the Influencer from the Artifact/ArtifactFile
+    // Step 8: Calculate amounts to send in the Selected Coin for each split to the Publisher, Platform, and Influencer
+    // 
+    // Step 9: Send the Payment to the Payment Addresses from Step 1 (and Step 6) using the selected coin from Step 5 for the amount calculated in Step 3 (or Step 7)
+
 	getPaymentAddresses(){
         return this._artifact.getPaymentAddresses();
 	}
