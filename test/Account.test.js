@@ -1,6 +1,6 @@
 var Account = require("../src/Account");
 
-test("Create new Account NO STORAGE!", (done) => {
+test("Create new Account MemoryStorage!", (done) => {
 	var acc = new Account(undefined, undefined, {store_memory: true, discover: false});
 
 	acc.create().then((account_info) => {
@@ -10,7 +10,7 @@ test("Create new Account NO STORAGE!", (done) => {
 	})
 })
 
-test("Create Account from Mnemonic NO STORAGE!", (done) => {
+test("Create Account from Mnemonic MemoryStorage!", (done) => {
 	var acc = new Account("abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about", undefined, {store_memory: true, discover: false});
 
 	acc.login().then((account_info) => {
@@ -21,7 +21,7 @@ test("Create Account from Mnemonic NO STORAGE!", (done) => {
 	})
 })
 
-test("Create Account from Mnemonic (Storage)", (done) => {
+test("Create Account from Mnemonic (localStorage)", (done) => {
 	var acc = new Account("abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about", "password", {discover: false});
 
 	acc.create().then((account_info) => {
@@ -32,7 +32,7 @@ test("Create Account from Mnemonic (Storage)", (done) => {
 	})
 })
 
-test("Can't find account if doesn't exist", (done) => {
+test("Can't find account if doesn't exist (localStorage)", (done) => {
 	var acc = new Account("test@me.com", "password", {discover: false})
 
 	acc.login().catch((error) => {
@@ -41,7 +41,7 @@ test("Can't find account if doesn't exist", (done) => {
 	})
 })
 
-test("Create Account (email)", async (done) => {
+test("Create Account (email) (localStorage)", async (done) => {
 	var acc = new Account("test@me.com", "password", {discover: false})
 
 	var account_info = await acc.create()
@@ -68,7 +68,7 @@ test("Create Account (email)", async (done) => {
 	done()
 })
 
-test("Create Account (no email)", async (done) => {
+test("Create Account (no email) (localStorage)", async (done) => {
 	var acc = new Account(undefined, "password", {discover: false})
 
 	var account_info = await acc.create()
