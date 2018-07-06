@@ -186,7 +186,7 @@ class ArtifactPaymentBuilder {
      * }
      *
      */
-
+    
     async superFunction(paymentAmount, paymentAddresses) {
         let coinsToFetch = [];
         // ------ @ToDo: use this when you get a valid 42 artifact
