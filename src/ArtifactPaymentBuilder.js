@@ -54,7 +54,12 @@ class ArtifactPaymentBuilder {
 
         // Send the payment in that crypto to the User (using this.wallet)
         if (usableCoins.length > 0) {
-            resolve(await this._wallet.sendPayment(this.getPaymentAddresses()));
+            // Grab Public Addresses
+            this.getPaymentAddresses()
+
+            // Choose coin to use
+
+            resolve(await this._wallet.sendPayment());
         } else (reject(new Error("Insufficient funds!")))
 
         // @ToDo: Save Transaction to `paymentHistory` if payment went through successfully
@@ -185,8 +190,9 @@ class ArtifactPaymentBuilder {
     async superFunction(paymentAmount, paymentAddresses) {
         let coinsToFetch = [];
         // ------ @ToDo: use this when you get a valid 42 artifact
-        // for (let coin of this.getPaymentAddresses()) {
-        //    for (let coin in addressPairs[addr]) {
+        addrs = this.getPaymentAddresses();
+        // for (let coin in addrs) {
+        //    for (let coin in addrs[coin]) {
         //         coinsToFetch.push(coin)
         //     }
         // }
