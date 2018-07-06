@@ -1,8 +1,13 @@
 var ArtifactPaymentBuilder = require("../src/ArtifactPaymentBuilder");
 var { Wallet } = require("oip-hdmw");
 var { Artifact } = require("oip-index");
+var { ArtifactFile } = require("oip-index");
 
-var artifact = new Artifact({
+// const wallet = new Wallet("00000000000000000000000000000000", {discover: false})
+// const APB = new ArtifactPaymentBuilder(wallet, artifact, .00012, "view", "usd");
+
+
+var artifactDehydrated = {
     "oip042": {
         "artifact": {
             "floAddress": "FLZXRaHzVPxJJfaoM32CWT4GZHuj2rx63k",
@@ -23,34 +28,41 @@ var artifact = new Artifact({
                 "location": "QmQh7uTC5YSinJG2FgWLrd8MYSNtr8G5JGAckR5ARwmyET"
             },
             "payment": {
-                "addresses": [{flo: 216}]
+                "addresses": []
             },
             "timestamp": 1508188263,
             "signature": "IAiCzx8ICjAKoj98yw5VwKLCzIuAGM1fVIewZjC/PrBHVkUsl67R2Pv0Eu1fFaWsoONmVc1lZA+lpmQ4/dGVG6o="
         }
     }
-})
-const wallet = new Wallet("00000000000000000000000000000000", {discover: false})
-const APB = new ArtifactPaymentBuilder(wallet, artifact, .00012, "view", "usd");
+}
+var wallet = new Wallet('00000000000000000000000000000001', {discover: false});
+let artifact = new Artifact(artifactDehydrated);
+let artifactFile = new ArtifactFile()
+let APB = new ArtifactPaymentBuilder(wallet, artifact, artifactFile, "view");
+
+test("APB, getPaymentAddresses()", async () => {
+    expect(await APB.getPaymentAddresses()).toEqual([])
+}, 5000)
+
 
 test("APB, getExchangeRates(): No Coin Parameters", async () => {
     expect.assertions(1);
     await expect(APB.getExchangeRates("usd")).resolves.toMatchObject(
         {
-            "flo": {"usd": expect.any(Number)},
-            "bitcoin": {"usd": expect.any(Number)},
-            "litecoin": {"usd": expect.any(Number)}
+            "flo":  expect.any(Number),
+            "bitcoin": expect.any(Number),
+            "litecoin": expect.any(Number)
         }
     )
     // uncomment to check exchange rates:
     // await expect(APB.getExchangeRates("usd")).resolves.toBe()
-}, 10000)
+}, 10000);
 
 test("APB, getExchangeRates(): One Coin Parameter", async () => {
     expect.assertions(1);
     await expect(APB.getExchangeRates("usd", ["flo"])).resolves.toMatchObject(
         {
-            "flo": {"usd": expect.any(Number)}
+            "flo": expect.any(Number)
         }
     )
 }, 10000);
@@ -59,49 +71,27 @@ test("APB, getExchangeRates(): Multiple Coin Parameters", async () => {
     expect.assertions(1);
     await expect(APB.getExchangeRates("usd", ["flo", "bitcoin", "litecoin"])).resolves.toMatchObject(
         {
-            "flo": {"usd": expect.any(Number)},
-            "bitcoin": {"usd": expect.any(Number)},
-            "litecoin": {"usd": expect.any(Number)}
+            "flo": expect.any(Number),
+            "bitcoin": expect.any(Number),
+            "litecoin": expect.any(Number)
         }
     )
 });
 
-test("APB, getExchangeRates(): No Coin Parameters", async () => {
-    expect.assertions(1);
-    await expect(APB.getExchangeRates("usd")).resolves.toMatchObject(
+test("APB, convertCosts", async () => {
+    let exchange_rates = await APB.getExchangeRates("usd")
+    await expect(APB.convertCosts(exchange_rates, .00012)).resolves.toMatchObject(
         {
-            "flo": {"usd": expect.any(Number)},
-            "bitcoin": {"usd": expect.any(Number)},
-            "litecoin": {"usd": expect.any(Number)}
-        }
-    )
-    // uncomment to check exchange rates:
-    // await expect(APB.getExchangeRates("usd")).resolves.toBe()
-}, 10000)
-
-test("APB, getExchangeRates(): One Coin Parameter", async () => {
-    expect.assertions(1);
-    await expect(APB.getExchangeRates("usd", ["flo"])).resolves.toMatchObject(
-        {
-            "flo": {"usd": expect.any(Number)}
-        }
-    )
-}, 10000)
-
-test("APB, getExchangeRates(): Multiple Coin Parameters", async () => {
-    expect.assertions(1);
-    await expect(APB.getExchangeRates("usd", ["flo", "bitcoin", "litecoin"])).resolves.toMatchObject(
-        {
-            "flo": {"usd": expect.any(Number)},
-            "bitcoin": {"usd": expect.any(Number)},
-            "litecoin": {"usd": expect.any(Number)}
+            "flo": expect.any(Number),
+            "bitcoin": expect.any(Number),
+            "litecoin": expect.any(Number)
         }
     )
 })
 
-test("APB, getBalances(): check to see if balances resolved", async () => {
-    // expect.assertions(3);
-    let balances = await APB.getBalances();
+test("APB, getWalletBalances(): without coin parameters", async () => {
+    expect.assertions(3);
+    let balances = await APB.getWalletBalances();
 
     let bitcoinResolved = false;
     let floResolved = false;
@@ -122,16 +112,50 @@ test("APB, getBalances(): check to see if balances resolved", async () => {
     expect(bitcoinResolved).toBeTruthy();
 }, 10000);
 
-test("APB, superFunction: ", async () => {
-    let superFunc = await APB.superFunction(APB._amount);
-    expect(superFunc["usableCoins"]).toEqual(expect.arrayContaining(["flo"]));
-    expect(superFunc["conversionPrices"]).toEqual(expect.objectContaining({"flo": expect.any(Number)}));
+test("APB, getWalletBalances(): with one coin parameter (flo)", async () => {
+    expect.hasAssertions();
+    let balances = await APB.getWalletBalances(["flo"]);
 
-    console.log(`Super Function : ${JSON.stringify(superFunc, null, 4)}`);
-});
+    let floResolved = false;
+    console.log("Balances, ", balances)
+    if (typeof balances["flo"] === "number" || typeof balances["flo"] === "string") {
+        floResolved = true;
+    }
+    expect(floResolved).toBeTruthy();
+}, 10000);
+
+
+test("APB, selectCoin()", async () => {
+    let exchange_rates = await APB.getExchangeRates("usd")
+    let conversion_costs = await APB.convertCosts(exchange_rates, .00012)
+    let coin_balances = await APB.getWalletBalances();
+
+
+    await expect(APB.selectCoin(exchange_rates, conversion_costs, coin_balances)).resolves.toBe("flo")
+}, 10000);
+
+// test("APB, selectCoin()", async () => {
+//     let coinBalances = await APB.getWalletBalances();
+//     let exchangeRates = await APB.getExchangeRates("usd")
+//
+//     await expect(APB.selectCoin(exchangeRates, coinBalances)).rejects.toMatch('error')
+// }, 10000);
+
+
+
+
+// test("APB, superFunction: ", async () => {
+//     let superFunc = await APB.superFunction(APB._amount);
+//     expect(superFunc["usableCoins"]).toEqual(expect.arrayContaining(["flo"]));
+//     expect(superFunc["conversionPrices"]).toEqual(expect.objectContaining({"flo": expect.any(Number)}));
+//
+//     console.log(`Super Function : ${JSON.stringify(superFunc, null, 4)}`);
+// });
 
 // test("APB, Pay function", async () => {
 //     let payment = await APB.pay()
 //     console.log("PAYMENT", payment);
 //
 // }, 10000)
+
+
