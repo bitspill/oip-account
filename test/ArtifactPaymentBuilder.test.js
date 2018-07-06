@@ -1,6 +1,6 @@
-var ArtifactPaymentBuilder = require("../lib/ArtifactPaymentBuilder");
+var ArtifactPaymentBuilder = require("../src/ArtifactPaymentBuilder");
 var { Wallet } = require("oip-hdmw");
-var {Artifact} = require("oip-js");
+var { Artifact } = require("oip-index");
 
 var artifact = new Artifact({
     "oip042": {

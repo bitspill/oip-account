@@ -1,5 +1,5 @@
 const Exchange = require("oip-exchange-rate");
-var { ArtifactFile } = require("oip-js");
+var { ArtifactFile } = require("oip-index");
 
 class ArtifactPaymentBuilder {
 	/**

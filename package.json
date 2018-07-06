@@ -11,8 +11,7 @@
     "node-localstorage": "^1.3.1",
     "oip-exchange-rate": "^1.0.6",
     "oip-hdmw": "git+https://github.com/oipwg/oip-hdmw.git",
-    "oip-index": "git+https://github.com/oipwg/oip-index.git",
-    "oip-js": "^1.1.34"
+    "oip-index": "^1.0.1"
   },
   "devDependencies": {
     "@babel/cli": "^7.0.0-beta.51",
@@ -56,5 +55,8 @@
   },
   "jest": {
     "testEnvironment": "node"
-  }
+  },
+  "files": [
+    "lib"
+  ]
 }
