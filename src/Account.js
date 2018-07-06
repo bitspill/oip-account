@@ -12,8 +12,10 @@ class Account {
 	 * @param  {string} password - Your Accounts password
 	 * @param  {Object} [options]  - Options about the Account being spawned
 	 * @param  {Boolean} [options.store_local=false] - If the wallet should be stored locally or on a Keystore server
+     * @param  {Boolean} [options.store_in_keystore=false] - If the wallet should be stored on a Keystore server
 	 * @param  {string} [options.keystore_url="https://keystore.oip.li/"] - Keystore to use to store the Account
-	 * @return {Account}
+     * @param  {Boolean} [options.discover=false] - set discovery
+     * @return {Account}
 	 */
 	constructor(username, password, options){
 		this._username = username
@@ -33,7 +35,7 @@ class Account {
 			paymentHistory: {
 
 			}
-		}
+		};
 
 		if (util.isMnemonic(this._username)){
 			this._account.wallet.mnemonic = this._username;
@@ -49,7 +51,7 @@ class Account {
 			this._storageAdapter = new LocalStorageAdapter(this._username, this._password);
 		}
 
-		this.discover = true
+		this.discover = true;
 
 		if (options && options.discover !== undefined)
 			this.discover = options.discover
@@ -100,7 +102,7 @@ class Account {
 	 * Logout of the currently logged in Account
 	 */
 	logout(){
-		this._wallet = undefined;
+		this._account.wallet = undefined;
 		this._account = undefined;
 	}
 	/**
@@ -145,11 +147,12 @@ class Account {
 	 * @param  {Artifact} artifact      - The Artifact from which you got the ArtifactFile from. This is used to lookup payment percentage information.
 	 * @param  {ArtifactFile} artifact_file - The specific ArtifactFile that you wish to pay for
 	 * @param  {string} purchase_type - Either `view` or `buy`
-	 * @return {Promise<Transaction>} Returns a Promise that will resolve to the payment transaction, or rejects if there is a payment error.
+     * @param  {string} fiat     - A string containing information about the users source currency (i.e. "usd")
+     * @return {Promise<Transaction>} Returns a Promise that will resolve to the payment transaction, or rejects if there is a payment error.
 	 */
-	payForArtifactFile(artifact, artifact_file, purchase_type){
+	payForArtifactFile(artifact, artifact_file, purchase_type, fiat){
 		return new Promise((resolve, reject) => {
-			var builder = new ArtifactPaymentBuilder(this.wallet, purchase_type, artifact, artifact_file)
+			var builder = new ArtifactPaymentBuilder(this.wallet, artifact, artifact_file, purchase_type, fiat);
 
 			builder.pay().then(resolve).catch(reject)
 		}) 
@@ -163,7 +166,7 @@ class Account {
 	 */
 	sendArtifactTip(artifact, amount, fiat){
 		return new Promise((resolve, reject) => {
-			var builder = new ArtifactPaymentBuilder(this.wallet, 'tip', artifact, amount, fiat)
+			var builder = new ArtifactPaymentBuilder(this.wallet, artifact, amount, 'tip', fiat)
 			
 			builder.pay().then(resolve).catch(reject)
 		})

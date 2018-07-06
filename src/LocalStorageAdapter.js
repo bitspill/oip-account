@@ -26,11 +26,11 @@ class LocalStorageAdapter extends StorageAdapter {
 	 * @return {Promise<Object>} Returns a Promise that will resolve to the Decrypted Account Data if successful
 	 */
 	async load(){
-		var id = await this.check()
+		var id = await this.check();
 
 		var stored_data = localStorage.getItem('oip_account');
 
-		stored_data = JSON.parse(stored_data)
+		stored_data = JSON.parse(stored_data);
 
 		if (stored_data[id]){
 			var decrypted_data = this.decrypt(stored_data[id].encrypted_data);
@@ -62,13 +62,13 @@ class LocalStorageAdapter extends StorageAdapter {
 			stored_data = JSON.parse(stored_data);
 
 		if (!stored_data)
-			stored_data = {}
+			stored_data = {};
 
 		this.encrypt(account_data);
 
 		stored_data[identifier] = this.storage;
 
-		localStorage.setItem('oip_account', JSON.stringify(stored_data))
+		localStorage.setItem('oip_account', JSON.stringify(stored_data));
 
 		return account_data
 	}
@@ -88,15 +88,15 @@ class LocalStorageAdapter extends StorageAdapter {
 			throw new Error("Account Not Found!");
 
 		if (this.storage.identifier !== "" && stored_data[this.storage.identifier])
-			return this.storage.identifier
+			return this.storage.identifier;
 
 		if (stored_data[this._username])
-			return this._username
+			return this._username;
 
 		for (var data in stored_data){
 			// Check if the Email matches
-			if (stored_data[data].email && stored_data[data].email !== "" && stored_data[data].email === this._username && this._username)
-				return data
+			if (stored_data[data].email && stored_data[data].email !== "" && this._username && stored_data[data].email === this._username)
+				return data;
 		}
 
 		throw new Error("Account Not Found!")

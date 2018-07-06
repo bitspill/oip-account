@@ -118,7 +118,7 @@ class StorageAdapter {
 
 		var identifier = bytes.slice(0, 7) + "-" + bytes.slice(8, 16) + "-" + bytes.slice(17, 24) + "-" + bytes.slice(25, 32)
 
-		this.storage.identifier = identifier
+		this.storage.identifier = identifier;
 
 		return identifier
 	}
@@ -163,7 +163,7 @@ class StorageAdapter {
 			var encrypted = CryptoJS.AES.encrypt(decrypted_string, this._password, AES_CONFIG)
 			var encrypted_string = encrypted.toString();
 
-			this.storage.encrypted_data = encrypted_string
+			this.storage.encrypted_data = encrypted_string;
 
 			return encrypted_string
 		} catch (e) {
