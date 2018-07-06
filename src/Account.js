@@ -1,11 +1,9 @@
 import { Wallet, util } from 'oip-hdmw';
 import { isValidEmail, isValidIdentifier, isValidSharedKey } from './util';
 
-import FakeStorageAdapter from './FakeStorageAdapter';
+import MemoryStorageAdapter from './MemoryStorageAdapter';
 import LocalStorageAdapter from './LocalStorageAdapter';
 import KeystoreStorageAdapter from './KeystoreStorageAdapter';
-
-const DEFAULT_KEYSTORE_SERVER = "https://keystore.oip.li/"
 
 class Account {
 	/**
@@ -24,8 +22,7 @@ class Account {
 		this._password = password
 
 		this._account = {
-			identifier: "",
-			email: "",
+			identifier: undefined,
 			wallet: {
 
 			},
@@ -40,20 +37,18 @@ class Account {
 			}
 		};
 
-		// Detect what kind of Username we are being passed.
-		if (options && options.store_local) {
-			this._storageAdapter = new LocalStorageAdapter(this._username, this._password);
-		} else if (options && options.store_in_keystore) {
-			if (options.keystore_url){
-				this._storageAdapter = new KeystoreStorageAdapter(options.keystore_url, this._username, this._password);
-			} else {
-				this._storageAdapter = new KeystoreStorageAdapter(DEFAULT_KEYSTORE_SERVER, this._username, this._password);
-			}
-		} else if (util.isMnemonic(this._username)){
+		if (util.isMnemonic(this._username)){
 			this._account.wallet.mnemonic = this._username;
-			this._storageAdapter = new FakeStorageAdapter(this._account);
-		} else if (!this._username && !this._password) {
-			this._storageAdapter = new FakeStorageAdapter(this._account);
+			this._username = undefined
+		}
+
+		// Detect what kind of Username we are being passed.
+		if (options && options.store_memory) {
+			this._storageAdapter = new MemoryStorageAdapter(this._account);
+		} else if (options && options.store_in_keystore) {
+			this._storageAdapter = new KeystoreStorageAdapter(options.keystore_url, this._username, this._password);
+		} else {
+			this._storageAdapter = new LocalStorageAdapter(this._username, this._password);
 		}
 
 		this.discover = true;
@@ -63,40 +58,45 @@ class Account {
 	}
 	/**
 	 * Create a new Wallet and save it to the Storage Adapter
-	 * @return {Promise} Returns a Promise that resolves if the wallet is created successfully.
+	 *
+	 * @async
+	 * @return {Promise<Object>} Returns a Promise that resolves if the wallet is created successfully.
 	 */
-	create(){
-		return new Promise((resolve, reject) => {
-			this._storageAdapter.check().then((identifier) => {
-				reject(new Error("Account already exists!"), identifier)
-			}).catch(() => {
-				this.wallet = new Wallet(undefined, {discover: this.discover });
+	async create(){
+		try {
+			var identifier = await this._storageAdapter.check()
+		} catch (e) {
 
-				this._account.wallet.mnemonic = this.wallet.getMnemonic()
+			// If an error was thrown in `check()` then it means the account does not exist, go ahead and create it then
+			this.wallet = new Wallet(this._account.wallet.mnemonic, {discover: this.discover });
 
-				this.store().then((identifier) => {
-					resolve(this._account);
-				}).catch(reject)
-			});
-		})
+			this._account.wallet.mnemonic = this.wallet.getMnemonic()
+
+			var account_data = await this._storageAdapter.create(this._account, this._account.email)
+
+			this._account = account_data
+
+			return this._account	
+		}
+
+		throw new Error("Account already exists!")
 	}
 	/**
 	 * Login to the Selected Account. This spawns and creates the oip-hdmw account.
 	 * @return {Promise} Returns a Promise that resolves after logging in successfully.
 	 */
-	login(){
-		return new Promise((resolve, reject) => {
-			this._storageAdapter.load().then((account_info) => {
-				this._account = account_info;
+	async login(){
+		// We pass in this._account to the load() on the StorageAdapter in case we are using the Memory Storage Adapter
+		var account_info = await this._storageAdapter.load(this._account)
 
-				if (!this._account.wallet.mnemonic)
-					reject(new Error("Accounts not containing a Wallet Mnemonic are NOT SUPPORTED!"))
+		this._account = account_info;
 
-				this.wallet = new Wallet(this._account.wallet.mnemonic, {discover: this.discover})
+		if (!this._account.wallet.mnemonic)
+			reject(new Error("Accounts not containing a Wallet Mnemonic are NOT SUPPORTED!"))
 
-				resolve(this._account)
-			}).catch(reject)
-		})
+		this.wallet = new Wallet(this._account.wallet.mnemonic, {discover: this.discover})
+
+		return JSON.parse(JSON.stringify(this._account))
 	}
 	/**
 	 * Logout of the currently logged in Account
@@ -107,31 +107,40 @@ class Account {
 	}
 	/**
 	 * Store changed information about the account to the StorageAdapter
-	 * @return {Promise} Returns a Promise that will resolve if the account is saved successfully, or rejects if there was an error storing.
+	 * @return {Promise<Object>} Returns a Promise that will resolve to the Account Data if the account is saved successfully, or rejects if there was an error storing.
 	 */
-	store(){
-		return this._storageAdapter.save(this._account)
+	async store(){
+		return await this._storageAdapter.save(this._account, this._account.identifier)
 	}
 	/**
 	 * Set a setting on the Account
+	 *
+	 * @async
 	 * @param {string} setting_node - The Setting you wish to set
 	 * @param {Object} setting_info - What you wish to set the setting to
-	 * @return {Promise} Returns a Promise that will resolve with the setting is saved to the StorageAdapter
+	 * @return {Promise<Object>} Returns a Promise that will resolve with the Account Data after the new setting is saved to the StorageAdapter
 	 */
-	setSetting(setting_node, setting_info){
-	    this._account.settings[setting_node] = setting_info;
-	    if (this._account.settings && this._account.settings[setting_node] !== null) {
-	        return 1
-        } else console.log("could not save settings!")
+	async setSetting(setting_node, setting_info){
+		if (!setting_node)
+			throw new Error("setting_node is a required parameter!")
 
+		if (!setting_info && setting_info !== false)
+			throw new Error("setting_info is a required parameter!")
+
+		this._account.settings[setting_node] = setting_info
+
+		return JSON.parse(JSON.stringify(await this.store()));
 	}
 	/**
 	 * Get a specific setting
 	 * @param {string} setting_node - The Setting you wish to get
-	 * @return {Promise<Object>} Returns a Promise that will resolve to the requested setting
+	 * @return {Object} Returns the requested setting_info
 	 */
-	getSettings(setting_node){
-        return this._account.settings[setting_node];
+	getSetting(setting_node){
+		if (!setting_node)
+			throw new Error("setting_node is a required parameter!")
+
+		return this._account.settings[setting_node]
 	}
 	/**
 	 * Pay to View or Buy and Artifact File. This makes the purchase as well as saving that info to the wallet.

@@ -1,7 +1,7 @@
 import CryptoJS from 'crypto-js';
 import crypto from 'crypto';
 
-import { isValidEmail } from './util'
+import { isValidEmail, isValidIdentifier } from './util'
 
 const AES_CONFIG = {
 	mode: CryptoJS.mode.CTR,
@@ -9,7 +9,23 @@ const AES_CONFIG = {
 	iterations: 5
 }
 
+/**
+ * A Unique identifier for the user. This is a set of characters seperated by dashes.
+ * @typedef {string} Identifier
+ * @example
+ * e7c7a45-8aac7317-b2b0098-2c7a046
+ */
+
+/**
+ * A Generic StorageAdapter class that provides shared functions between all StorageAdapters
+ */
 class StorageAdapter {
+	/**
+	 * Create a new Storage Adapter
+	 * @param  {string} username - The username of the account you wish to use
+	 * @param  {string} password - The password of the account you wish to use
+	 * @return {StorageAdapter}
+	 */
 	constructor(username, password){
 		this._username = username
 		this._password = password || ""
@@ -20,37 +36,82 @@ class StorageAdapter {
 			encrypted_data: ""
 		}
 
-		if (this._username && isValidEmail(this._username))
+		if (this._username && !isValidIdentifier(this._username) && isValidEmail(this._username))
 			this.storage.email = this._username;
 	}
-	create(account_data, email){
-		if (email)
+	/**
+	 * Create an account using the StorageAdapter
+	 *
+	 * @async
+	 * @param  {Object} account_data - The Account Data you wish to save
+	 * @param  {string} [email]      - The Email you wish to attach to your account
+	 * @return {Promise<Identifier>} The Identifier of the Created Account
+	 */
+	async create(account_data, email){
+		var account_data_copy = JSON.parse(JSON.stringify(account_data));
+
+		if (email){
 			this.storage.email = email
+			account_data_copy.email = email;
+
+			if (!this._username)
+				this._username = email
+		} else {
+			if (isValidEmail(this._username)){
+				this.storage.email = this._username
+				account_data_copy.email = this._username
+			}
+		}
 
 		var identifier = this.generateIdentifier();
 
-		account_data.identifier = identifier;
+		account_data_copy.identifier = identifier;
 
-		return this.save(account_data, identifier)
+		if (!this._username)
+			this._username = identifier
+
+		return await this.save(account_data_copy, identifier)
 	}
+	/**
+	 * Save an Account using the StorageAdapter
+	 *
+	 * @async
+	 * @param  {Object} account_data - The Account Data you wish to save
+	 * @param  {Identifier} [identifier] - The Identifier of the Account you wish to save to
+	 * @return {Promise<Identifier>} Returns the Identifier of the saved account
+	 */
 	async save(account_data, identifier){
 		if (identifier){
 			return await this._save(account_data, identifier)
 		} else {
 			try {
 				var id = await this.check()
+
 				return await this._save(account_data, id)
 			} catch(e) {
+				if (this.storage.identifier && e.response && e.response.data && e.response.data.type)
+					throw new Error(e.response.data.type)
+
 				// No ID, generate new and save
-				var id = await this.create(account_data)
-				return await this._save(account_data, id)
+				return await this.create(account_data)
 			}
 		}
 	}
-	load(){}
-	check(){}
 	/**
-	 * Generate Identifier
+	 * Load the Wallet from the StorageAdapter, this function is overwritten by sub-classes
+	 *
+	 * @async
+	 * @return {Promise<Object>} Returns the Account Data for the specified account
+	 */
+	async load(){}
+	/**
+	 * Check if the Wallet exists on the StorageAdapter, this function is overwritten by sub-classes
+	 * @return {Promise<Identifier>} Returns the Identifier of the matched wallet (if found)
+	 */
+	async check(){}
+	/**
+	 * Generate a valid Identifier
+	 * @return {Identifier} Returns a newly generated identifier
 	 */
 	generateIdentifier() {
 		var bytes = crypto.randomBytes(16).toString('hex')
@@ -90,10 +151,10 @@ class StorageAdapter {
 	 * @return {string} Returns the Encrypted Data as a String
 	 */
 	encrypt(decrypted_data){
-		if (decrypted_data && !decrypted_data.email && this.storage.email !== "")
-			decrypted_data.email = this.storage.email;
+		if (decrypted_data && !decrypted_data.email && this.storage.email && this.storage.email !== "")
+			decrypted_data.email = this.storage.email
 
-		if (decrypted_data && !decrypted_data.identifier && this.storage.identifier !== ""){
+		if (decrypted_data && !decrypted_data.identifier && this.storage.identifier && this.storage.identifier !== ""){
 			decrypted_data.identifier = this.storage.identifier
 		}
 

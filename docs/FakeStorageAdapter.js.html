@@ -1,0 +1,170 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>
+      FakeStorageAdapter.js - Documentation
+  </title>
+
+  <link href="https://www.braintreepayments.com/images/favicon-ccda0b14.png" rel="icon" type="image/png">
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.7.0/highlight.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlightjs-line-numbers.js/2.3.0/highlightjs-line-numbers.min.js"></script>
+  <script>
+    hljs.initHighlightingOnLoad();
+  </script>
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+
+  <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+  <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+  <link type="text/css" rel="stylesheet" href="styles/monokai-sublime.css">
+
+  
+
+  <!-- start Mixpanel -->
+  <script type="text/javascript">(function(e,a){if(!a.__SV){var b=window;try{var c,l,i,j=b.location,g=j.hash;c=function(a,b){return(l=a.match(RegExp(b+"=([^&]*)")))?l[1]:null};g&&c(g,"state")&&(i=JSON.parse(decodeURIComponent(c(g,"state"))),"mpeditor"===i.action&&(b.sessionStorage.setItem("_mpcehash",g),history.replaceState(i.desiredHash||"",e.title,j.pathname+j.search)))}catch(m){}var k,h;window.mixpanel=a;a._i=[];a.init=function(b,c,f){function e(b,a){var c=a.split(".");2==c.length&&(b=b[c[0]],a=c[1]);b[a]=function(){b.push([a].concat(Array.prototype.slice.call(arguments,
+  0)))}}var d=a;"undefined"!==typeof f?d=a[f]=[]:f="mixpanel";d.people=d.people||[];d.toString=function(b){var a="mixpanel";"mixpanel"!==f&&(a+="."+f);b||(a+=" (stub)");return a};d.people.toString=function(){return d.toString(1)+".people (stub)"};k="disable time_event track track_pageview track_links track_forms register register_once alias unregister identify name_tag set_config reset people.set people.set_once people.increment people.append people.union people.track_charge people.clear_charges people.delete_user".split(" ");
+  for(h=0;h<k.length;h++)e(d,k[h]);a._i.push([b,c,f])};a.__SV=1.2;b=e.createElement("script");b.type="text/javascript";b.async=!0;b.src="undefined"!==typeof MIXPANEL_CUSTOM_LIB_URL?MIXPANEL_CUSTOM_LIB_URL:"file:"===e.location.protocol&&"//cdn.mxpnl.com/libs/mixpanel-2-latest.min.js".match(/^\/\//)?"https://cdn.mxpnl.com/libs/mixpanel-2-latest.min.js":"//cdn.mxpnl.com/libs/mixpanel-2-latest.min.js";c=e.getElementsByTagName("script")[0];c.parentNode.insertBefore(b,c)}})(document,window.mixpanel||[]);
+  mixpanel.init("1919205b2da72e4da3b9b6639b444d59");</script>
+  <!-- end Mixpanel -->
+</head>
+
+<body>
+  <svg style="display: none;">
+    <defs>
+      <symbol id="linkIcon" fill="#706d77" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg">
+          <path d="M0 0h24v24H0z" fill="none"/>
+          <path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/>
+      </symbol>
+    </defs>
+  </svg>
+
+  <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+  <label for="nav-trigger" class="navicon-button x">
+    <div class="navicon"></div>
+  </label>
+
+  <label for="nav-trigger" class="overlay"></label>
+
+  <div class="top-nav-wrapper">
+    <ul>
+      <li >
+        <a href="index.html">
+          
+            <svg fill="#6D6D6D" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg">
+              <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
+              <path d="M0 0h24v24H0z" fill="none"/>
+            </svg>
+          
+          
+        </a>
+      </li>
+
+      
+
+    </ul>
+  </div>
+
+  <nav>
+    <h3 class="reference-title">
+      OIP HDMW
+    </h3>
+
+    <h3>Classes</h3><ul><li id="Account-nav"><a href="Account.html">Account</a><ul class='methods'><li data-type="method" id="Account-create-nav"><a href="Account.html#create">create</a></li><li data-type="method" id="Account-getSettings-nav"><a href="Account.html#getSettings">getSettings</a></li><li data-type="method" id="Account-login-nav"><a href="Account.html#login">login</a></li><li data-type="method" id="Account-logout-nav"><a href="Account.html#logout">logout</a></li><li data-type="method" id="Account-payForArtifactFile-nav"><a href="Account.html#payForArtifactFile">payForArtifactFile</a></li><li data-type="method" id="Account-sendArtifactTip-nav"><a href="Account.html#sendArtifactTip">sendArtifactTip</a></li><li data-type="method" id="Account-setSetting-nav"><a href="Account.html#setSetting">setSetting</a></li><li data-type="method" id="Account-store-nav"><a href="Account.html#store">store</a></li></ul></li><li id="ArtifactPaymentBuilder-nav"><a href="ArtifactPaymentBuilder.html">ArtifactPaymentBuilder</a><ul class='methods'><li data-type="method" id="ArtifactPaymentBuilder-calculateCryptoExchangeRate-nav"><a href="ArtifactPaymentBuilder.html#calculateCryptoExchangeRate">calculateCryptoExchangeRate</a></li><li data-type="method" id="ArtifactPaymentBuilder-pay-nav"><a href="ArtifactPaymentBuilder.html#pay">pay</a></li></ul></li><li id="KeystoreStorageAdapter-nav"><a href="KeystoreStorageAdapter.html">KeystoreStorageAdapter</a><ul class='methods'><li data-type="method" id="KeystoreStorageAdapter-_save-nav"><a href="KeystoreStorageAdapter.html#_save">_save</a></li><li data-type="method" id="KeystoreStorageAdapter-check-nav"><a href="KeystoreStorageAdapter.html#check">check</a></li><li data-type="method" id="KeystoreStorageAdapter-create-nav"><a href="KeystoreStorageAdapter.html#create">create</a></li><li data-type="method" id="KeystoreStorageAdapter-decrypt-nav"><a href="KeystoreStorageAdapter.html#decrypt">decrypt</a></li><li data-type="method" id="KeystoreStorageAdapter-encrypt-nav"><a href="KeystoreStorageAdapter.html#encrypt">encrypt</a></li><li data-type="method" id="KeystoreStorageAdapter-generateIdentifier-nav"><a href="KeystoreStorageAdapter.html#generateIdentifier">generateIdentifier</a></li><li data-type="method" id="KeystoreStorageAdapter-load-nav"><a href="KeystoreStorageAdapter.html#load">load</a></li><li data-type="method" id="KeystoreStorageAdapter-save-nav"><a href="KeystoreStorageAdapter.html#save">save</a></li></ul></li><li id="LocalStorageAdapter-nav"><a href="LocalStorageAdapter.html">LocalStorageAdapter</a><ul class='methods'><li data-type="method" id="LocalStorageAdapter-_save-nav"><a href="LocalStorageAdapter.html#_save">_save</a></li><li data-type="method" id="LocalStorageAdapter-check-nav"><a href="LocalStorageAdapter.html#check">check</a></li><li data-type="method" id="LocalStorageAdapter-create-nav"><a href="LocalStorageAdapter.html#create">create</a></li><li data-type="method" id="LocalStorageAdapter-decrypt-nav"><a href="LocalStorageAdapter.html#decrypt">decrypt</a></li><li data-type="method" id="LocalStorageAdapter-encrypt-nav"><a href="LocalStorageAdapter.html#encrypt">encrypt</a></li><li data-type="method" id="LocalStorageAdapter-generateIdentifier-nav"><a href="LocalStorageAdapter.html#generateIdentifier">generateIdentifier</a></li><li data-type="method" id="LocalStorageAdapter-load-nav"><a href="LocalStorageAdapter.html#load">load</a></li><li data-type="method" id="LocalStorageAdapter-save-nav"><a href="LocalStorageAdapter.html#save">save</a></li></ul></li><li id="MemoryStorageAdapter-nav"><a href="MemoryStorageAdapter.html">MemoryStorageAdapter</a><ul class='methods'><li data-type="method" id="MemoryStorageAdapter-_save-nav"><a href="MemoryStorageAdapter.html#_save">_save</a></li><li data-type="method" id="MemoryStorageAdapter-check-nav"><a href="MemoryStorageAdapter.html#check">check</a></li><li data-type="method" id="MemoryStorageAdapter-create-nav"><a href="MemoryStorageAdapter.html#create">create</a></li><li data-type="method" id="MemoryStorageAdapter-decrypt-nav"><a href="MemoryStorageAdapter.html#decrypt">decrypt</a></li><li data-type="method" id="MemoryStorageAdapter-encrypt-nav"><a href="MemoryStorageAdapter.html#encrypt">encrypt</a></li><li data-type="method" id="MemoryStorageAdapter-generateIdentifier-nav"><a href="MemoryStorageAdapter.html#generateIdentifier">generateIdentifier</a></li><li data-type="method" id="MemoryStorageAdapter-load-nav"><a href="MemoryStorageAdapter.html#load">load</a></li><li data-type="method" id="MemoryStorageAdapter-save-nav"><a href="MemoryStorageAdapter.html#save">save</a></li></ul></li><li id="StorageAdapter-nav"><a href="StorageAdapter.html">StorageAdapter</a><ul class='methods'><li data-type="method" id="StorageAdapter-check-nav"><a href="StorageAdapter.html#check">check</a></li><li data-type="method" id="StorageAdapter-create-nav"><a href="StorageAdapter.html#create">create</a></li><li data-type="method" id="StorageAdapter-decrypt-nav"><a href="StorageAdapter.html#decrypt">decrypt</a></li><li data-type="method" id="StorageAdapter-encrypt-nav"><a href="StorageAdapter.html#encrypt">encrypt</a></li><li data-type="method" id="StorageAdapter-generateIdentifier-nav"><a href="StorageAdapter.html#generateIdentifier">generateIdentifier</a></li><li data-type="method" id="StorageAdapter-load-nav"><a href="StorageAdapter.html#load">load</a></li><li data-type="method" id="StorageAdapter-save-nav"><a href="StorageAdapter.html#save">save</a></li></ul></li></ul><h3 id="global-nav"><a href="global.html">Global</a></h3>
+  </nav>
+
+  <div id="main">
+    
+      <h1 class="page-title">
+        FakeStorageAdapter.js
+      </h1>
+    
+
+    
+      
+
+<section>
+  <article>
+    <pre class="prettyprint source linenums"><code>import StorageAdapter from './StorageAdapter'
+
+/**
+ * The MemoryStorageAdapter is used when the user only wants their wallet stored in memory for the single session.
+ * @extends {StorageAdapter}
+ */
+class MemoryStorageAdapter extends StorageAdapter {
+	/**
+	 * Create a new MemoryStorageAdapter
+	 * @param  {string} username     - The username of the account you wish to use
+	 * @param  {string} password     - The password of the account you wish to use
+	 * @param  {string} [keystore_url="https://keystore.oip.li/v2/"] - The URL of the [OIP Keystore](https://github.com/oipwg/oip-keystore) server to use
+	 * @return {MemoryStorageServer}
+	 */
+	constructor(account){
+		super(undefined, undefined)
+		this._account = account		
+	}
+	/**
+	 * Load an Account from the Memory
+	 *
+	 * @async
+	 * @return {Promise&lt;Object>} Returns a Promise that will resolve to the Account Data
+	 */
+	async load(){
+		return this._account
+	}
+	/**
+	 * Internal Save function to Save an Account to the Memory
+	 *
+	 * @async
+	 * @param  {Object} account_data - The new Account Data you wish to save
+	 * @param  {Identifier} identifier - The Identifier of the account you wish to save
+	 * @return {Promise&lt;Identifier>} Returns a Promise that will resolve to the Identifier of the updated account
+	 */
+	async _save(account_data, identifier){
+		if (!account_data.identifier)
+			account_data.identifier = identifier;
+
+		this._account = account_data
+		
+		return identifier
+	}
+	/**
+	 * Check if the Account exists in Memory. It will never exists, so it always will return an error 
+	 * This matches an email to an identifier if the username being used is an email.
+	 *
+	 * @async
+	 * @return {Promise&lt;Identifier>} Returns a Promsie that will resolve to the Accounts Identifier if set
+	 */
+	async check(){
+		throw new Error("Account Not Found!")
+	}
+}
+
+module.exports = FakeStorageAdapter;</code></pre>
+  </article>
+</section>
+
+    
+
+
+  </div>
+
+  <br class="clear">
+
+  <footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a>
+  </footer>
+
+  <script src="scripts/linenumber.js"></script>
+  <script src="scripts/pagelocation.js"></script>
+
+  
+  
+</body>
+</html>
