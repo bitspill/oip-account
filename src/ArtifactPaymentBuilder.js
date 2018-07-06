@@ -49,71 +49,15 @@ class ArtifactPaymentBuilder {
 
         console.log(`paymentAmount: ${paymentAmount} and Fiat: ${this._fiat}`);
 
-        let coinsToFetch = [];
-        // ------ @ToDo: use this when you get a valid 42 artifact
-        // for (let coin of this.getPaymentAddresses()) {
-	     //    for (let coin in addressPairs[addr]) {
-        //         coinsToFetch.push(coin)
-        //     }
-        // }
-
-        // ------ @ToDo: then delete this
-        let addressPairs = [{flo: "FLZXRaHzVPxJJfaoM32CWT4GZHuj2rx63k"}];
-        for (let addr in addressPairs) {
-            for (let coin in addressPairs[addr]) {
-                coinsToFetch.push(coin)
-            }
-        }
-
-        console.log(`Coins to fetch: ${coinsToFetch}`)
-
-        // Get percentages to be paid out to Platforms and Influencers (don't worry about this for now)
-			
-		// Calculate crypto cost based on the exchange rate for the Fiat (using oip-exchange-rate)
-        let exchangeRates;
-        try {
-            exchangeRates = await this.getExchangeRates(this._fiat, coinsToFetch);
-            console.log(`exchangeRates: ${JSON.stringify(exchangeRates, null, 4)}`)
-        } catch (err) {
-	        console.log(`Error on getExchangeRates: ${err}`)
-	    };
-
-        // Check Coin Balances
-        let coinBalances;
-        try {
-            coinBalances = await this.getBalances(coinsToFetch)
-            console.log(`myCoinBalances: ${JSON.stringify(coinBalances, null, 4)}`)
-
-        } catch (err) {
-            console.log(`Error on getBalances: ${err}`)
-        }
-
-        //exchange rate / file cost
-        let conversionPrices = {};
-        for (let coin in exchangeRates) {
-            if (typeof exchangeRates[coin][fiat] === "number") {
-                conversionPrices[coin] = paymentAmount / exchangeRates[coin][fiat];
-                console.log(`${conversionPrices[coin]} = ${paymentAmount} / ${exchangeRates[coin][fiat]}`)
-            }
-        }
-        console.log("conversionPrices: ", conversionPrices);
-
-        // If not enough balance
-        //reject(new Error("Not Enough Balance!"))
-        let usableCoins = [];
-        for (let coin in coinBalances) {
-            if (coinBalances[coin] && conversionPrices[coin]) {
-                if (coinBalances[coin] >= conversionPrices[coin]) {
-                    usableCoins.push(coin)
-                } else console.log(`Balance not enough: ${coinBalances[coin]} <= ${conversionPrices[coin]}`)
-            }
-        }
-        console.log(`Usable coins: ${usableCoins}`)
-        // Pick crypto(s) to pay with
+        let superObject = await this.superFunction(paymentAmount, fiat);
+        let usableCoins = superObject["usableCoins"];
 
         // Send the payment in that crypto to the User (using this.wallet)
+        if (usableCoins.length > 0) {
+            resolve(await this._wallet.sendPayment(this.getPaymentAddresses()));
+        } else (reject(new Error("Insufficient funds!")))
 
-        // Save Transaction to `paymentHistory` if payment went through successfully
+        // @ToDo: Save Transaction to `paymentHistory` if payment went through successfully
 
     }
 
@@ -129,12 +73,12 @@ class ArtifactPaymentBuilder {
      * }
      */
      async getBalances(coinArray) {
-            const coins = coinArray || Object.key(this._wallet.getCoins());
+            const coins = coinArray || Object.keys(this._wallet.getCoins());
             let coinClass = this._wallet.getCoins();
 
             let coinPromises = {};
             let balances = {};
-
+            console.log(`Coin in get balances: ${JSON.stringify(coins, null, 4)}`);
             for (let coin of coins) {
                 coinPromises[coin] = {};
                 try {
@@ -198,6 +142,89 @@ class ArtifactPaymentBuilder {
         }
 
         return rates
+    }
+
+    /**
+     * Get coins with sufficient balance to pay or tip given an initial payment amount
+     * @param  {string} paymentAmount     - The amount you wish to send or the cost of an item
+     * @return {object}
+     * @example
+     * {
+     *      usableCoins: ["flo"],
+     *      conversionPrices: {
+     *          flo: 216
+     *      }
+     * }
+     */
+
+    async superFunction(paymentAmount, fiat) {
+        let coinsToFetch = [];
+        // ------ @ToDo: use this when you get a valid 42 artifact
+        // for (let coin of this.getPaymentAddresses()) {
+        //    for (let coin in addressPairs[addr]) {
+        //         coinsToFetch.push(coin)
+        //     }
+        // }
+
+        // ------ @ToDo: then delete this
+        let addressPairs = [{flo: "FLZXRaHzVPxJJfaoM32CWT4GZHuj2rx63k"}];
+        for (let addr in addressPairs) {
+            for (let coin in addressPairs[addr]) {
+                coinsToFetch.push(coin)
+            }
+        }
+
+        console.log(`Coins to fetch: ${coinsToFetch}`)
+
+        // @ToDO: Get percentages to be paid out to Platforms and Influencers
+
+        // Calculate crypto cost based on the exchange rate for the Fiat (using oip-exchange-rate)
+        let exchangeRates;
+        try {
+            exchangeRates = await this.getExchangeRates(fiat, coinsToFetch);
+            console.log(`exchangeRates: ${JSON.stringify(exchangeRates, null, 4)}`)
+        } catch (err) {
+            console.log(`Error on getExchangeRates: ${err}`)
+        };
+
+        // Check Coin Balances
+        let coinBalances;
+        try {
+            coinBalances = await this.getBalances(coinsToFetch)
+            console.log(`myCoinBalances: ${JSON.stringify(coinBalances, null, 4)}`)
+
+        } catch (err) {
+            console.log(`Error on getBalances: ${err}`)
+        }
+
+        //exchange rate / file cost
+        let conversionPrices = {};
+        for (let coin in exchangeRates) {
+            if (typeof exchangeRates[coin][fiat] === "number") {
+                conversionPrices[coin] = paymentAmount / exchangeRates[coin][fiat];
+                console.log(`${conversionPrices[coin]} = ${paymentAmount} / ${exchangeRates[coin][fiat]}`)
+            }
+        }
+        console.log("conversionPrices: ", conversionPrices);
+
+        // If not enough balance
+        // reject(new Error("Not Enough Balance!"))
+        // Pick crypto(s) to pay with
+
+        let usableCoins = [];
+        for (let coin in coinBalances) {
+            if (coinBalances[coin] && conversionPrices[coin]) {
+                if (coinBalances[coin] >= conversionPrices[coin]) {
+                    usableCoins.push(coin)
+                } else console.log(`Balance not enough for ${coin}: ${coinBalances[coin]} <= ${conversionPrices[coin]}`)
+            }
+        }
+        console.log(`Usable coins: ${usableCoins}`);
+
+        return {
+            usableCoins,
+            conversionPrices
+        }
     }
 }
 

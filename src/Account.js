@@ -137,7 +137,7 @@ class Account {
 	 */
 	payForArtifactFile(artifact, artifact_file, purchase_type, fiat){
 		return new Promise((resolve, reject) => {
-			var builder = new ArtifactPaymentBuilder(this.wallet, purchase_type, artifact, artifact_file, fiat)
+			var builder = new ArtifactPaymentBuilder(this.wallet, artifact, purchase_type, artifact_file, fiat);
 
 			builder.pay().then(resolve).catch(reject)
 		}) 
@@ -151,7 +151,7 @@ class Account {
 	 */
 	sendArtifactTip(artifact, amount, fiat){
 		return new Promise((resolve, reject) => {
-			var builder = new ArtifactPaymentBuilder(this.wallet, 'tip', artifact, amount, fiat)
+			var builder = new ArtifactPaymentBuilder(this.wallet, artifact, 'tip', amount, fiat)
 			
 			builder.pay().then(resolve).catch(reject)
 		})
