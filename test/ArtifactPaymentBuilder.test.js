@@ -97,16 +97,16 @@ test("APB, getWalletBalances(): with one coin parameter (flo)", async (done) => 
 }, 20000);
 
 
-// test("APB, selectCoin()", async (done) => {
-//     let exchange_rates = await APB.getExchangeRates("usd")
-//     let conversion_costs = await APB.convertCosts(exchange_rates, .00012)
-//     let coin_balances = await APB.getWalletBalances();
-//
-//
-//     await expect(APB.selectCoin(exchange_rates, conversion_costs, coin_balances)).resolves.toEqual(expect.any(String))
-//
-//     done()
-// }, 20000);
+test("APB, selectCoin()", async (done) => {
+    let exchange_rates = await APB.getExchangeRates("usd")
+    let conversion_costs = await APB.convertCosts(exchange_rates, .00012)
+    let coin_balances = await APB.getWalletBalances();
+
+    let selected_coin = await APB.selectCoin(coin_balances, conversion_costs);
+    expect(selected_coin).toEqual(expect.any(String));
+
+    done()
+}, 20000);
 
 
 

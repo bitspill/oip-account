@@ -96,11 +96,11 @@ class ArtifactPaymentBuilder {
         return coin_balances
     }
     // Step 5: Choose a coin with enough balance in our wallet to spend (default to Flo, then Litecoin, then Bitcoin last)
-    async selectCoin(coin_balances, payment_amounts, conversion_costs){
+    async selectCoin(coin_balances, conversion_costs){
 	    let selected_coin;
         let usableCoins = [];
         for (let coin in coin_balances) {
-            if (coin_balances[coin] && conversion_costs[coin]) {
+            if (typeof coin_balances[coin] === "number" && typeof conversion_costs[coin] ==="number") {
                 if (coin_balances[coin] >= conversion_costs[coin]) {
                     usableCoins.push(coin)
                 } else console.log(`${coin} has insufficient funds: either error or amount <= ${conversion_costs[coin]}`)
@@ -108,7 +108,7 @@ class ArtifactPaymentBuilder {
         }
 
         if (!usableCoins.length) {
-            return Promise.reject(new Error("Insufficient Funds"));
+            throw new Error("Insufficient Funds");
         }
         if (usableCoins.includes("flo")) {selected_coin = "flo"}
         else if (usableCoins.includes("litecoin")) {selected_coin = "litecoin"}

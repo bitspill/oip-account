@@ -2,7 +2,6 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="80224f43-2aa0-4196-ad31-d5973ca4e269" name="Default" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/ArtifactPaymentBuilder.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/ArtifactPaymentBuilder.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/test/ArtifactPaymentBuilder.test.js" beforeDir="false" afterPath="$PROJECT_DIR$/test/ArtifactPaymentBuilder.test.js" afterDir="false" />
     </list>
@@ -21,8 +20,8 @@
       <file leaf-file-name="ArtifactPaymentBuilder.js" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/ArtifactPaymentBuilder.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="312">
-              <caret line="84" lean-forward="true" selection-start-line="84" selection-end-line="84" />
+            <state relative-caret-position="741">
+              <caret line="125" column="9" lean-forward="true" selection-start-line="125" selection-start-column="9" selection-end-line="125" selection-end-column="9" />
             </state>
           </provider>
         </entry>
@@ -30,8 +29,8 @@
       <file leaf-file-name="ArtifactPaymentBuilder.test.js" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/test/ArtifactPaymentBuilder.test.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="523">
-              <caret line="92" column="23" selection-start-line="92" selection-start-column="23" selection-end-line="92" selection-end-column="23" />
+            <state relative-caret-position="368">
+              <caret line="105" column="33" selection-start-line="105" selection-start-column="33" selection-end-line="105" selection-end-column="33" />
             </state>
           </provider>
         </entry>
@@ -71,8 +70,8 @@
         <option value="$PROJECT_DIR$/test/KeystoreStorageAdapter.test.js" />
         <option value="$PROJECT_DIR$/test/Account.test.js" />
         <option value="$PROJECT_DIR$/package.json" />
-        <option value="$PROJECT_DIR$/test/ArtifactPaymentBuilder.test.js" />
         <option value="$PROJECT_DIR$/src/ArtifactPaymentBuilder.js" />
+        <option value="$PROJECT_DIR$/test/ArtifactPaymentBuilder.test.js" />
       </list>
     </option>
   </component>
@@ -189,7 +188,7 @@
       <workItem from="1530859317976" duration="3383000" />
       <workItem from="1530888231883" duration="7536000" />
       <workItem from="1530909599004" duration="15122000" />
-      <workItem from="1530948305062" duration="1636000" />
+      <workItem from="1530948305062" duration="2365000" />
     </task>
     <task id="LOCAL-00001" summary="tests for calculateCryptoExchangeRate &lt;&lt; ArtifactPaymentBuilder()">
       <created>1530635550088</created>
@@ -202,7 +201,7 @@
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="111948000" />
+    <option name="totallyTimeSpent" value="112677000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="23" width="1280" height="777" extended-state="6" />
@@ -511,15 +510,15 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/ArtifactPaymentBuilder.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="312">
-          <caret line="84" lean-forward="true" selection-start-line="84" selection-end-line="84" />
+        <state relative-caret-position="741">
+          <caret line="125" column="9" lean-forward="true" selection-start-line="125" selection-start-column="9" selection-end-line="125" selection-end-column="9" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/test/ArtifactPaymentBuilder.test.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="523">
-          <caret line="92" column="23" selection-start-line="92" selection-start-column="23" selection-end-line="92" selection-end-column="23" />
+        <state relative-caret-position="368">
+          <caret line="105" column="33" selection-start-line="105" selection-start-column="33" selection-end-line="105" selection-end-column="33" />
         </state>
       </provider>
     </entry>
