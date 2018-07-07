@@ -81,40 +81,22 @@ test("APB, convertCosts", async (done) => {
 })
 
 test("APB, getWalletBalances(): without coin parameters", async (done) => {
-    expect.hasAssertions();
     let balances = await APB.getWalletBalances();
+    expect(balances).toHaveProperty("flo");
+    expect(balances).toHaveProperty("bitcoin");
+    expect(balances).toHaveProperty("litecoin");
 
-    let bitcoinResolved = false;
-    let floResolved = false;
-    let ltcResolved = false;
-    if (typeof balances["bitcoin"] === "number" || typeof balances["bitcoin"] === "string") {
-        bitcoinResolved = true;
-    }
-    if (typeof balances["flo"] === "number" || typeof balances["flo"] === "string") {
-        floResolved = true;
-    }
-    if (typeof balances["litecoin"] === "number" || typeof balances["litecoin"] === "string") {
-        ltcResolved = true;
-    }
-
-    expect(floResolved).toBeTruthy();
-    expect(ltcResolved).toBeTruthy();
-    expect(bitcoinResolved).toBeTruthy();
     done()
 }, 20000);
 
-// test("APB, getWalletBalances(): with one coin parameter (flo)", async (done) => {
-//     let balances = await APB.getWalletBalances(["flo"]);
-//
-//     let floResolved = false;
-//     if (typeof balances["flo"] === "number" || typeof balances["flo"] === "string") {
-//         floResolved = true;
-//     }
-//     expect(floResolved).toBeTruthy();
-//     done()
-// }, 20000);
-//
-//
+test("APB, getWalletBalances(): with one coin parameter (flo)", async (done) => {
+    let balances = await APB.getWalletBalances(["flo"]);
+    expect(balances).toHaveProperty("flo");
+    // expect(floResolved).toBeTruthy();
+    done()
+}, 20000);
+
+
 // test("APB, selectCoin()", async (done) => {
 //     let exchange_rates = await APB.getExchangeRates("usd")
 //     let conversion_costs = await APB.convertCosts(exchange_rates, .00012)

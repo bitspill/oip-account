@@ -73,7 +73,7 @@ class ArtifactPaymentBuilder {
             try {
                 coinPromises[coin] = _coins[coin].getBalance({discover: true})
             } catch (err) {
-                coinPromises[coin] = "promise error fetching balance";
+                coinPromises[coin] = `${err}`;
                 console.log(`Error on fetching promise for ${coin}: ${err}`)
             }
         }
@@ -81,15 +81,15 @@ class ArtifactPaymentBuilder {
         for (let coin in coinPromises) {
             try {
                 coin_balances[coin] = await coinPromises[coin];
-                console.log(`${coin} promise balance fetch: ${coin_balances[coin]}`)
+                console.log(`${coin}: resolved balance: ${coin_balances[coin]}`)
 
             } catch (err) {
                 coin_balances[coin] = "error fetching balance";
-                console.log(`Error while trying to resolve balance: ${err}`)
+                console.log(`Error while trying to resolve the balance of ${coin}: ${err}`)
 
                 if (err.response && err.response.statusText) {
-                    console.log("error fetching balance: ", err.response.statusText)
-                } else { console.log("error resolving balance")}
+                    console.log("error response status text: ", err.response.statusText)
+                }
             }
         }
         console.log(`coin balances: ${coin_balances}`);
