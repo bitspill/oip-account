@@ -120,7 +120,7 @@ class ArtifactPaymentBuilder {
         return await this._artifact.getPaymentAddresses();
     }
     // Step 2: Calculate Exchange Rate (only for the supported coins) (this is so that we can know how much to pay in the cryptocurrency to the Artifact/ArtifactFile)
-    async getExchangeRates(fiat, supported_coins_array){
+    async getExchangeRates(fiat = this._fiat, supported_coins_array){
         let coins =  supported_coins_array || Object.keys(this._wallet.getCoins());
         let rates = {};
         let promiseArray = {};
@@ -156,11 +156,13 @@ class ArtifactPaymentBuilder {
     }
     // Step 4: Get Balances from our wallet for each coin that is supported (The supported coins that the Artifact accepts, gotten in step 1)
     async getWalletBalances(coins_array){
+	    console.log(`BEGIN`)
         const coins = coins_array || Object.keys(this._wallet.getCoins());
         let _coins = this._wallet.getCoins();
 
         let coinPromises = {};
         let coin_balances = {};
+        console.log(`BOUT  TO  LOOP`)
 
         for (let coin of coins) {
             try {
@@ -170,17 +172,24 @@ class ArtifactPaymentBuilder {
                 console.log(`Error on fetching promise for ${coin}: ${err}`)
             }
         }
+        console.log(`AFTER  THE  FIRST LOOP: ${coinPromises}`)
 
         for (let coin in coinPromises) {
             try {
                 coin_balances[coin] = await coinPromises[coin];
+                console.log(`${coin} promise balance fetch: ${coin_balances[coin]}`)
+
             } catch (err) {
                 coin_balances[coin] = "error fetching balance";
+                console.log(`ERROR IN LOOP: ${err}`)
+
                 if (err.response &amp;&amp; err.response.statusText) {
                     console.log("error fetching balance: ", err.response.statusText)
                 } else { console.log("error resolving balance")}
             }
         }
+        console.log(`BALANCES?`)
+
         return coin_balances
     }
     // Step 5: Choose a coin with enough balance in our wallet to spend (default to Flo, then Litecoin, then Bitcoin last)
@@ -228,9 +237,7 @@ class ArtifactPaymentBuilder {
     async sendPayment(payment_address, amount){
         // payment_address = "FLZXRaHzVPxJJfaoM32CWT4GZHuj2rx63k"
         // amount = 1.154
-        
         var to = {};
-
         to[payment_address] = amount
 
         return this._wallet.sendPayment(to)

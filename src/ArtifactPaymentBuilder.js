@@ -63,13 +63,11 @@ class ArtifactPaymentBuilder {
     }
     // Step 4: Get Balances from our wallet for each coin that is supported (The supported coins that the Artifact accepts, gotten in step 1)
     async getWalletBalances(coins_array){
-	    console.log(`BEGIN`)
         const coins = coins_array || Object.keys(this._wallet.getCoins());
         let _coins = this._wallet.getCoins();
 
         let coinPromises = {};
         let coin_balances = {};
-        console.log(`BOUT  TO  LOOP`)
 
         for (let coin of coins) {
             try {
@@ -79,7 +77,6 @@ class ArtifactPaymentBuilder {
                 console.log(`Error on fetching promise for ${coin}: ${err}`)
             }
         }
-        console.log(`AFTER  THE  FIRST LOOP: ${coinPromises}`)
 
         for (let coin in coinPromises) {
             try {
@@ -88,15 +85,14 @@ class ArtifactPaymentBuilder {
 
             } catch (err) {
                 coin_balances[coin] = "error fetching balance";
-                console.log(`ERROR IN LOOP: ${err}`)
+                console.log(`Error while trying to resolve balance: ${err}`)
 
                 if (err.response && err.response.statusText) {
                     console.log("error fetching balance: ", err.response.statusText)
                 } else { console.log("error resolving balance")}
             }
         }
-        console.log(`BALANCES?`)
-
+        console.log(`coin balances: ${coin_balances}`);
         return coin_balances
     }
     // Step 5: Choose a coin with enough balance in our wallet to spend (default to Flo, then Litecoin, then Bitcoin last)
