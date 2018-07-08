@@ -44,6 +44,7 @@ class ArtifactPaymentBuilder {
                 rates[coin] = "error fetching rate";
             }
         }
+        console.log(`Exchange rates: ${JSON.stringify(rates, null, 4)}`)
         return rates;
     }
 
@@ -65,6 +66,7 @@ class ArtifactPaymentBuilder {
     async getWalletBalances(coins_array){
         const coins = coins_array || Object.keys(this._wallet.getCoins());
         let _coins = this._wallet.getCoins();
+        // console.log(`Check to see coin_array: ${coins_array} -- ${coins} -- ${_coins}`)
 
         let coinPromises = {};
         let coin_balances = {};
@@ -74,25 +76,25 @@ class ArtifactPaymentBuilder {
                 coinPromises[coin] = _coins[coin].getBalance({discover: true})
             } catch (err) {
                 coinPromises[coin] = `${err}`;
-                console.log(`Error on fetching promise for ${coin}: ${err}`)
+                // console.log(`Error on fetching promise for ${coin}: ${err}`)
             }
         }
 
         for (let coin in coinPromises) {
             try {
                 coin_balances[coin] = await coinPromises[coin];
-                console.log(`${coin}: resolved balance: ${coin_balances[coin]}`)
+                // console.log(`${coin}: resolved balance: ${coin_balances[coin]}`)
 
             } catch (err) {
                 coin_balances[coin] = "error fetching balance";
-                console.log(`Error while trying to resolve the balance of ${coin}: ${err}`)
+                // console.log(`Error while trying to resolve the balance of ${coin}: ${err}`)
 
                 if (err.response && err.response.statusText) {
-                    console.log("error response status text: ", err.response.statusText)
+                    // console.log("error response status text: ", err.response.statusText)
                 }
             }
         }
-        console.log(`coin balances: ${coin_balances}`);
+        console.log(`Coin balances: ${JSON.stringify(coin_balances, null, 4)}`);
         return coin_balances
     }
     // Step 5: Choose a coin with enough balance in our wallet to spend (default to Flo, then Litecoin, then Bitcoin last)
@@ -103,7 +105,9 @@ class ArtifactPaymentBuilder {
             if (typeof coin_balances[coin] === "number" && typeof conversion_costs[coin] ==="number") {
                 if (coin_balances[coin] >= conversion_costs[coin]) {
                     usableCoins.push(coin)
-                } else console.log(`${coin} has insufficient funds: either error or amount <= ${conversion_costs[coin]}`)
+                } else {
+                    // console.log(`${coin} has insufficient funds: either error or amount <= ${conversion_costs[coin]}`)
+                }
             }
         }
 
@@ -141,7 +145,7 @@ class ArtifactPaymentBuilder {
         // payment_address = "FLZXRaHzVPxJJfaoM32CWT4GZHuj2rx63k"
         // amount = 1.154
         var to = {};
-        to[payment_address] = amount
+        to[payment_address] = amount;
 
         return this._wallet.sendPayment(to)
     }

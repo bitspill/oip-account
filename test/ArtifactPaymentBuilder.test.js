@@ -45,7 +45,6 @@ test("APB, getPaymentAddresses()", async (done) => {
     done()
 }, 10000)
 
-
 test("APB, getExchangeRates(): No Coin Parameters", async (done) => {
     let exchange_rates = await APB.getExchangeRates("usd");
     expect(exchange_rates).toHaveProperty('flo');
@@ -108,5 +107,6 @@ test("APB, selectCoin()", async (done) => {
     done()
 }, 20000);
 
-
-
+test("APB, sendPayment()", async () => {
+    APB.sendPayment({})
+})
