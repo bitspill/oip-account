@@ -45,8 +45,23 @@ test("APB, getPaymentAddresses()", async (done) => {
     done()
 }, 10000)
 
+test("APB, getPaymentAmount()", async () => {
+    await expect(APB.getPaymentAmount()).resolves.toEqual(expect.any(Number))
+})
+
+test("APB, getPaymentAmount(): with 'tip'", async () => {
+    let APB1 = new ArtifactPaymentBuilder(wallet, artifact, 0.0012, "tip");
+    await expect(APB1.getPaymentAmount()).resolves.toBe(.0012)
+})
+
+test("APB, getPaymentAmount(): error with 'buy'", async () => {
+    let APB1 = new ArtifactPaymentBuilder(wallet, artifact, artifactFile, "buy");
+    await expect(APB1.getPaymentAmount()).resolves.toEqual(expect.any(Number))
+})
+
+
 test("APB, getExchangeRates(): No Coin Parameters", async (done) => {
-    let exchange_rates = await APB.getExchangeRates("usd");
+    let exchange_rates = await APB.getExchangeRates();
     expect(exchange_rates).toHaveProperty('flo');
     expect(exchange_rates).toHaveProperty('bitcoin');
     expect(exchange_rates).toHaveProperty('litecoin');
@@ -55,13 +70,13 @@ test("APB, getExchangeRates(): No Coin Parameters", async (done) => {
 }, 10000);
 
 test("APB, getExchangeRates(): One Coin Parameter", async (done) => {
-    let exchange_rates = await APB.getExchangeRates("usd", ["flo"]);
+    let exchange_rates = await APB.getExchangeRates(["flo"], "usd");
     expect(exchange_rates).toHaveProperty('flo');
     done()
 }, 10000);
 
 test("APB, getExchangeRates(): Multiple Coin Parameters", async (done) => {
-    let exchange_rates = await APB.getExchangeRates("usd", ["flo", "bitcoin", "litecoin"]);
+    let exchange_rates = await APB.getExchangeRates(["flo", "bitcoin", "litecoin"], "usd");
     expect(exchange_rates).toHaveProperty('flo');
     expect(exchange_rates).toHaveProperty('bitcoin');
     expect(exchange_rates).toHaveProperty('litecoin');
@@ -69,7 +84,7 @@ test("APB, getExchangeRates(): Multiple Coin Parameters", async (done) => {
 }, 10000);
 
 test("APB, convertCosts", async (done) => {
-    let exchange_rates = await APB.getExchangeRates("usd")
+    let exchange_rates = await APB.getExchangeRates()
     let conversion_costs = await APB.convertCosts(exchange_rates, .00012);
     for (let coin in exchange_rates) {
         if (Object.keys(conversion_costs).indexOf(coin) !== -1){
@@ -77,7 +92,7 @@ test("APB, convertCosts", async (done) => {
         }
     }
     done()
-})
+}, 10000)
 
 test("APB, getWalletBalances(): without coin parameters", async (done) => {
     let balances = await APB.getWalletBalances();
@@ -97,7 +112,7 @@ test("APB, getWalletBalances(): with one coin parameter (flo)", async (done) => 
 
 
 test("APB, selectCoin()", async (done) => {
-    let exchange_rates = await APB.getExchangeRates("usd")
+    let exchange_rates = await APB.getExchangeRates()
     let conversion_costs = await APB.convertCosts(exchange_rates, .00012)
     let coin_balances = await APB.getWalletBalances();
 
@@ -107,6 +122,7 @@ test("APB, selectCoin()", async (done) => {
     done()
 }, 20000);
 
-test("APB, sendPayment()", async () => {
-    APB.sendPayment({})
-})
+// test("APB, sendPayment()", async () => {
+//     await expect(APB.sendPayment("FLZXRaHzVPxJJfaoM32CWT4GZHuj2rx63k", .000001)).resolves.toBe()
+// });
+

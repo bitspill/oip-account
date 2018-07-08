@@ -2,23 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="80224f43-2aa0-4196-ad31-d5973ca4e269" name="Default" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/dictionaries/ryan.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dictionaries/ryan.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/Account.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/Account.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/Account.js.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/Account.js.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/ArtifactPaymentBuilder.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/ArtifactPaymentBuilder.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/ArtifactPaymentBuilder.js.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/ArtifactPaymentBuilder.js.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/KeystoreStorageAdapter.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/KeystoreStorageAdapter.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/KeystoreStorageAdapter.js.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/KeystoreStorageAdapter.js.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/LocalStorageAdapter.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/LocalStorageAdapter.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/LocalStorageAdapter.js.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/LocalStorageAdapter.js.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/MemoryStorageAdapter.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/MemoryStorageAdapter.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/MemoryStorageAdapter.js.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/MemoryStorageAdapter.js.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/StorageAdapter.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/StorageAdapter.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/StorageAdapter.js.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/StorageAdapter.js.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/global.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/global.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/index.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/ArtifactPaymentBuilder.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/ArtifactPaymentBuilder.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/test/ArtifactPaymentBuilder.test.js" beforeDir="false" afterPath="$PROJECT_DIR$/test/ArtifactPaymentBuilder.test.js" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/.tmp/" />
     <ignored path="$PROJECT_DIR$/temp/" />
@@ -38,25 +23,8 @@
             <file leaf-file-name="ArtifactPaymentBuilder.test.js" pinned="false" current-in-tab="true">
               <entry file="file://$PROJECT_DIR$/test/ArtifactPaymentBuilder.test.js">
                 <provider selected="true" editor-type-id="text-editor">
-                  <state relative-caret-position="415">
-                    <caret line="40" column="75" selection-start-line="40" selection-start-column="37" selection-end-line="40" selection-end-column="75" />
-                  </state>
-                </provider>
-              </entry>
-            </file>
-          </leaf>
-        </state>
-      </content>
-    </window>
-    <window id="2">
-      <content type="file-editors">
-        <state>
-          <leaf>
-            <file leaf-file-name="Account.js" pinned="false" current-in-tab="true">
-              <entry file="file://$PROJECT_DIR$/src/Account.js">
-                <provider selected="true" editor-type-id="text-editor">
-                  <state relative-caret-position="-46">
-                    <caret line="136" column="58" selection-start-line="136" selection-start-column="58" selection-end-line="136" selection-end-column="58" />
+                  <state relative-caret-position="755">
+                    <caret line="123" lean-forward="true" selection-start-line="96" selection-end-line="123" />
                   </state>
                 </provider>
               </entry>
@@ -71,8 +39,8 @@
       <file leaf-file-name="ArtifactPaymentBuilder.js" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/ArtifactPaymentBuilder.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="326">
-              <caret line="209" column="79" selection-start-line="209" selection-start-column="79" selection-end-line="209" selection-end-column="79" />
+            <state relative-caret-position="-496">
+              <caret line="244" column="32" lean-forward="true" selection-start-line="244" selection-start-column="32" selection-end-line="244" selection-end-column="32" />
             </state>
           </provider>
         </entry>
@@ -126,8 +94,8 @@
         <option value="$PROJECT_DIR$/test/KeystoreStorageAdapter.test.js" />
         <option value="$PROJECT_DIR$/test/Account.test.js" />
         <option value="$PROJECT_DIR$/package.json" />
-        <option value="$PROJECT_DIR$/test/ArtifactPaymentBuilder.test.js" />
         <option value="$PROJECT_DIR$/src/ArtifactPaymentBuilder.js" />
+        <option value="$PROJECT_DIR$/test/ArtifactPaymentBuilder.test.js" />
       </list>
     </option>
   </component>
@@ -254,7 +222,7 @@
       <workItem from="1530888231883" duration="7536000" />
       <workItem from="1530909599004" duration="15122000" />
       <workItem from="1530948305062" duration="3384000" />
-      <workItem from="1531081489877" duration="5454000" />
+      <workItem from="1531081489877" duration="11482000" />
     </task>
     <task id="LOCAL-00001" summary="tests for calculateCryptoExchangeRate &lt;&lt; ArtifactPaymentBuilder()">
       <created>1530635550088</created>
@@ -267,7 +235,7 @@
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="119150000" />
+    <option name="totallyTimeSpent" value="125178000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="23" width="1280" height="777" extended-state="6" />
@@ -555,20 +523,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/test/ArtifactPaymentBuilder.test.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="415">
-          <caret line="40" column="75" selection-start-line="40" selection-start-column="37" selection-end-line="40" selection-end-column="75" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/Account.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-46">
-          <caret line="136" column="58" selection-start-line="136" selection-start-column="58" selection-end-line="136" selection-end-column="58" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/KeystoreStorageAdapter.js">
       <provider selected="true" editor-type-id="text-editor" />
     </entry>
@@ -579,10 +533,24 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/src/Account.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="345">
+          <caret line="153" column="23" selection-start-line="153" selection-start-column="23" selection-end-line="153" selection-end-column="23" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/ArtifactPaymentBuilder.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="326">
-          <caret line="209" column="79" selection-start-line="209" selection-start-column="79" selection-end-line="209" selection-end-column="79" />
+        <state relative-caret-position="-496">
+          <caret line="244" column="32" lean-forward="true" selection-start-line="244" selection-start-column="32" selection-end-line="244" selection-end-column="32" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/test/ArtifactPaymentBuilder.test.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="755">
+          <caret line="123" lean-forward="true" selection-start-line="96" selection-end-line="123" />
         </state>
       </provider>
     </entry>
