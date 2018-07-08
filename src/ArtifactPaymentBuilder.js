@@ -1,6 +1,9 @@
 const Exchange = require("oip-exchange-rate");
 var { ArtifactFile } = require("oip-index");
 
+/**
+ * A payment builder that calculates exchange rates, balances, conversion costs, and which coin to use for payment
+ */
 class ArtifactPaymentBuilder {
 	/**
 	 * Create a new ArtifactPaymentBuilder
@@ -9,7 +12,7 @@ class ArtifactPaymentBuilder {
      * @param  {ArtifactFile|number} amount	- The amount you wish to pay (`tip`), or the ArtifactFile you wish to pay for (`view` & `buy`)
      * @param  {string} type     - The type of the purchase, either `tip`, `view`, or `buy`
      * @param  {string} [fiat="usd"]   - The Fiat you wish to `tip` in (if amount was a number and NOT an ArtifactFile) default: "usd"
-	 * @return {ArtifactPaymentBuilder}          [description]
+	 * @return {ArtifactPaymentBuilder}
 	 */
 	constructor(wallet, artifact, amount, type, fiat = "usd"){
         this._wallet = wallet;
@@ -20,17 +23,42 @@ class ArtifactPaymentBuilder {
         this._exchange = new Exchange();
 	}
 
-    // Sky Young (July 6, 2018)
-    // Step 1: Get Artifact Payment Addresses (to know what coins are supported)
-    // { flo: "FLZXRaHzVPxJJfaoM32CWT4GZHuj2rx63k" }
+    /**
+     * Get Artifact Payment Addresses (to know what coins are supported)
+     * @return {Array.<Object>}
+     * @example
+     * let APB = new ArtifactPaymentBuilder(wallet, artifact, artifactFile, "view")
+     * APB.getPaymentAddresses()
+     *
+     * //returns
+     * [{ flo: "FLZXRaHzVPxJJfaoM32CWT4GZHuj2rx63k" }]
+     */
     async getPaymentAddresses(){
         return await this._artifact.getPaymentAddresses();
     }
-    // Step 2: Calculate Exchange Rate (only for the supported coins) (this is so that we can know how much to pay in the cryptocurrency to the Artifact/ArtifactFile)
-    async getExchangeRates(fiat = this._fiat, supported_coins_array){
-        let coins =  supported_coins_array || Object.keys(this._wallet.getCoins());
+
+    /**
+     * Calculate Exchange Rate (only for the supported coins) (this is so that we can know how much to pay in the cryptocurrency to the Artifact/ArtifactFile)
+     * @param  {string} [fiat="usd"]     - The fiat currency you wish to check against. If none is given, "usd" is defaulted.
+     * @param  {array} [coins_array=this._wallet.getCoins()]    - An array of coins you want to get exchange rates for. If none are given, an array of all available coins will be used.
+     * @return {Object} exchange_rates
+     * @example
+     * let APB = new ArtifactPaymentBuilder(wallet, artifact, artifactFile, "view")
+     * APB.getExchangeRates("usd", ["flo", "bitcoin", "litecoin"])
+     *
+     * //returns
+     * {
+     *      "flo": expect.any(Number) || "error",
+     *      "bitcoin": expect.any(Number) || "error",
+     *      "litecoin": expect.any(Number) || "error"
+     * }
+     */
+    async getExchangeRates(fiat = this._fiat, coins_array){
+        let coins =  coins_array || Object.keys(this._wallet.getCoins());
         let rates = {};
         let promiseArray = {};
+
+        if (!coins) throw new Error("No coins found to fetch exchange rates");
 
         for (let coin of coins) {
             promiseArray[coin] = this._exchange.getExchangeRate(coin, fiat);
@@ -48,8 +76,17 @@ class ArtifactPaymentBuilder {
         return rates;
     }
 
-
-    // Step 3: Calculate Payment Amounts for each cryptocurrency for all the supported coins (this uses the exchange rate along with the fiat amount defined in the Artifact/ArtifactFile)
+    /**
+     * Calculate Payment Amounts for each cryptocurrency for all the supported coins (this uses the exchange rate along with the fiat amount defined in the Artifact/ArtifactFile)
+     * @param {Object} exchange_rates           - see getExchangeRates()
+     * @param {number|Array.<Number>} payment_amounts          - the amount you wish to tip or the cost of a file to view or buy (currently only supports one payment amount)
+     * @returns {Object} conversion_costs
+     * @example
+     * //returns
+     * {
+     *      "coin": expect.any(Number),
+     * }
+     */
     async convertCosts(exchange_rates, payment_amounts){
         let conversion_costs = {};
         for (let coin in exchange_rates) {
@@ -62,7 +99,22 @@ class ArtifactPaymentBuilder {
         console.log(`Conversion costs: ${JSON.stringify(conversion_costs, null, 4)}`)
         return conversion_costs
     }
-    // Step 4: Get Balances from our wallet for each coin that is supported (The supported coins that the Artifact accepts, gotten in step 1)
+
+    /**
+     * Get Balances for each coin that is supported (The supported coins that the Artifact accepts)
+     * @param  {array} [coins_array=this._wallet.getCoins()]    - An array of coins you want to get balances for. If no coins are given, an array of all available coins will be used.
+     * @return {object} coin_balances
+     * @example
+     * let APB = new ArtifactPaymentBuilder(wallet, artifact, artifactFile, "view")
+     * APB.getBalances(["flo", "bitcoin", "litecoin"])
+     *
+     * //returns
+     * {
+     *      "flo": 2.16216,
+     *      "bitcoin": "error fetching balance",
+     *      "litecoin": 3.32211
+     * }
+     */
     async getWalletBalances(coins_array){
         const coins = coins_array || Object.keys(this._wallet.getCoins());
         let _coins = this._wallet.getCoins();
@@ -97,7 +149,19 @@ class ArtifactPaymentBuilder {
         console.log(`Coin balances: ${JSON.stringify(coin_balances, null, 4)}`);
         return coin_balances
     }
-    // Step 5: Choose a coin with enough balance in our wallet to spend (default to Flo, then Litecoin, then Bitcoin last)
+
+    /**
+     * Choose a coin with enough balance in our wallet to spend (default to Flo, then Litecoin, then Bitcoin last)
+     * @param  {object} coin_balances    - Key value pairs [coin][balance]. See: getBalances()
+     * @param  {object} conversion_costs    - Key value pairs [coin][conversion cost]. See: convertCosts()
+     * @return {string} The `selected_coin` to use for the transaction
+     * @example
+     * let APB = new ArtifactPaymentBuilder(wallet, artifact, artifactFile, "view")
+     * APB.selectCoin(coin_balances, conversion_costs)
+     *
+     * //returns
+     * "flo"
+     */
     async selectCoin(coin_balances, conversion_costs){
 	    let selected_coin;
         let usableCoins = [];
@@ -129,8 +193,6 @@ class ArtifactPaymentBuilder {
             selected_coin = coinWithHighestAmount;
         }
         console.log(`Usable coin(s): ${usableCoins}. The selectedCoin: ${selected_coin}`);
-        // balances = { flo: 2.5981 }
-        // payment_amounts = { flo: 1.154 }
         return selected_coin
     }
 
@@ -141,6 +203,13 @@ class ArtifactPaymentBuilder {
     // Step 8: Calculate amounts to send in the Selected Coin for each split to the Publisher, Platform, and Influencer
     // 
     // Step 9: Send the Payment to the Payment Addresses from Step 1 (and Step 6) using the selected coin from Step 5 for the amount calculated in Step 3 (or Step 7)
+
+    /**
+     * Send the Payment to the Payment Addresses using the selected coin from selectCoin() for the amount calculated
+     * @param {array.<Object>} payment_address      -The addresses you wish to pay to
+     * @param {number} amount                       -The amount you wish to pay
+     * @returns {Promise} A promise that resolves to a txid if the tx went through or an error if it didn't
+     */
     async sendPayment(payment_address, amount){
         // payment_address = "FLZXRaHzVPxJJfaoM32CWT4GZHuj2rx63k"
         // amount = 1.154
@@ -150,8 +219,11 @@ class ArtifactPaymentBuilder {
         return this._wallet.sendPayment(to)
     }
 
-    // Run is an overall function that runs the series of steps specified above and wires them all together
-    async run(){
+    /**
+     * Pay is the overall function that runs a series of methods to calculate balances, addresses, and execute payment
+     * @returns {Promise} A promise that resolves to a txid if the tx went through or an error if it didn't
+     */
+    async pay(){
         // Step 1
         var payment_addresses = await this.getPaymentAddresses()
 
@@ -177,262 +249,6 @@ class ArtifactPaymentBuilder {
 
         return await this.sendPayment(payment_addresses, amount_to_pay)
     }
-
-
-
-
-
-
-
-	// getPaymentAddresses(){
-     //    return this._artifact.getPaymentAddresses();
-	// }
-
-	/**
-	 * Pay for the item you requested
-	 * @return {Promise<Transaction>} Returns a Promise that resolves to the payment transaction, or rejects if there was an error
-	 */
-    // async pay(){
-	 //    console.log("Beginning Payment")
-	 //    let paymentAmount, fiat;
-	 //    fiat = this._fiat;
-    //     // Get ArtifactFile Cost and Artifact Fiat
-	 //    if (this._amount instanceof ArtifactFile) {
-	 //        switch (this._type) {
-    //             case "buy":
-    //                 paymentAmount = this._amount.getSuggestedBuyCost();
-    //                 break;
-    //             case "play":
-    //                 paymentAmount = this._amount.getSuggestedPlayCost();
-    //                 break;
-    //             case "tip":
-    //                 paymentAmount = this._amount;
-    //                 break;
-    //         }
-    //         //@ToDo: set default
-    //     } else {paymentAmount = this._amount}
-    //
-    //     console.log(`paymentAmount: ${paymentAmount} and Fiat: ${this._fiat}`);
-    //
-    //     let superObject = await this.superFunction(paymentAmount, fiat);
-    //     let usableCoins = superObject["usableCoins"];
-    //
-    //     // Send the payment in that crypto to the User (using this.wallet)
-    //     if (usableCoins.length > 0) {
-    //         // Grab Public Addresses
-    //         this.getPaymentAddresses()
-    //
-    //         // Choose coin to use
-    //
-    //         resolve(await this._wallet.sendPayment());
-    //     } else {
-    //          throw new Error("Insufficient funds!")
-    //      }
-    //
-    //     // @ToDo: Save Transaction to `paymentHistory` if payment went through successfully
-    //
-    // }
-    //
-    // /**
-    //  * Get balances for each coin
-    //  * @param  {array} [coinArray]    - An array of coins you want to get balances for. If no coins are given, an array of all available coins will be used.
-    //  * @return {object}
-    //  * @example
-    //  * let APB = new ArtifactPaymentBuilder(...)
-    //  * APB.getBalances(["flo", "bitcoin", "litecoin"])
-    //  *
-    //  * //returns
-    //  * {
-    //  *      "flo": 2.16216,
-    //  *      "bitcoin": "error fetching balance",
-    //  *      "litecoin": 3.32211
-    //  * }
-    //  */
-    //  async getBalances(coinArray) {
-    //         const coins = coinArray || Object.keys(this._wallet.getCoins());
-    //         let coinClass = this._wallet.getCoins();
-    //
-    //         let coinPromises = {};
-    //         let balances = {};
-    //         console.log(`Coin in get balances: ${JSON.stringify(coins, null, 4)}`);
-    //         for (let coin of coins) {
-    //             coinPromises[coin] = {};
-    //             try {
-    //                 coinPromises[coin] = coinClass[coin].getBalance({discover: true})
-    //             } catch (err) {
-    //                 coinPromises[coin] = "promise error fetching balance";
-    //                 console.log(`Error on ${coin}: ${err}`)
-    //             }
-    //         }
-    //
-    //         for (let coin in coinPromises) {
-    //             try {
-    //                 let balance = await coinPromises[coin];
-    //                 balances[coin] = {};
-    //                 balances[coin] = balance
-    //             } catch (err) {
-    //                 balances[coin] = {};
-    //                 balances[coin] = "error fetching balance";
-    //                 if (err.response && err.response.statusText) {
-    //                     console.log("error fetching balance: ", err.response.statusText)
-    //                 }
-    //             }
-    //         }
-    //         return balances
-    // }
-    //
-    //
-    // /**
-    //  * Calculate the exchange rate between a fiat currency and a cryptocurrency
-    //  * @param  {string} fiat     - The fiat currency you wish to check against
-    //  * @param  {array} [coinArray]    - An array of coins you want to get exchange rates for. If no coins are given, an array of all available coins will be used.
-    //  * @return {object} rates
-    //  * @example
-    //  * let APB = new ArtifactPaymentBuilder(...)
-    //  * APB.getExchangeRates("usd", ["flo", "bitcoin", "litecoin"])
-    //  *
-    //  * //returns
-    //  * {
-    //  *      "flo": {"usd": expect.any(Number) || "error},
-    //  *      "bitcoin": {"usd": expect.any(Number) || "error},
-    //  *      "litecoin": {"usd": expect.any(Number) || "error"}
-    //  * }
-    //  */
-    // async getExchangeRates(fiat, coinArray) {
-    //     let coins =  coinArray || Object.keys(this._wallet.getCoins());
-    //     let rates = {};
-    //     let promiseArray = {};
-    //
-    //     for (let coin of coins) {
-    //         promiseArray[coin] = {};
-    //         promiseArray[coin].promise = this._exchange.getExchangeRate(coin, fiat);
-    //         promiseArray[coin].fiat = fiat
-    //     }
-    //
-    //     for (let p in promiseArray) {
-    //         try {
-    //             let rate = await promiseArray[p].promise;
-    //             rates[p] = {};
-    //             rates[p][promiseArray[p].fiat] = rate;
-    //         } catch (err) {
-    //             rates[p] = {};
-    //             rates[p][promiseArray[p].fiat] = "error fetching rate";
-    //
-    //         }
-    //     }
-    //
-    //     return rates
-    // }
-    //
-    // /**
-    //  * Gets the coins with a sufficient balance to pay crpyto amount after price conversion
-    //  * @param  {string} paymentAmount     - The amount in fiat you wish to send or the cost of an item
-    //  * @param  {array} [paymentAddresses]     - Array of keyVal pair objects: [{[coin][coin address]},]
-    //  * @return {object}
-    //  * @example
-    //  *
-    //  * const APB = new APB(wallet, artifact, 00.00012, "view");
-    //  * APB.superFunction(00.00012)
-    //  *
-    //  * //returns
-    //  *{
-    //  *    "usableCoins": [
-    //  *         "flo"
-    //  *     ],
-    //  *     "conversionPrices": {
-    //  *         "flo": 0.0024994844813257264
-    //  *     },
-    //  *     "coinBalances": {
-    //  *         "flo": 0.00302368
-    //  *     },
-    //  *     "exchangeRates": {
-    //  *         "flo": {
-    //  *             "usd": 0.0480099
-    //  *         }
-    //  *     }
-    //  * }
-    //  *
-    //  */
-    //
-    // async superFunction(paymentAmount, paymentAddresses) {
-    //     // let addressPairs = paymentAddresses || false
-    //     let coinsToFetch = [];
-    //     // ------ @ToDo: use this when you get a valid 42 artifact
-    //     if (!paymentAddresses) {
-    //         addressPairs = this.getPaymentAddresses();
-    //         if (!addressPairs) {
-    //             for (let coin in addressPairs) {
-    //                 for (let coin in addressPairs[coin]) {
-    //                     coinsToFetch.push(coin)
-    //                 }
-    //             }
-    //         } else return new Error("could not get payment addresses")
-    //
-    //     }
-    //
-    //     // ------ @ToDo: then delete this
-    //     let addressPairs = [{flo: "FLZXRaHzVPxJJfaoM32CWT4GZHuj2rx63k"}];
-    //     for (let addr in addressPairs) {
-    //         for (let coin in addressPairs[addr]) {
-    //             coinsToFetch.push(coin)
-    //         }
-    //     }
-    //
-    //     console.log(`Coins to fetch: ${coinsToFetch}`)
-    //
-    //     // @ToDO: Get percentages to be paid out to Platforms and Influencers
-    //     let platformCut, influencerCut;
-    //
-    //     // Calculate crypto cost based on the exchange rate for the Fiat (using oip-exchange-rate)
-    //     let exchangeRates;
-    //     try {
-    //         exchangeRates = await this.getExchangeRates(this._fiat, coinsToFetch);
-    //         console.log(`exchangeRates: ${JSON.stringify(exchangeRates, null, 4)}`)
-    //     } catch (err) {
-    //         console.log(`Error on getExchangeRates: ${err}`)
-    //     };
-    //
-    //     // Check Coin Balances
-    //     let coinBalances;
-    //     try {
-    //         coinBalances = await this.getBalances(coinsToFetch)
-    //         console.log(`myCoinBalances: ${JSON.stringify(coinBalances, null, 4)}`)
-    //
-    //     } catch (err) {
-    //         console.log(`Error on getBalances: ${err}`)
-    //     }
-    //
-    //     //exchange rate / file cost
-    //     let conversionPrices = {};
-    //     for (let coin in exchangeRates) {
-    //         if (typeof exchangeRates[coin][this._fiat] === "number") {
-    //             conversionPrices[coin] = paymentAmount / exchangeRates[coin][this._fiat];
-    //             console.log(`${conversionPrices[coin]} = ${paymentAmount} / ${exchangeRates[coin][this._fiat]}`)
-    //         }
-    //     }
-    //     console.log("conversionPrices: ", conversionPrices);
-    //
-    //     // If not enough balance
-    //     // reject(new Error("Not Enough Balance!"))
-    //     // Pick crypto(s) to pay with
-    //
-    //     let usableCoins = [];
-    //     for (let coin in coinBalances) {
-    //         if (coinBalances[coin] && conversionPrices[coin]) {
-    //             if (coinBalances[coin] >= conversionPrices[coin]) {
-    //                 usableCoins.push(coin)
-    //             } else console.log(`Balance not enough for ${coin}: ${coinBalances[coin]} <= ${conversionPrices[coin]}`)
-    //         }
-    //     }
-    //     console.log(`Usable coins: ${usableCoins}`);
-    //
-    //     return {
-    //         usableCoins,
-    //         conversionPrices,
-    //         coinBalances,
-    //         exchangeRates
-    //     }
-    // }
 }
 
 module.exports = ArtifactPaymentBuilder;
