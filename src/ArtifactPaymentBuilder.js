@@ -98,7 +98,7 @@ class ArtifactPaymentBuilder {
                 rates[coin] = "error fetching rate";
             }
         }
-        console.log(`Exchange rates: ${JSON.stringify(rates, null, 4)}`)
+        // console.log(`Exchange rates: ${JSON.stringify(rates, null, 4)}`)
         return rates;
     }
 
@@ -123,7 +123,7 @@ class ArtifactPaymentBuilder {
                 conversion_costs[coin] = payment_amounts / exchange_rates[coin];
             }
         }
-        console.log(`Conversion costs: ${JSON.stringify(conversion_costs, null, 4)}`)
+        // console.log(`Conversion costs: ${JSON.stringify(conversion_costs, null, 4)}`)
         return conversion_costs
     }
 
@@ -173,7 +173,7 @@ class ArtifactPaymentBuilder {
                 }
             }
         }
-        console.log(`Coin balances: ${JSON.stringify(coin_balances, null, 4)}`);
+        // console.log(`Coin balances: ${JSON.stringify(coin_balances, null, 4)}`);
         return coin_balances
     }
 
@@ -219,7 +219,7 @@ class ArtifactPaymentBuilder {
             }
             selected_coin = coinWithHighestAmount;
         }
-        console.log(`Usable coin(s): ${usableCoins}. The selectedCoin: ${selected_coin}`);
+        // console.log(`Usable coin(s): ${usableCoins}. \n The selectedCoin: ${selected_coin}`);
         return selected_coin
     }
 
@@ -247,7 +247,7 @@ class ArtifactPaymentBuilder {
         payment_options.to = to;
         if (selected_coin) {payment_options.coin = selected_coin};
 
-        console.log(`payment_options: ${JSON.stringify(payment_options, null, 4)}`)
+        // console.log(`payment_options: ${JSON.stringify(payment_options, null, 4)}`)
         return await this._wallet.sendPayment(payment_options)
     }
 
@@ -258,11 +258,11 @@ class ArtifactPaymentBuilder {
     async pay(){
         //Step 1.a: Determine amount to pay
         let payment_amount = await this.getPaymentAmount();
-        console.log(`Payment amount: ${payment_amount}`)
+        console.log(`payment_amount: ${payment_amount}`)
 
         // Step 1.b: Get supported_coin and addresses
         const paymentAddresses = await this.getPaymentAddresses();
-        console.log(`Payment addresses: ${JSON.stringify(paymentAddresses, null, 4)}`)
+        console.log(`paymentAddresses: ${JSON.stringify(paymentAddresses, null, 4)}`)
 
 
         const supported_coins = [];
@@ -272,31 +272,38 @@ class ArtifactPaymentBuilder {
                 supported_coins.push(coin);
             }
         }
-        console.log(`Supported coins: ${supported_coins}`)
+        console.log(`supported_coins: ${supported_coins}`)
 
 
         // Step 2: Get exchange rates for supported_coins
         const exchange_rates = await this.getExchangeRates(supported_coins);
-        console.log(`Exchange_rates: ${exchange_rates}`)
+        console.log(`exchange_rates: ${JSON.stringify(exchange_rates, null, 4)}`)
 
 
         // Step 3: Convert the costs using the exchange_rates
         const conversion_costs = await this.convertCosts(exchange_rates, payment_amount);
-        console.log(`Conversion costs: ${conversion_costs}`)
+        console.log(`conversion_costs: ${JSON.stringify(conversion_costs)}`)
 
         // Step 4 (this step can be running while Step 3 is running)
         const coin_balances = await this.getWalletBalances(supported_coins);
-        console.log(`Coin balances: ${coin_balances}`)
+        console.log(`coin_balances: ${JSON.stringify(coin_balances, null, 4)}`)
 
         // Step 5
         const selected_coin = await this.selectCoin(coin_balances, conversion_costs);
-        console.log(`Selected coin: ${selected_coin}`)
+        console.log(`selected_coin: ${selected_coin}`)
 
+        let payment_address;
+        for (let addr of paymentAddresses) {
+            for (let coin in addr) {
+                if (coin === selected_coin) {
+                    payment_address = addr[coin];
+                }
+            }
+        }
+        console.log(`payment_address: ${payment_address}`)
 
-        const payment_address = paymentAddresses[selected_coin];
-        console.log(`Payment address: ${payment_address}`)
         const amount_to_pay = conversion_costs[selected_coin];
-        console.log(`Amount to pay: ${amount_to_pay}`)
+        console.log(`amount_to_pay: ${amount_to_pay}`)
 
         return await this.sendPayment(payment_address, amount_to_pay, selected_coin)
     }
