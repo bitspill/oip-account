@@ -122,11 +122,13 @@ test("APB, selectCoin()", async (done) => {
     done()
 }, 20000);
 
-test("APB, sendPayment()", async () => {
-    let payment = await APB.sendPayment("FLZXRaHzVPxJJfaoM32CWT4GZHuj2rx63k", .00001);
-    console.log(`Type of payment: ${typeof payment}`)
-    console.log(`TXID OR ERR: ${payment}`)
-}, 10000);
+// This function (sendPayment()) is run in the below test (pay())
+// test("APB, sendPayment()", async (done) => {
+//     let payment = await APB.sendPayment("FLZXRaHzVPxJJfaoM32CWT4GZHuj2rx63k", .00001);
+//     console.log(`Type of payment: ${typeof payment}`)
+//     console.log(`TXID OR ERR: ${payment}`)
+//     done()
+// }, 10000);
 
 test("APB, pay()", async (done) => {
     let APBpay = new ArtifactPaymentBuilder(wallet, artifact, 0.00001, "tip");
