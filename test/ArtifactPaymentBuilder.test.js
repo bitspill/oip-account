@@ -122,7 +122,9 @@ test("APB, selectCoin()", async (done) => {
     done()
 }, 20000);
 
-test("APB, sendPayment() error", async () => {
-    await expect(APB.sendPayment("FLZXRaHzVPxJJfaoM32CWT4GZHuj2rx63k", .00001)).rejects.toBeDefined();
+test("APB, sendPayment()", async () => {
+    let payment = await APB.sendPayment("FLZXRaHzVPxJJfaoM32CWT4GZHuj2rx63k", .00001);
+    console.log(`Type of payment: ${typeof payment}`)
+    console.log(`TXID OR ERR: ${payment}`)
 }, 10000);
 
