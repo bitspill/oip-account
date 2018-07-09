@@ -128,3 +128,11 @@ test("APB, sendPayment()", async () => {
     console.log(`TXID OR ERR: ${payment}`)
 }, 10000);
 
+test("APB, pay()", async (done) => {
+    let APBpay = new ArtifactPaymentBuilder(wallet, artifact, 0.00001, "tip");
+    let pay = await APBpay.pay();
+    console.log(`Pay result: ${pay}`)
+    done()
+}, 20000)
+
+//@ToDo: add tests for 'view' and 'buy' type artifactFiles
