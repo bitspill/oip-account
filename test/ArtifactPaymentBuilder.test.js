@@ -35,7 +35,7 @@ var artifactDehydrated = {
         }
     }
 }
-var wallet = new Wallet('00000000000000000000000000000000', {discover: false});
+var wallet = new Wallet('00000000000000000000000000000001', {discover: false});
 let artifact = new Artifact(artifactDehydrated);
 let artifactFile = new ArtifactFile()
 let APB = new ArtifactPaymentBuilder(wallet, artifact, artifactFile, "view");
@@ -122,7 +122,7 @@ test("APB, selectCoin()", async (done) => {
     done()
 }, 20000);
 
-// test("APB, sendPayment()", async () => {
-//     await expect(APB.sendPayment("FLZXRaHzVPxJJfaoM32CWT4GZHuj2rx63k", .000001)).resolves.toBe()
-// });
+test("APB, sendPayment() error", async () => {
+    await expect(APB.sendPayment("FLZXRaHzVPxJJfaoM32CWT4GZHuj2rx63k", .00001)).rejects.toBeDefined();
+}, 10000);
 

@@ -103,7 +103,7 @@ class ArtifactPaymentBuilder {
     }
 
     /**
-     * Calculate Payment Amounts for each cryptocurrency for all the supported coins (this uses the exchange rate along with the fiat amount defined in the Artifact/ArtifactFile)
+     * Convert fiat price to crypto price using live exchange_rates
      * @param {Object} exchange_rates           - see getExchangeRates()
      * @param {number|Array.<Number>} payment_amounts          - the amount you wish to tip or the cost of a file to view or buy (currently only supports one payment amount)
      * @returns {Object} conversion_costs
@@ -111,6 +111,7 @@ class ArtifactPaymentBuilder {
      * //returns
      * {
      *      "coin": expect.any(Number),
+     *      ...
      * }
      */
     async convertCosts(exchange_rates, payment_amounts){
@@ -234,18 +235,20 @@ class ArtifactPaymentBuilder {
      * Send the Payment to the Payment Addresses using the selected coin from selectCoin() for the amount calculated
      * @param {string} payment_address      -The addresses you wish to send money to
      * @param {number} amount_to_pay                       -The amount you wish to pay
+     * @param {string} [selected_coin]                     -The coin you wish to spend with. If no coin is given, function will try to match address with a coin.
      * @returns {Promise} A promise that resolves to a txid if the tx went through or an error if it didn't
      */
-    async sendPayment(payment_address, amount_to_pay){
+    async sendPayment(payment_address, amount_to_pay, selected_coin){
         // payment_address = "FLZXRaHzVPxJJfaoM32CWT4GZHuj2rx63k"
         // amount = 1.154
 
         let payment_options = {}, to ={};
         to[payment_address] = amount_to_pay;
         payment_options.to = to;
+        if (selected_coin) {payment_options.coin = selected_coin};
 
         console.log(`payment_options: ${JSON.stringify(payment_options, null, 4)}`)
-        return this._wallet.sendPayment(payment_options)
+        return await this._wallet.sendPayment(payment_options)
     }
 
     /**
@@ -280,7 +283,7 @@ class ArtifactPaymentBuilder {
         const payment_address = paymentAddresses[selected_coin];
         const amount_to_pay = conversion_costs[selected_coin];
 
-        return await this.sendPayment(payment_address, amount_to_pay)
+        return await this.sendPayment(payment_address, amount_to_pay, selected_coin)
     }
 }
 
