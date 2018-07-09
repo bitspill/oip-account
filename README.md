@@ -58,13 +58,48 @@ To login to an already created account, we will first need to import the `Accoun
 
 Note: If you have not yet created an Account, please see the [Create your first Account](https://github.com/oipwg/oip-account/#) Getting Started right above this one.
 
+Go ahead and spawn a new `Account` Object with your login ID or Email. You will want to set the `password` to the password you chose in the [Create your first Account](https://github.com/oipwg/oip-account/#) section. 
+
 ```javascript
 import { Account } from 'oip-account'
+
+var myAccount = new Account("test@me.com", "password")
 ```
 
-After you have imported the Account class, you can go ahead and spawn a new `Account` Object. Pass it in your login ID or Email. You will want to also set the `password` to . If you don't define a password, it will be encrypted using a blank string WHICH IS NOT SAFE!
+Now that we have created our `Account` Object (named `myAccount` in this case), we will want to "login" to it. We do this by running the [`.login()` method](https://oipwg.github.io/oip-account/Account.html#login) on the `Account` object we just created. This method returns a Promise that will be resolved if able to login to your account properly.
+
+```javascript
+myAccount.login().then((account_data) => {
+	console.log("Account Login Successful", account_data)
+})
+```
 
 ### Paying for an Artifact
+
+To Pay for an Artifact, we need to first get the Artifact we want to pay for from the index using the [OIP Index](https://github.com/oipwg/oip-index/) Module. Once we have selected the Artifact as well as the ArtifactFile for which we wish to pay, we can make the payment to view/buy the specific File. 
+
+In order to make the Payment, we need to make sure that we are logging into the Account. You can view an example below of how we login to the account we created in [Create your first Account](https://github.com/oipwg/oip-account/#) and then pay for the ArtifactFile we wish to view.
+```javascript
+import { Account } from 'oip-account';
+import { Index } from 'oip-index';
+
+var myAccount = new Account("test@me.com", "password")
+
+var index = new Index();
+
+myAccount.login().then((account_data) => {
+	console.log("Logged Into Account");
+
+	index.getArtifact("513691", (artifact) => {
+		var files = artifact.getFiles();
+		var file = files[0];
+
+		myAccount.payForArtifactFile(artifact, file, "view", "usd").then((txid) => {
+			console.log("Payment Successful! https://livenet.flocha.in/tx/" + txid)
+		})
+	})
+})
+```
 
 ## API Documentation
 Learn more about how each Class works, or take a look at all functions available to you.
