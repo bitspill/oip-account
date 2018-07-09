@@ -6,16 +6,16 @@ OIP Account is an NPM Module that provides access to User Account functions such
 ## Table of Contents
 * [Installation Instructions](https://github.com/oipwg/oip-account/#installation-instructions)
 * [Getting Started](https://github.com/oipwg/oip-account/#getting-started)
-	* [Creating your first Account](https://github.com/oipwg/oip-account/#)
-	* [Logging in to your Account](https://github.com/oipwg/oip-account/#)
-	* [Paying for an Artifact](https://github.com/oipwg/oip-account/#)
+    * [Creating your first Account](https://github.com/oipwg/oip-account/#)
+    * [Logging in to your Account](https://github.com/oipwg/oip-account/#)
+    * [Paying for an Artifact](https://github.com/oipwg/oip-account/#)
 * [API Documentation](https://github.com/oipwg/oip-account/#api-documentation)
-	* [Account](https://oipwg.github.io/oip-account/Account.html)
-	* [ArtifactPaymentBuilder](https://oipwg.github.io/oip-account/Account.html)
-	* [StorageAdapter](https://oipwg.github.io/oip-account/StorageAdapter.html)
-	* [MemoryStorageAdapter](https://oipwg.github.io/oip-account/MemoryStorageAdapter.html)
-	* [LocalStorageAdapter](https://oipwg.github.io/oip-account/LocalStorageAdapter.html)
-	* [KeystoreStorageAdapter](https://oipwg.github.io/oip-account/KeystoreStorageAdapter.html)
+    * [Account](https://oipwg.github.io/oip-account/Account.html)
+    * [ArtifactPaymentBuilder](https://oipwg.github.io/oip-account/Account.html)
+    * [StorageAdapter](https://oipwg.github.io/oip-account/StorageAdapter.html)
+    * [MemoryStorageAdapter](https://oipwg.github.io/oip-account/MemoryStorageAdapter.html)
+    * [LocalStorageAdapter](https://oipwg.github.io/oip-account/LocalStorageAdapter.html)
+    * [KeystoreStorageAdapter](https://oipwg.github.io/oip-account/KeystoreStorageAdapter.html)
 * [License](https://github.com/oipwg/oip-account/#license)
 
 ## Installation Instructions
@@ -46,7 +46,7 @@ Now that we have created our `Account` Object (named `myAccount` in this case), 
 
 ```javascript
 myAccount.create().then((account_info) => {
-	console.log(account_info)
+    console.log(account_info)
 })
 ```
 
@@ -70,7 +70,7 @@ Now that we have created our `Account` Object (named `myAccount` in this case), 
 
 ```javascript
 myAccount.login().then((account_data) => {
-	console.log("Account Login Successful", account_data)
+    console.log("Account Login Successful", account_data)
 })
 ```
 
@@ -88,28 +88,28 @@ var myAccount = new Account("test@me.com", "password")
 var index = new Index();
 
 myAccount.login().then((account_data) => {
-	console.log("Logged Into Account");
+    console.log("Logged Into Account");
 
-	index.getArtifact("513691", (artifact) => {
-		var files = artifact.getFiles();
-		var file = files[0];
+    index.getArtifact("513691", (artifact) => {
+        var files = artifact.getFiles();
+        var file = files[0];
 
-		myAccount.payForArtifactFile(artifact, file, "view", "usd").then((txid) => {
-			console.log("Payment Successful! https://livenet.flocha.in/tx/" + txid)
-		})
-	})
+        myAccount.payForArtifactFile(artifact, file, "view", "usd").then((txid) => {
+            console.log("Payment Successful! https://livenet.flocha.in/tx/" + txid)
+        })
+    })
 })
 ```
 
 ## API Documentation
 Learn more about how each Class works, or take a look at all functions available to you.
 * [Documentation Home](https://oipwg.github.io/oip-account/)
-	* [Account](https://oipwg.github.io/oip-account/Account.html)
-	* [ArtifactPaymentBuilder](https://oipwg.github.io/oip-account/Account.html)
-	* [StorageAdapter](https://oipwg.github.io/oip-account/StorageAdapter.html)
-	* [MemoryStorageAdapter](https://oipwg.github.io/oip-account/MemoryStorageAdapter.html)
-	* [LocalStorageAdapter](https://oipwg.github.io/oip-account/LocalStorageAdapter.html)
-	* [KeystoreStorageAdapter](https://oipwg.github.io/oip-account/KeystoreStorageAdapter.html)
+    * [Account](https://oipwg.github.io/oip-account/Account.html)
+    * [ArtifactPaymentBuilder](https://oipwg.github.io/oip-account/Account.html)
+    * [StorageAdapter](https://oipwg.github.io/oip-account/StorageAdapter.html)
+    * [MemoryStorageAdapter](https://oipwg.github.io/oip-account/MemoryStorageAdapter.html)
+    * [LocalStorageAdapter](https://oipwg.github.io/oip-account/LocalStorageAdapter.html)
+    * [KeystoreStorageAdapter](https://oipwg.github.io/oip-account/KeystoreStorageAdapter.html)
 
 ## License
 MIT License
