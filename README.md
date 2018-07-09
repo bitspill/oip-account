@@ -90,7 +90,7 @@ var index = new Index();
 myAccount.login().then((account_data) => {
     console.log("Logged Into Account");
 
-    index.getArtifact("513691", (artifact) => {
+    index.getArtifact("513691").then((artifact) => {
         var files = artifact.getFiles();
         var file = files[0];
 
