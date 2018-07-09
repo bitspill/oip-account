@@ -6,16 +6,16 @@ OIP Account is an NPM Module that provides access to User Account functions such
 ## Table of Contents
 * [Installation Instructions](https://github.com/oipwg/oip-account/#installation-instructions)
 * [Getting Started](https://github.com/oipwg/oip-account/#getting-started)
-	* [Creating your first Account](https://github.com/oipwg/oip-account/#)
-	* [Logging in to your Account](https://github.com/oipwg/oip-account/#)
-	* [Paying for an Artifact](https://github.com/oipwg/oip-account/#)
+    * [Creating your first Account](https://github.com/oipwg/oip-account/#)
+    * [Logging in to your Account](https://github.com/oipwg/oip-account/#)
+    * [Paying for an Artifact](https://github.com/oipwg/oip-account/#)
 * [API Documentation](https://github.com/oipwg/oip-account/#api-documentation)
-	* [Account](https://oipwg.github.io/oip-account/Account.html)
-	* [ArtifactPaymentBuilder](https://oipwg.github.io/oip-account/Account.html)
-	* [StorageAdapter](https://oipwg.github.io/oip-account/StorageAdapter.html)
-	* [MemoryStorageAdapter](https://oipwg.github.io/oip-account/MemoryStorageAdapter.html)
-	* [LocalStorageAdapter](https://oipwg.github.io/oip-account/LocalStorageAdapter.html)
-	* [KeystoreStorageAdapter](https://oipwg.github.io/oip-account/KeystoreStorageAdapter.html)
+    * [Account](https://oipwg.github.io/oip-account/Account.html)
+    * [ArtifactPaymentBuilder](https://oipwg.github.io/oip-account/Account.html)
+    * [StorageAdapter](https://oipwg.github.io/oip-account/StorageAdapter.html)
+    * [MemoryStorageAdapter](https://oipwg.github.io/oip-account/MemoryStorageAdapter.html)
+    * [LocalStorageAdapter](https://oipwg.github.io/oip-account/LocalStorageAdapter.html)
+    * [KeystoreStorageAdapter](https://oipwg.github.io/oip-account/KeystoreStorageAdapter.html)
 * [License](https://github.com/oipwg/oip-account/#license)
 
 ## Installation Instructions
@@ -46,7 +46,7 @@ Now that we have created our `Account` Object (named `myAccount` in this case), 
 
 ```javascript
 myAccount.create().then((account_info) => {
-	console.log(account_info)
+    console.log(account_info)
 })
 ```
 
@@ -58,23 +58,58 @@ To login to an already created account, we will first need to import the `Accoun
 
 Note: If you have not yet created an Account, please see the [Create your first Account](https://github.com/oipwg/oip-account/#) Getting Started right above this one.
 
+Go ahead and spawn a new `Account` Object with your login ID or Email. You will want to set the `password` to the password you chose in the [Create your first Account](https://github.com/oipwg/oip-account/#) section. 
+
 ```javascript
 import { Account } from 'oip-account'
+
+var myAccount = new Account("test@me.com", "password")
 ```
 
-After you have imported the Account class, you can go ahead and spawn a new `Account` Object. Pass it in your login ID or Email. You will want to also set the `password` to . If you don't define a password, it will be encrypted using a blank string WHICH IS NOT SAFE!
+Now that we have created our `Account` Object (named `myAccount` in this case), we will want to "login" to it. We do this by running the [`.login()` method](https://oipwg.github.io/oip-account/Account.html#login) on the `Account` object we just created. This method returns a Promise that will be resolved if able to login to your account properly.
+
+```javascript
+myAccount.login().then((account_data) => {
+    console.log("Account Login Successful", account_data)
+})
+```
 
 ### Paying for an Artifact
+
+To Pay for an Artifact, we need to first get the Artifact we want to pay for from the index using the [OIP Index](https://github.com/oipwg/oip-index/) Module. Once we have selected the Artifact as well as the ArtifactFile for which we wish to pay, we can make the payment to view/buy the specific File. 
+
+In order to make the Payment, we need to make sure that we are logging into the Account. You can view an example below of how we login to the account we created in [Create your first Account](https://github.com/oipwg/oip-account/#) and then pay for the ArtifactFile we wish to view.
+```javascript
+import { Account } from 'oip-account';
+import { Index } from 'oip-index';
+
+var myAccount = new Account("test@me.com", "password")
+
+var index = new Index();
+
+myAccount.login().then((account_data) => {
+    console.log("Logged Into Account");
+
+    index.getArtifact("513691").then((artifact) => {
+        var files = artifact.getFiles();
+        var file = files[0];
+
+        myAccount.payForArtifactFile(artifact, file, "view", "usd").then((txid) => {
+            console.log("Payment Successful! https://livenet.flocha.in/tx/" + txid)
+        })
+    })
+})
+```
 
 ## API Documentation
 Learn more about how each Class works, or take a look at all functions available to you.
 * [Documentation Home](https://oipwg.github.io/oip-account/)
-	* [Account](https://oipwg.github.io/oip-account/Account.html)
-	* [ArtifactPaymentBuilder](https://oipwg.github.io/oip-account/Account.html)
-	* [StorageAdapter](https://oipwg.github.io/oip-account/StorageAdapter.html)
-	* [MemoryStorageAdapter](https://oipwg.github.io/oip-account/MemoryStorageAdapter.html)
-	* [LocalStorageAdapter](https://oipwg.github.io/oip-account/LocalStorageAdapter.html)
-	* [KeystoreStorageAdapter](https://oipwg.github.io/oip-account/KeystoreStorageAdapter.html)
+    * [Account](https://oipwg.github.io/oip-account/Account.html)
+    * [ArtifactPaymentBuilder](https://oipwg.github.io/oip-account/Account.html)
+    * [StorageAdapter](https://oipwg.github.io/oip-account/StorageAdapter.html)
+    * [MemoryStorageAdapter](https://oipwg.github.io/oip-account/MemoryStorageAdapter.html)
+    * [LocalStorageAdapter](https://oipwg.github.io/oip-account/LocalStorageAdapter.html)
+    * [KeystoreStorageAdapter](https://oipwg.github.io/oip-account/KeystoreStorageAdapter.html)
 
 ## License
 MIT License

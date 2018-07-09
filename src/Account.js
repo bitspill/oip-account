@@ -11,7 +11,7 @@ class Account {
 	 * @param  {string} username - Pass in your Email, Account ID, or a BIP39 Mnemonic
 	 * @param  {string} password - Your Accounts password
 	 * @param  {Object} [options]  - Options about the Account being spawned
-	 * @param  {Boolean} [options.store_local=false] - If the wallet should be stored locally or on a Keystore server
+	 * @param  {Boolean} [options.store_memory=false] - If the wallet should be stored only in the Memory and wiped completely on logout
      * @param  {Boolean} [options.store_in_keystore=false] - If the wallet should be stored on a Keystore server
 	 * @param  {string} [options.keystore_url="https://keystore.oip.li/"] - Keystore to use to store the Account
      * @param  {Boolean} [options.discover=false] - set discovery
