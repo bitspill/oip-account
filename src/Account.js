@@ -92,7 +92,7 @@ class Account {
 		this._account = account_info;
 
 		if (!this._account.wallet.mnemonic)
-			reject(new Error("Accounts not containing a Wallet Mnemonic are NOT SUPPORTED!"))
+		    throw new Error("Accounts not containing a Wallet Mnemonic are NOT SUPPORTED!")
 
 		this.wallet = new Wallet(this._account.wallet.mnemonic, {discover: this.discover})
 
