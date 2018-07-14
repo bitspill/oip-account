@@ -1,4 +1,5 @@
-var Account = require("../src/Account");
+// var Account = require("../src/Account");
+import Account from '../src/Account';
 
 test("Create new Account MemoryStorage!", (done) => {
 	var acc = new Account(undefined, undefined, {store_memory: true, discover: false});
