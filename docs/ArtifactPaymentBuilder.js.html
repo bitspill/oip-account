@@ -163,7 +163,7 @@ class ArtifactPaymentBuilder {
      * @return {Object} exchange_rates
      * @example
      * let APB = new ArtifactPaymentBuilder(wallet, artifact, artifactFile, "view")
-     * APB.getExchangeRates("usd", ["flo", "bitcoin", "litecoin"])
+     * APB.getExchangeRates(["flo", "bitcoin", "litecoin"], "usd")
      *
      * //returns
      * {
@@ -373,7 +373,7 @@ class ArtifactPaymentBuilder {
         console.log(`exchange_rates: ${JSON.stringify(exchange_rates, null, 4)}`)
 
 
-        // Step 3: Convert the costs using the exchange_rates
+        // Step 3: Convert the file/tip costs using the exchange_rates
         const conversion_costs = await this.convertCosts(exchange_rates, payment_amount);
         console.log(`conversion_costs: ${JSON.stringify(conversion_costs)}`)
 
