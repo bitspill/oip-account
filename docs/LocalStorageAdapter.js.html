@@ -92,21 +92,11 @@
 <section>
   <article>
     <pre class="prettyprint source linenums"><code>import StorageAdapter from './StorageAdapter'
-
-//FOR PROD
-// if (typeof window.localStorage === "undefined" || window.localStorage === null) {
-//     if (typeof localStorage === "undefined" || localStorage === null) {
-//         var LocalStorage = require('node-localstorage').LocalStorage;
-//         var localStorage = new LocalStorage('./localStorage');
-//     }
-// } else {
-//     var localStorage = window.localStorage
-// }
-
-// FOR TESTING
-if (typeof localStorage === "undefined" || localStorage === null) {
-    var LocalStorage = require('node-localstorage').LocalStorage;
-    var localStorage = new LocalStorage('./localStorage');
+if (typeof window.localStorage === "undefined" || window.localStorage === null) {
+    if (typeof localStorage === "undefined" || localStorage === null) {
+        var LocalStorage = require('node-localstorage').LocalStorage;
+        var localStorage = new LocalStorage('./localStorage');
+    }
 } else {
     var localStorage = window.localStorage
 }
@@ -140,6 +130,7 @@ class LocalStorageAdapter extends StorageAdapter {
 
 		if (stored_data[id]){
 			var decrypted_data = this.decrypt(stored_data[id].encrypted_data);
+
 			if (decrypted_data){
 				if (!decrypted_data.identifier)
 					decrypted_data.identifier = id;
