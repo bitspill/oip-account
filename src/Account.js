@@ -1,4 +1,5 @@
 import { Wallet, util } from 'oip-hdmw';
+import ArtifactPaymentBuilder from './ArtifactPaymentBuilder';
 import { isValidEmail, isValidIdentifier, isValidSharedKey } from './util';
 
 import MemoryStorageAdapter from './MemoryStorageAdapter';
@@ -152,7 +153,7 @@ class Account {
 	 */
 	payForArtifactFile(artifact, artifact_file, purchase_type, fiat){
 		return new Promise((resolve, reject) => {
-			var builder = new ArtifactPaymentBuilder(this.wallet, artifact, artifact_file, purchase_type, fiat);
+			let builder = new ArtifactPaymentBuilder(this.wallet, artifact, artifact_file, purchase_type, fiat);
 
 			builder.pay().then(resolve).catch(reject)
 		}) 
@@ -166,7 +167,7 @@ class Account {
 	 */
 	sendArtifactTip(artifact, amount, fiat){
 		return new Promise((resolve, reject) => {
-			var builder = new ArtifactPaymentBuilder(this.wallet, artifact, amount, 'tip', fiat)
+			let builder = new ArtifactPaymentBuilder(this.wallet, artifact, amount, 'tip', fiat)
 			
 			builder.pay().then(resolve).catch(reject)
 		})

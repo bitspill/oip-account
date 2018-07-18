@@ -1,5 +1,6 @@
 // var Account = require("../src/Account");
 import Account from '../src/Account';
+import { Index } from 'oip-index'
 
 test("Create new Account MemoryStorage!", (done) => {
 	var acc = new Account(undefined, undefined, {store_memory: true, discover: false});
@@ -80,3 +81,31 @@ test("Create Account (no email) (localStorage)", async (done) => {
 	done()
 })
 
+test("Account wallet methods (localStorage)", async (done) => {
+    var acc = new Account("abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about", "password", {discover: false});
+
+    let info = await acc.create();
+    let x = await acc.wallet.getFiatBalances()
+    let y = await acc.wallet.getCoinBalances()
+    let z = await acc.wallet.getExchangeRates()
+    expect(x).toBeDefined()
+    expect(y).toBeDefined()
+    expect(z).toBeDefined()
+    done()
+}, 100000)
+
+
+
+test("Account payment builder: pay to View artifact 227447", async (done) => {
+    // var acc = new Account("siren comic spy donkey unknown license asset lens proud bus exhaust section", "password", {discover: false});
+    // let info = await acc.create();
+    let network = new Index()
+    let art = await network.getArtifact("227447")
+    let file = art.getFiles()[0]
+    console.log(file.getSuggestedPlayCost())
+    // acc.payForArtifactFile(art, file, "view")
+    //     .then(suc => {console.log(suc)})
+    //     .catch(err => {console.log(err)})
+
+    done()
+}, 100000)

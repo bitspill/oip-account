@@ -1,5 +1,5 @@
+import {ArtifactFile} from 'oip-index'
 const Exchange = require("oip-exchange-rate");
-var { ArtifactFile } = require("oip-index");
 
 /**
  * A payment builder that calculates exchange rates, balances, conversion costs, and which coin to use for payment
@@ -309,4 +309,4 @@ class ArtifactPaymentBuilder {
     }
 }
 
-module.exports = ArtifactPaymentBuilder;
+export default ArtifactPaymentBuilder;
