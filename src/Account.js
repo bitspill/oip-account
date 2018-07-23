@@ -43,6 +43,12 @@ class Account {
 			this._username = undefined
 		}
 
+		if (isValidEmail(this._username))
+		    this._account.email = this._username
+
+        if (isValidIdentifier(this._username))
+            this._account.identifier = this._username
+
 		// Detect what kind of Username we are being passed.
 		if (options && options.store_memory) {
 			this._storageAdapter = new MemoryStorageAdapter(this._account);
