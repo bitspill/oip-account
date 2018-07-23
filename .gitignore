@@ -63,8 +63,10 @@ lib/*
 localStorage/*
 .DS_Store
 *.xml
-.idea/*
-*.idea/
 *.xml
 .idea/workspace.xml
 db.json
+
+# jetbrains
+.idea/*
+

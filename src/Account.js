@@ -47,7 +47,7 @@ class Account {
 		if (options && options.store_memory) {
 			this._storageAdapter = new MemoryStorageAdapter(this._account);
 		} else if (options && options.store_in_keystore) {
-			this._storageAdapter = new KeystoreStorageAdapter(options.keystore_url, this._username, this._password);
+			this._storageAdapter = new KeystoreStorageAdapter(this._username, this._password, options.keystore_url);
 		} else {
 			this._storageAdapter = new LocalStorageAdapter(this._username, this._password);
 		}
