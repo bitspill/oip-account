@@ -10,7 +10,7 @@ function isValidEmail (email) {
 
 function isValidIdentifier (identifier) {
 	// for example 75c1209-dbcac5a6-e040977-64a52ae
-	return /^[0-9a-f]{7}-[0-9a-f]{8}-[0-9a-f]{7}-[0-9a-f]{7}$/.test(identifier) || isValidEmail(identifier)
+	return /^[0-9a-f]{7}-[0-9a-f]{8}-[0-9a-f]{7}-[0-9a-f]{7}$/.test(identifier)
 }
 
 function isValidSharedKey (sharedKey) {

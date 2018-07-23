@@ -37,7 +37,8 @@ class StorageAdapter {
 		}
 
 		if (this._username && !isValidIdentifier(this._username) && isValidEmail(this._username))
-			this.storage.email = this._username;
+            this.storage.email = this._username;
+
 	}
 	/**
 	 * Create an account using the StorageAdapter
