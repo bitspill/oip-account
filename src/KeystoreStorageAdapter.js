@@ -39,7 +39,7 @@ class KeystoreStorageAdapter extends StorageAdapter {
 		try {
 			var create = await this._keystore.post("/create", { email: email })
 		} catch(e) {
-		    if (e.response.data.type)
+		    if (e.response && e.response.data && e.response.data.type)
 			    throw new Error(e.response.data.type)
             throw new Error(e.response)
 		}
