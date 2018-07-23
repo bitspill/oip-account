@@ -39,7 +39,9 @@ class KeystoreStorageAdapter extends StorageAdapter {
 		try {
 			var create = await this._keystore.post("/create", { email: email })
 		} catch(e) {
-			throw new Error(e.response.data.type)
+		    if (e.response.data.type)
+			    throw new Error(e.response.data.type)
+            throw new Error(e.response)
 		}
 
 		if (create.data.shared_key){
