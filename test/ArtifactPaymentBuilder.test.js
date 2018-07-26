@@ -29,7 +29,11 @@ var artifactDehydrated = {
                 "location": "QmQh7uTC5YSinJG2FgWLrd8MYSNtr8G5JGAckR5ARwmyET"
             },
             "payment": {
-                "addresses": []
+                "addresses": [
+                    {"btc": "19HuaNprtc8MpG6bmiPoZigjaEu9xccxps"},
+                    {"ltc": "LbpjYYPwYBjoPQ44PrNZr7nTq7HkYgcoXN"},
+                    {"flo": "F6esyn5opgUDcEdJpujxS9WLfu8Zj9XUZQ"}
+                ]
             },
             "timestamp": 1508188263,
             "signature": "IAiCzx8ICjAKoj98yw5VwKLCzIuAGM1fVIewZjC/PrBHVkUsl67R2Pv0Eu1fFaWsoONmVc1lZA+lpmQ4/dGVG6o="
@@ -42,9 +46,30 @@ let artifactFile = new ArtifactFile()
 let APB = new ArtifactPaymentBuilder(wallet, artifact, artifactFile, "view");
 
 test("APB, getPaymentAddresses()", async (done) => {
-    expect(await APB.getPaymentAddresses()).toEqual([{"flo": "FLZXRaHzVPxJJfaoM32CWT4GZHuj2rx63k"}])
+    // console.log(artifact.getPaymentAddresses())
+    expect(await APB.getPaymentAddresses()).toEqual([
+        {"btc": "19HuaNprtc8MpG6bmiPoZigjaEu9xccxps"},
+        {"ltc": "LbpjYYPwYBjoPQ44PrNZr7nTq7HkYgcoXN"},
+        {"flo": "F6esyn5opgUDcEdJpujxS9WLfu8Zj9XUZQ"}
+    ])
     done()
 }, 10000)
+
+test("APB, getPaymentAddresses() with artifact argument", async (done) => {
+    // console.log(artifact.getPaymentAddresses())
+    let test = new ArtifactPaymentBuilder();
+    expect(await test.getPaymentAddresses(artifact)).toEqual([
+        {"btc": "19HuaNprtc8MpG6bmiPoZigjaEu9xccxps"},
+        {"ltc": "LbpjYYPwYBjoPQ44PrNZr7nTq7HkYgcoXN"},
+        {"flo": "F6esyn5opgUDcEdJpujxS9WLfu8Zj9XUZQ"}
+    ])
+    done()
+}, 10000)
+
+test("APB, getSupportedCoins() ",  () => {
+    let test = new ArtifactPaymentBuilder();
+    expect(test.getSupportedCoins(artifact)).toEqual(["btc", "ltc", "flo"])
+})
 
 test("APB, getPaymentAmount()", async () => {
     await expect(APB.getPaymentAmount()).resolves.toEqual(expect.any(Number))

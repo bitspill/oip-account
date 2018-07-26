@@ -1,4 +1,5 @@
 import {ArtifactFile} from 'oip-index'
+import {Artifact} from 'oip-index'
 const Exchange = require("oip-exchange-rate");
 
 /**
@@ -27,6 +28,7 @@ class ArtifactPaymentBuilder {
 
     /**
      * Get Artifact Payment Addresses (to know what coins are supported)
+     * @param {Artifact} [artifact] - Get the payment addresses of a given artifact... if no artifact is given, it will use the artifact given in the constructor
      * @return {Array.<Object>}
      * @example
      * let APB = new ArtifactPaymentBuilder(wallet, artifact, artifactFile, "view")
@@ -35,8 +37,8 @@ class ArtifactPaymentBuilder {
      * //returns
      * [{ flo: "FLZXRaHzVPxJJfaoM32CWT4GZHuj2rx63k" }]
      */
-    async getPaymentAddresses(){
-        return await this._artifact.getPaymentAddresses();
+    async getPaymentAddresses(artifact){
+        return artifact ? await artifact.getPaymentAddresses() : await this._artifact.getPaymentAddresses()
     }
 
     /**
@@ -236,7 +238,7 @@ class ArtifactPaymentBuilder {
     /**
      * Send the Payment to the Payment Addresses using the selected coin from selectCoin() for the amount calculated
      * @param {string} payment_address      -The addresses you wish to send money to
-     * @param {number} amount_to_pay                       -The amount you wish to pay
+     * @param {number} amount_to_pay                       -The amount you wish to pay in crypto
      * @param {string} [selected_coin]                     -The coin you wish to spend with. If no coin is given, function will try to match address with a coin.
      * @returns {Promise} A promise that resolves to a txid if the tx went through or an error if it didn't
      */
@@ -251,6 +253,27 @@ class ArtifactPaymentBuilder {
 
         // console.log(`payment_options: ${JSON.stringify(payment_options, null, 4)}`)
         return await this._wallet.sendPayment(payment_options)
+    }
+    /**
+     * getSupportedCoins retrieves the coins the Artifact accepts as payment
+     * @param {Array.<Object> || {Artifact}} [addresses] - Either a string of addresses or an Artifact to get the addresses from. If nothing is passed in, it will attempt to use the constructor's Artifact
+     * @returns {Array} An array of coins that the Artifact accepts as payment
+     */
+    getSupportedCoins(addresses) {
+        let addrs = addresses || this._artifact
+        let supported_coins = [];
+        if (addrs instanceof Artifact) {
+            addrs = addrs.getPaymentAddresses()
+        }
+        if (Array.isArray(addrs)) {
+            for (let addr of addrs) {
+                for (let coin in addr) {
+                    supported_coins.push(coin);
+                }
+            }
+        } else { throw new Error("Invalid parameter. Expecting an Array of Objects: [{[coin][addr]},]")}
+
+        return supported_coins
     }
 
     /**
