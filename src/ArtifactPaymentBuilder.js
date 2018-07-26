@@ -11,14 +11,16 @@ class ArtifactPaymentBuilder {
 	 * @param  {Artifact} artifact - The Artifact related to the Payment you wish to make
      * @param  {ArtifactFile|number} amount	- The amount you wish to pay (`tip`), or the ArtifactFile you wish to pay for (`view` & `buy`)
      * @param  {string} type     - The type of the purchase, either `tip`, `view`, or `buy`
+     * @param  {string} [coin=undefined]   - The Coin you wish to pay with
      * @param  {string} [fiat="usd"]   - The Fiat you wish to `tip` in (if amount was a number and NOT an ArtifactFile) default: "usd"
 	 * @return {ArtifactPaymentBuilder}
 	 */
-	constructor(wallet, artifact, amount, type, fiat = "usd"){
+	constructor(wallet, artifact, amount, type, coin = undefined, fiat = "usd"){
         this._wallet = wallet;
         this._type = type;
         this._artifact = artifact;
         this._amount = amount;
+        this._selected_coin = coin;
         this._fiat = fiat;
         this._exchange = new Exchange();
 	}
@@ -257,15 +259,21 @@ class ArtifactPaymentBuilder {
      */
     async pay(){
         //Step 1.a: Determine amount to pay
-        let payment_amount = await this.getPaymentAmount();
+        let payment_amount
+         try {
+            payment_amount = await this.getPaymentAmount();
+         } catch (err) {throw new Error("Could not get amount to pay")}
         console.log(`payment_amount: ${payment_amount}`)
 
         // Step 1.b: Get supported_coin and addresses
-        const paymentAddresses = await this.getPaymentAddresses();
+        let paymentAddresses = []
+        try {
+            paymentAddresses = await this.getPaymentAddresses();
+        } catch (err) {throw new Error("Could not get payment addresses")}
         console.log(`paymentAddresses: ${JSON.stringify(paymentAddresses, null, 4)}`)
 
 
-        const supported_coins = [];
+        let supported_coins = [];
 
         for (let addr of paymentAddresses) {
             for (let coin in addr) {
@@ -274,22 +282,47 @@ class ArtifactPaymentBuilder {
         }
         console.log(`supported_coins: ${supported_coins}`)
 
+        //checks to see if there is a coin the user wants to pay with
+        if (this._selected_coin) {
+            let found_coin = false
+            for (let coin of supported_coins) {
+                if (this._selected_coin === coin) {
+                    found_coin = true
+                    supported_coins = [coin]
+                    break
+                }
+            }
+            if (!found_coin)
+                throw new Error("File does not accept selected coin: ", this._selected_coin)
+        }
 
         // Step 2: Get exchange rates for supported_coins
-        const exchange_rates = await this.getExchangeRates(supported_coins);
+        let exchange_rates
+        try {
+            exchange_rates = await this.getExchangeRates(supported_coins);
+        } catch (err) {throw new Error(`Could not get exchange rates for ${supported_coins}`)}
         console.log(`exchange_rates: ${JSON.stringify(exchange_rates, null, 4)}`)
 
 
         // Step 3: Convert the file/tip costs using the exchange_rates
-        const conversion_costs = await this.convertCosts(exchange_rates, payment_amount);
+        let conversion_costs
+        try {
+            conversion_costs = await this.convertCosts(exchange_rates, payment_amount);
+        } catch (err) {throw new Error("Could not get conversion costs for artifact file")}
         console.log(`conversion_costs: ${JSON.stringify(conversion_costs)}`)
 
         // Step 4 (this step can be running while Step 3 is running)
-        const coin_balances = await this.getWalletBalances(supported_coins);
+        let coin_balances
+        try {
+            coin_balances = await this.getWalletBalances(supported_coins);
+        } catch (err) {throw new Error("Could not get coin_balances")}
         console.log(`coin_balances: ${JSON.stringify(coin_balances, null, 4)}`)
 
         // Step 5
-        const selected_coin = await this.selectCoin(coin_balances, conversion_costs);
+        let selected_coin
+        try {
+            selected_coin = await this.selectCoin(coin_balances, conversion_costs)
+        } catch (err) {throw new Error("Coin(s) did not have enough balance to pay for costs")}
         console.log(`selected_coin: ${selected_coin}`)
 
         let payment_address;

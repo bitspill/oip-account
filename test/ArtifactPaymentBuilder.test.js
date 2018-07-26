@@ -1,4 +1,5 @@
-var ArtifactPaymentBuilder = require("../src/ArtifactPaymentBuilder");
+// var ArtifactPaymentBuilder = require("../src/ArtifactPaymentBuilder");
+import ArtifactPaymentBuilder from "../src/ArtifactPaymentBuilder"
 var { Wallet } = require("oip-hdmw");
 var { Artifact } = require("oip-index");
 var { ArtifactFile } = require("oip-index");
@@ -132,6 +133,13 @@ test("APB, selectCoin()", async (done) => {
 
 test("APB, pay()", async (done) => {
     let APBpay = new ArtifactPaymentBuilder(wallet, artifact, 0.00001, "tip");
+    let pay = await APBpay.pay();
+    console.log(`Pay result: ${pay}`)
+    done()
+}, 20000)
+
+test("APB, pay() with specified coin", async (done) => {
+    let APBpay = new ArtifactPaymentBuilder(wallet, artifact, 0.00001, "tip", "flo");
     let pay = await APBpay.pay();
     console.log(`Pay result: ${pay}`)
     done()

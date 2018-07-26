@@ -154,12 +154,13 @@ class Account {
 	 * @param  {Artifact} artifact      - The Artifact from which you got the ArtifactFile from. This is used to lookup payment percentage information.
 	 * @param  {ArtifactFile} artifact_file - The specific ArtifactFile that you wish to pay for
 	 * @param  {string} purchase_type - Either `view` or `buy`
-     * @param  {string} fiat     - A string containing information about the users source currency (i.e. "usd")
+     * @param  {string} [coin]   - The Coin you wish to pay with
+     * @param  {string} [fiat]     - A string containing information about the users source currency (i.e. "usd")
      * @return {Promise<Transaction>} Returns a Promise that will resolve to the payment transaction, or rejects if there is a payment error.
 	 */
-	payForArtifactFile(artifact, artifact_file, purchase_type, fiat){
+	payForArtifactFile(artifact, artifact_file, purchase_type, coin, fiat){
 		return new Promise((resolve, reject) => {
-			let builder = new ArtifactPaymentBuilder(this.wallet, artifact, artifact_file, purchase_type, fiat);
+			let builder = new ArtifactPaymentBuilder(this.wallet, artifact, artifact_file, purchase_type, coin, fiat);
 
 			builder.pay().then(resolve).catch(reject)
 		}) 
@@ -168,12 +169,13 @@ class Account {
 	 * Send a tip to the Publisher for a specific Artifact
 	 * @param  {Artifact} artifact - The Artifact you wish to tip
 	 * @param  {number} amount   - The Amount in `fiat` you wish to tip
-	 * @param  {string} fiat     - A string containing information about the users source currency (i.e. "usd")
-	 * @return {Promise<Transaction>} Returns a Promise that will resolve to the payment transaction, or rejects if there is a payment error.
+     * @param  {string} [coin]   - The Coin you wish to pay with
+     * @param  {string} [fiat="usd"]     - A string containing information about the users source currency (i.e. "usd")
+     * @return {Promise<Transaction>} Returns a Promise that will resolve to the payment transaction, or rejects if there is a payment error.
 	 */
-	sendArtifactTip(artifact, amount, fiat){
+	sendArtifactTip(artifact, amount, coin, fiat){
 		return new Promise((resolve, reject) => {
-			let builder = new ArtifactPaymentBuilder(this.wallet, artifact, amount, 'tip', fiat)
+			let builder = new ArtifactPaymentBuilder(this.wallet, artifact, amount, 'tip', coin, fiat)
 			
 			builder.pay().then(resolve).catch(reject)
 		})
