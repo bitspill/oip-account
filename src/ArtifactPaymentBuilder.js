@@ -256,7 +256,7 @@ class ArtifactPaymentBuilder {
     }
     /**
      * getSupportedCoins retrieves the coins the Artifact accepts as payment
-     * @param {Array.<Object> || {Artifact}} [addresses] - Either a string of addresses or an Artifact to get the addresses from. If nothing is passed in, it will attempt to use the constructor's Artifact
+     * @param {Array.<Object>|Artifact} [addresses] - Either a string of addresses or an Artifact to get the addresses from. If nothing is passed in, it will attempt to use the constructor's Artifact
      * @returns {Array} An array of coins that the Artifact accepts as payment
      */
     getSupportedCoins(addresses) {
