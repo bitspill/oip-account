@@ -1,5 +1,4 @@
-import {ArtifactFile} from 'oip-index'
-import {Artifact} from 'oip-index'
+import {Artifact, ArtifactFile} from 'oip-index';
 const Exchange = require("oip-exchange-rate");
 
 /**
