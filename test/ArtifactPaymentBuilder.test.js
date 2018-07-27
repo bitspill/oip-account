@@ -157,7 +157,7 @@ test("APB, getExchangeRates(): No Coin Parameters", async (done) => {
     expect(exchange_rates).toHaveProperty('litecoin');
     // await expect(APB.getExchangeRates("usd")).resolves.toBe()
     done()
-}, 10000);
+}, 100000);
 
 test("APB, getExchangeRates(): One Coin Parameter", async (done) => {
     let exchange_rates = await APB.getExchangeRates(["flo"], "usd");
@@ -191,7 +191,7 @@ test("APB, getWalletBalances(): without coin parameters", async (done) => {
     expect(balances).toHaveProperty("litecoin");
 
     done()
-}, 20000);
+}, 30000);
 
 test("APB, getWalletBalances(): with one coin parameter (flo)", async (done) => {
     let balances = await APB.getWalletBalances(["flo"]);
@@ -212,6 +212,7 @@ test("APB, selectCoin()", async (done) => {
     done()
 }, 20000);
 
+//@ToDo::Write new tests for payments
 // This function (sendPayment()) is run in the below test (pay())
 // test("APB, sendPayment()", async (done) => {
 //     let payment = await APB.sendPayment("FLZXRaHzVPxJJfaoM32CWT4GZHuj2rx63k", .00001);
@@ -220,18 +221,18 @@ test("APB, selectCoin()", async (done) => {
 //     done()
 // }, 10000);
 
-test("APB, pay()", async (done) => {
-    let APBpay = new ArtifactPaymentBuilder(wallet, artifact, 0.00001, "tip");
-    let pay = await APBpay.pay();
-    console.log(`Pay result: ${pay}`)
-    done()
-}, 20000)
-
-test("APB, pay() with specified coin", async (done) => {
-    let APBpay = new ArtifactPaymentBuilder(wallet, artifact, 0.00001, "tip", "flo");
-    let pay = await APBpay.pay();
-    console.log(`Pay result: ${pay}`)
-    done()
-}, 20000)
+// test("APB, pay()", async (done) => {
+//     let APBpay = new ArtifactPaymentBuilder(wallet, artifact, 0.00001, "tip");
+//     let pay = await APBpay.pay();
+//     console.log(`Pay result: ${pay}`)
+//     done()
+// }, 20000)
+//
+// test("APB, pay() with specified coin", async (done) => {
+//     let APBpay = new ArtifactPaymentBuilder(wallet, artifact, 0.00001, "tip", "flo");
+//     let pay = await APBpay.pay();
+//     console.log(`Pay result: ${pay}`)
+//     done()
+// }, 20000)
 
 //@ToDo: add tests for 'view' and 'buy' type artifactFiles
