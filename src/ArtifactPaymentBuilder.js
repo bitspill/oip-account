@@ -62,6 +62,20 @@ class ArtifactPaymentBuilder {
         return artifact ? await artifact.getPaymentAddresses() : await this._artifact.getPaymentAddresses()
     }
     /**
+     * Get Artifact Payment Address
+     * @param {Artifact} [artifact] - Get the payment addresses of a given artifact... if no artifact is given, it will use the artifact given in the constructor
+     * @return {Object}
+     * @example
+     * let APB = new ArtifactPaymentBuilder(undefined, artifact)
+     * APB.getPaymentAddresses(["btc"])
+     *
+     * //returns
+     * { btc: "FLZXRaHzVPxJJfaoM32CWT4GZHuj2rx63k" }
+     */
+    async getPaymentAddress(coin_array, artifact){
+        return artifact ? await artifact.getPaymentAddress(coin_array) : await this._artifact.getPaymentAddress(coin_array)
+    }
+    /**
      * getSupportedCoins retrieves the coins the Artifact accepts as payment
      * @param {(Object|Artifact)} [addresses] - Either an object of [coin][addrs] or an Artifact to get the addresses from. If nothing is passed in, it will attempt to use the constructor's Artifact
      * @param {Array.<string>} [walletCoins] - An array of coins you want to check support for

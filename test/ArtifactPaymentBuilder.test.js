@@ -87,6 +87,29 @@ test("APB, getPaymentAddresses() with artifact argument", async (done) => {
     done()
 }, 10000)
 
+test("APB, getPaymentAddress()", async (done) => {
+    // console.log(artifact.getPaymentAddresses())
+    let test = new ArtifactPaymentBuilder(undefined, artifact);
+    expect(await test.getPaymentAddress(["btc"])).toEqual(
+        {
+            btc: "19HuaNprtc8MpG6bmiPoZigjaEu9xccxps",
+        }
+    )
+    done()
+}, 10000)
+
+test("APB, getPaymentAddress() multiple coins", async (done) => {
+    // console.log(artifact.getPaymentAddresses())
+    let test = new ArtifactPaymentBuilder(undefined, artifact);
+    expect(await test.getPaymentAddress(["btc", "ltc"])).toEqual(
+        {
+            btc: "19HuaNprtc8MpG6bmiPoZigjaEu9xccxps",
+            ltc: "LbpjYYPwYBjoPQ44PrNZr7nTq7HkYgcoXN"
+        }
+    )
+    done()
+}, 10000)
+
 test("APB, getSupportedCoins() ",  () => {
     let test = new ArtifactPaymentBuilder();
     expect(test.getSupportedCoins(artifact)).toEqual(["btc", "ltc", "flo"])
