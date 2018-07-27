@@ -50,7 +50,7 @@ class ArtifactPaymentBuilder {
     /**
      * Get Artifact Payment Addresses (to know what coins are supported)
      * @param {Artifact} [artifact] - Get the payment addresses of a given artifact... if no artifact is given, it will use the artifact given in the constructor
-     * @return {<Object>}
+     * @return {Object}
      * @example
      * let APB = new ArtifactPaymentBuilder(wallet, artifact, artifactFile, "view")
      * APB.getPaymentAddresses()
@@ -94,7 +94,7 @@ class ArtifactPaymentBuilder {
     
     /**
      * Calculate Exchange Rate (only for the supported coins) (this is so that we can know how much to pay in the cryptocurrency to the Artifact/ArtifactFile)
-     * @param  {array} [coins_array=this._wallet.getCoins()]    - An array of coins you want to get exchange rates for. If none are given, an array of all available coins will be used.
+     * @param  {Array.<String>} [coins_array=this._wallet.getCoins()]    - An array of coins you want to get exchange rates for. If none are given, an array of all available coins will be used.
      * @param  {string} [fiat="usd"]     - The fiat currency you wish to check against. If none is given, "usd" is defaulted.
      * @return {Object} exchange_rates
      * @example
@@ -158,7 +158,7 @@ class ArtifactPaymentBuilder {
 
     /**
      * Get Balances for each coin that is supported (The supported coins that the Artifact accepts)
-     * @param  {array} [coins_array=this._wallet.getCoins()]    - An array of coins you want to get balances for. If no coins are given, an array of all available coins will be used.
+     * @param  {Array.<string>} [coins_array=this._wallet.getCoins()]    - An array of coins you want to get balances for. If no coins are given, an array of all available coins will be used.
      * @return {object} coin_balances
      * @example
      * let APB = new ArtifactPaymentBuilder(wallet, artifact, artifactFile, "view")
