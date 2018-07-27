@@ -10,7 +10,7 @@
     "isemail": "^3.1.2",
     "node-localstorage": "^1.3.1",
     "oip-exchange-rate": "^1.0.6",
-    "oip-hdmw": "^1.0.7",
+    "oip-hdmw": "^1.0.8",
     "oip-index": "git+https://github.com/oipwg/oip-index.git"
   },
   "devDependencies": {
