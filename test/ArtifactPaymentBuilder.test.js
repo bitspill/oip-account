@@ -1,8 +1,6 @@
-// var ArtifactPaymentBuilder = require("../src/ArtifactPaymentBuilder");
 import ArtifactPaymentBuilder from "../src/ArtifactPaymentBuilder"
 var { Wallet } = require("oip-hdmw");
-var { Artifact } = require("oip-index");
-var { ArtifactFile } = require("oip-index");
+import {Artifact, ArtifactFile} from 'oip-index'
 
 // const wallet = new Wallet("00000000000000000000000000000000", {discover: false})
 // const APB = new ArtifactPaymentBuilder(wallet, artifact, .00012, "view", "usd");
