@@ -252,7 +252,6 @@ class ArtifactPaymentBuilder {
         return selected_coin
     }
 
-
     /**
      * Pay is the overall function that runs a series of methods to calculate balances, addresses, and execute payment
      * @returns {Promise} A promise that resolves to a txid if the tx went through or an error if it didn't

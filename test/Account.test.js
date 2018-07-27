@@ -93,19 +93,3 @@ test("Account wallet methods (localStorage)", async (done) => {
     expect(z).toBeDefined()
     done()
 }, 100000)
-
-
-
-test("Account payment builder: pay to View artifact 227447", async (done) => {
-    // var acc = new Account("siren comic spy donkey unknown license asset lens proud bus exhaust section", "password", {discover: false});
-    // let info = await acc.create();
-    let network = new Index()
-    let art = await network.getArtifact("227447")
-    let file = art.getFiles()[0]
-    console.log(file.getSuggestedPlayCost())
-    // acc.payForArtifactFile(art, file, "view")
-    //     .then(suc => {console.log(suc)})
-    //     .catch(err => {console.log(err)})
-
-    done()
-}, 100000)
