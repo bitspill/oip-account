@@ -288,7 +288,7 @@ class ArtifactPaymentBuilder {
 
         let supported_coins = [];
 
-        for (let addr of paymentAddresses) {
+        for (let addr in paymentAddresses) {
             for (let coin in addr) {
                 supported_coins.push(coin);
             }
