@@ -41,7 +41,7 @@ test("Can't find account if doesn't exist (localStorage)", (done) => {
 		expect(error).toEqual(new Error("Account Not Found!"))
 		done()
 	})
-})
+}, 10000)
 
 test("Create Account (email) (localStorage)", async (done) => {
 	var acc = new Account("test@me.com", "password", {discover: false})

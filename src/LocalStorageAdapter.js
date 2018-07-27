@@ -1,10 +1,11 @@
 import StorageAdapter from './StorageAdapter'
 
-if ((typeof window === undefined && typeof window.localStorage === undefined) || typeof localStorage === "undefined" || localStorage === null) {
-    var LocalStorage = require('node-localstorage').LocalStorage;
-    var localStorage = new LocalStorage('./localStorage');
+if (typeof window === "undefined" || typeof window.localStorage === "undefined") {
+    if (typeof localStorage === "undefined") {
+        var LocalStorage = require('node-localstorage').LocalStorage;
+        var localStorage = new LocalStorage('./localStorage');
+    }
 }
-
 
 /**
  * LocalStorageAdapter allows saving of Wallets to the users local computer if they don't wish to store it on a Keystore server.
