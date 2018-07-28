@@ -78,16 +78,3 @@ test("Create Account (no email) (localStorage)", async (done) => {
 	expect(account_info.wallet.mnemonic).toBeDefined()
 	done()
 })
-
-test("Account wallet methods (localStorage)", async (done) => {
-    var acc = new Account("abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about", "password", {discover: false});
-
-    let info = await acc.create();
-    let x = await acc.wallet.getFiatBalances()
-    let y = await acc.wallet.getCoinBalances()
-    let z = await acc.wallet.getExchangeRates()
-    expect(x).toBeDefined()
-    expect(y).toBeDefined()
-    expect(z).toBeDefined()
-    done()
-}, 100000)
