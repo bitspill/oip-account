@@ -224,70 +224,60 @@ test("APB, fiatToCrypto", async (done) => {
     done()
 }, 10000)
 
-test("APB, getWalletBalances(): without coin parameters", async (done) => {
+test("APB, getWalletBalances(): without coin parameters", () => {
         APB.getWalletBalances()
             .then( b => {
                 expect(typeof b.flo === "number").toBeTruthy()
                 expect(typeof b.bitcoin === "number" || typeof b.bitcoin === "string").toBeTruthy()
                 expect(typeof b.litecoin === "number").toBeTruthy()
-                done()
             })
             .catch( err => {
                 expect(err).toBeDefined()
-                done()
             })
-}, 20000);
+});
 
-test("APB, getWalletBalances(): with string parameter ", async (done) => {
+test("APB, getWalletBalances(): with string parameter ", () => {
         APB.getWalletBalances("bitcoin")
             .then( b => {
                 expect(typeof b["bitcoin"] === "number" || typeof b["bitcoin"] === "string").toBeTruthy()
-                done()
             })
             .catch( err => {
                 expect(err).toBeDefined()
-                done()
             })
-}, 20000);
+});
 
 
-test("APB, getWalletBalances(): with one coin parameter (flo)", async (done) => {
+test("APB, getWalletBalances(): with one coin parameter (flo)", () => {
         APB.getWalletBalances(["flo"])
             .then( balances => {
                 expect(typeof balances["flo"] === "number").toBeTruthy()
-                done()
             })
             .catch( err => {
                 expect(err).toBeDefined()
-                done()
             })
-}, 20000);
+});
 
-test("APB, getWalletBalances(): with two coin parameters (flo, bitcoin)", async (done) => {
+test("APB, getWalletBalances(): with two coin parameters (flo, bitcoin)", () => {
         APB.getWalletBalances(["flo", "bitcoin"])
             .then(b => {
                 expect(typeof b.flo === "number").toBeTruthy()
                 expect(typeof b.bitcoin === "number" || typeof b.bitcoin === "string").toBeTruthy()
-                done()
             })
             .catch(err => {
                 expect(err).toBeDefined()
-                done()
             })
-}, 20000);
+});
 
-test("APB, getWalletBalances(): ticker to name (flo, btc)", async (done) => {
+test("APB, getWalletBalances(): ticker to name (flo, btc)", () => {
         APB.getWalletBalances(APB.tickerToName(["flo", "btc"]))
             .then( b => {
                 expect(typeof b.flo === "number").toBeTruthy()
                 expect(typeof b.bitcoin === "number" || typeof b.bitcoin === "string").toBeTruthy()
-                done()
             })
             .catch( err => {
                 expect(err).toBeDefined()
-                done()
             });
-}, 20000);
+});
 
 test("APB, coinPicker()", async (done) => {
     try {
