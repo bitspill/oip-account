@@ -13,4 +13,4 @@ env:
     JEST_FLAGS="--coverage --detectOpenHandles"
 
 script:
-  - node./test/rm-test-data.js && jest ${JEST_FLAGS}
+  - node ./test/rm-test-data.js && jest ${JEST_FLAGS}
