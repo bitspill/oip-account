@@ -262,22 +262,26 @@ class ArtifactPaymentBuilder {
         let walletCoins = this._wallet.getCoins();
 
         let coinPromises = {};
-        let coin_balances = {};
-
         for (let coin of coins) {
-            if (walletCoins[coin]) {
-                coinPromises[coin] = walletCoins[coin].getBalance({discover: true})
+            try {
+                if (walletCoins[coin]) {
+                    coinPromises[coin] = walletCoins[coin].getBalance({discover: true})
+                }
+            } catch (err) {
+                coinPromises[coin] = `${err}`;
             }
         }
 
+        let coin_balances = {};
         for (let coin in coinPromises) {
             try {
                 coin_balances[coin] = await coinPromises[coin];
             } catch (err) {
                 coin_balances[coin] = "error fetching balance";
+                console.log(`Error while trying to resolve the balance of ${coin}: ${err}`)
 
                 if (err.response && err.response.statusText) {
-                    coin_balances[coin] = `Status code ${err.response.status}: ${err.response.statusText}`
+                    coin_balances[coin] = `${err.response.status} +${err.response.statusText}`
                 }
             }
         }
