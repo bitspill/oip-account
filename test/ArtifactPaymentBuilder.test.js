@@ -56,13 +56,13 @@ test("APB, getPaymentAmount(): tip", () => {
     expect(test.getPaymentAmount()).toBe(.0012)
 })
 
-test("APB, getPaymentAmount(): buy", async () => {
+test("APB, getPaymentAmount(): buy", () => {
     let test = new ArtifactPaymentBuilder(wallet, artifact, artifactFile, "buy");
     expect(test.getPaymentAmount()).toEqual(expect.any(Number))
 })
 
-test("APB, getPaymentAddresses()", async (done) => {
-    expect(await APB.getPaymentAddresses()).toEqual(
+test("APB, getPaymentAddresses()", (done) => {
+    expect(APB.getPaymentAddresses()).toEqual(
         {
             btc: "19HuaNprtc8MpG6bmiPoZigjaEu9xccxps",
             ltc: "LbpjYYPwYBjoPQ44PrNZr7nTq7HkYgcoXN",
@@ -72,9 +72,9 @@ test("APB, getPaymentAddresses()", async (done) => {
     done()
 }, 10000)
 
-test("APB, getPaymentAddresses() with artifact argument", async (done) => {
+test("APB, getPaymentAddresses() with artifact argument", (done) => {
     let test = new ArtifactPaymentBuilder();
-    expect(await test.getPaymentAddresses(artifact)).toEqual(
+    expect(test.getPaymentAddresses(artifact)).toEqual(
         {
             btc: "19HuaNprtc8MpG6bmiPoZigjaEu9xccxps",
             ltc: "LbpjYYPwYBjoPQ44PrNZr7nTq7HkYgcoXN",
@@ -84,9 +84,9 @@ test("APB, getPaymentAddresses() with artifact argument", async (done) => {
     done()
 }, 10000)
 
-test("APB, getPaymentAddress()", async (done) => {
+test("APB, getPaymentAddress()", (done) => {
     let test = new ArtifactPaymentBuilder(undefined, artifact);
-    expect(await test.getPaymentAddress(["btc"])).toEqual(
+    expect(test.getPaymentAddress(["btc"])).toEqual(
         {
             btc: "19HuaNprtc8MpG6bmiPoZigjaEu9xccxps",
         }
@@ -94,9 +94,9 @@ test("APB, getPaymentAddress()", async (done) => {
     done()
 }, 10000)
 
-test("APB, getPaymentAddress() multiple coins", async (done) => {
+test("APB, getPaymentAddress() multiple coins", (done) => {
     let test = new ArtifactPaymentBuilder(undefined, artifact);
-    expect(await test.getPaymentAddress(["btc", "ltc"])).toEqual(
+    expect(test.getPaymentAddress(["btc", "ltc"])).toEqual(
         {
             btc: "19HuaNprtc8MpG6bmiPoZigjaEu9xccxps",
             ltc: "LbpjYYPwYBjoPQ44PrNZr7nTq7HkYgcoXN"
