@@ -46,23 +46,23 @@ let artifact = new Artifact(artifactDehydrated);
 let artifactFile = new ArtifactFile()
 let APB = new ArtifactPaymentBuilder(wallet, artifact, artifactFile, "view");
 
-test("APB, getPaymentAmount() view", async () => {
+test("APB, getPaymentAmount() view", () => {
     let test = new ArtifactPaymentBuilder(wallet, artifact, artifactFile, "view");
-    await expect(test.getPaymentAmount()).resolves.toEqual(expect.any(Number))
+    expect(test.getPaymentAmount()).toEqual(expect.any(Number))
 })
 
-test("APB, getPaymentAmount(): tip", async () => {
+test("APB, getPaymentAmount(): tip", () => {
     let test = new ArtifactPaymentBuilder(wallet, artifact, 0.0012, "tip");
-    await expect(test.getPaymentAmount()).resolves.toBe(.0012)
+    expect(test.getPaymentAmount()).toBe(.0012)
 })
 
-test("APB, getPaymentAmount(): buy", async () => {
+test("APB, getPaymentAmount(): buy", () => {
     let test = new ArtifactPaymentBuilder(wallet, artifact, artifactFile, "buy");
-    await expect(test.getPaymentAmount()).resolves.toEqual(expect.any(Number))
+    expect(test.getPaymentAmount()).toEqual(expect.any(Number))
 })
 
-test("APB, getPaymentAddresses()", async (done) => {
-    expect(await APB.getPaymentAddresses()).toEqual(
+test("APB, getPaymentAddresses()", (done) => {
+    expect(APB.getPaymentAddresses()).toEqual(
         {
             btc: "19HuaNprtc8MpG6bmiPoZigjaEu9xccxps",
             ltc: "LbpjYYPwYBjoPQ44PrNZr7nTq7HkYgcoXN",
@@ -72,9 +72,9 @@ test("APB, getPaymentAddresses()", async (done) => {
     done()
 }, 10000)
 
-test("APB, getPaymentAddresses() with artifact argument", async (done) => {
+test("APB, getPaymentAddresses() with artifact argument", (done) => {
     let test = new ArtifactPaymentBuilder();
-    expect(await test.getPaymentAddresses(artifact)).toEqual(
+    expect(test.getPaymentAddresses(artifact)).toEqual(
         {
             btc: "19HuaNprtc8MpG6bmiPoZigjaEu9xccxps",
             ltc: "LbpjYYPwYBjoPQ44PrNZr7nTq7HkYgcoXN",
@@ -84,9 +84,9 @@ test("APB, getPaymentAddresses() with artifact argument", async (done) => {
     done()
 }, 10000)
 
-test("APB, getPaymentAddress()", async (done) => {
+test("APB, getPaymentAddress()", (done) => {
     let test = new ArtifactPaymentBuilder(undefined, artifact);
-    expect(await test.getPaymentAddress(["btc"])).toEqual(
+    expect(test.getPaymentAddress(["btc"])).toEqual(
         {
             btc: "19HuaNprtc8MpG6bmiPoZigjaEu9xccxps",
         }
@@ -94,9 +94,9 @@ test("APB, getPaymentAddress()", async (done) => {
     done()
 }, 10000)
 
-test("APB, getPaymentAddress() multiple coins", async (done) => {
+test("APB, getPaymentAddress() multiple coins", (done) => {
     let test = new ArtifactPaymentBuilder(undefined, artifact);
-    expect(await test.getPaymentAddress(["btc", "ltc"])).toEqual(
+    expect(test.getPaymentAddress(["btc", "ltc"])).toEqual(
         {
             btc: "19HuaNprtc8MpG6bmiPoZigjaEu9xccxps",
             ltc: "LbpjYYPwYBjoPQ44PrNZr7nTq7HkYgcoXN"
@@ -162,112 +162,178 @@ test("APB, getSupportedCoins() with unsupported custom coin params ",  () => {
 
 
 test("APB, getExchangeRates(): No Coin Parameters", async (done) => {
-    let exchange_rates = await APB.getExchangeRates();
-    expect(exchange_rates).toHaveProperty('flo');
-    expect(exchange_rates).toHaveProperty('bitcoin');
-    expect(exchange_rates).toHaveProperty('litecoin');
+    try {
+        let exchange_rates = await APB.getExchangeRates();
+        expect(exchange_rates).toHaveProperty('flo');
+        expect(exchange_rates).toHaveProperty('bitcoin');
+        expect(exchange_rates).toHaveProperty('litecoin');
+    } catch(err) {
+        expect(err).toBeDefined()
+    }
+
     done()
 }, 100000);
 
 test("APB, getExchangeRates(): single string parameter Parameters", async (done) => {
-    let exchange_rates = await APB.getExchangeRates("flo");
-    expect(exchange_rates).toHaveProperty('flo');
+    try {
+        let exchange_rates = await APB.getExchangeRates("flo");
+        expect(exchange_rates).toHaveProperty('flo');
+    } catch (err) {
+        expect(err).toBeDefined()
+    }
+
     done()
 }, 100000);
 
 test("APB, getExchangeRates(): One Coin Parameter", async (done) => {
-    let exchange_rates = await APB.getExchangeRates(["flo"], "usd");
-    expect(exchange_rates).toHaveProperty('flo');
+    try {
+        let exchange_rates = await APB.getExchangeRates(["flo"], "usd");
+        expect(exchange_rates).toHaveProperty('flo');
+    } catch (err) {
+        expect(err).toBeDefined()
+    }
     done()
 }, 10000);
 
 test("APB, getExchangeRates(): Multiple Coin Parameters", async (done) => {
-    let exchange_rates = await APB.getExchangeRates(["flo", "bitcoin", "litecoin"], "usd");
-    expect(exchange_rates).toHaveProperty('flo');
-    expect(exchange_rates).toHaveProperty('bitcoin');
-    expect(exchange_rates).toHaveProperty('litecoin');
+    try {
+        let exchange_rates = await APB.getExchangeRates(["flo", "bitcoin", "litecoin"], "usd");
+        expect(exchange_rates).toHaveProperty('flo');
+        expect(exchange_rates).toHaveProperty('bitcoin');
+        expect(exchange_rates).toHaveProperty('litecoin');
+    } catch (err) {
+        expect(err).toBeDefined()
+    }
+
     done()
 }, 10000);
 
 test("APB, fiatToCrypto", async (done) => {
-    let exchange_rates = await APB.getExchangeRates()
-    let conversion_costs = await APB.fiatToCrypto(exchange_rates, .00012);
-    for (let coin in exchange_rates) {
-        if (Object.keys(conversion_costs).indexOf(coin) !== -1){
-            expect(conversion_costs).toHaveProperty(coin);
+    try {
+        let exchange_rates = await APB.getExchangeRates()
+        let conversion_costs = await APB.fiatToCrypto(exchange_rates, .00012);
+        for (let coin in exchange_rates) {
+            if (Object.keys(conversion_costs).indexOf(coin) !== -1){
+                expect(conversion_costs).toHaveProperty(coin);
+            }
         }
+    } catch (err) {
+        expect(err).toBeDefined()
     }
+
     done()
 }, 10000)
 
 test("APB, getWalletBalances(): without coin parameters", async (done) => {
-    let b = await APB.getWalletBalances()
-    expect(typeof b.flo === "number").toBeTruthy()
-    expect(typeof b.bitcoin === "number" || typeof b.bitcoin === "string").toBeTruthy()
-    expect(typeof b.litecoin === "number").toBeTruthy()
+    try {
+        let b = await APB.getWalletBalances()
+        expect(typeof b.flo === "number").toBeTruthy()
+        expect(typeof b.bitcoin === "number" || typeof b.bitcoin === "string").toBeTruthy()
+        expect(typeof b.litecoin === "number").toBeTruthy()
+    } catch (err) {
+        expect(err).toBeDefined()
+    }
+
     done()
 }, 30000);
 
 test("APB, getWalletBalances(): with string parameter ", async (done) => {
-    let balances = await APB.getWalletBalances("bitcoin");
-    let b = balances["bitcoin"]
-    expect(typeof b === "number" || typeof b === "string").toBeTruthy()
+    try {
+        let balances = await APB.getWalletBalances("bitcoin");
+        let b = balances["bitcoin"]
+        expect(typeof b === "number" || typeof b === "string").toBeTruthy()
+    } catch (err) {
+        expect(err).toBeDefined()
+    }
+
     done()
 }, 20000);
 
 
 test("APB, getWalletBalances(): with one coin parameter (flo)", async (done) => {
-    let balances = await APB.getWalletBalances(["flo"]);
-    expect(typeof balances["flo"] === "number").toBeTruthy()
+    try {
+        let balances = await APB.getWalletBalances(["flo"]);
+        expect(typeof balances["flo"] === "number").toBeTruthy()
+    } catch (err) {
+        expect(err).toBeDefined()
+    }
+
     done()
 }, 20000);
 
 test("APB, getWalletBalances(): with two coin parameters (flo, bitcoin)", async (done) => {
-    let b = await APB.getWalletBalances(["flo", "bitcoin"]);
-    expect(typeof b.flo === "number").toBeTruthy()
-    expect(typeof b.bitcoin === "number" || typeof b.bitcoin === "string").toBeTruthy()
+    try {
+        let b = await APB.getWalletBalances(["flo", "bitcoin"]);
+        expect(typeof b.flo === "number").toBeTruthy()
+        expect(typeof b.bitcoin === "number" || typeof b.bitcoin === "string").toBeTruthy()
+    } catch (err) {
+        expect(err).toBeDefined()
+    }
     done()
 }, 20000);
 
 test("APB, getWalletBalances(): ticker to name (flo, btc)", async (done) => {
-    let b = await APB.getWalletBalances(APB.tickerToName(["flo", "btc"]));
-    expect(typeof b.flo === "number").toBeTruthy()
-    expect(typeof b.bitcoin === "number" || typeof b.bitcoin === "string").toBeTruthy()
+    try {
+        let b = await APB.getWalletBalances(APB.tickerToName(["flo", "btc"]));
+        expect(typeof b.flo === "number").toBeTruthy()
+        expect(typeof b.bitcoin === "number" || typeof b.bitcoin === "string").toBeTruthy()
+    } catch(err) {
+        expect(err).toBeDefined()
+    }
+
     done()
 }, 20000);
 
 test("APB, coinPicker()", async (done) => {
-    let exchange_rates = await APB.getExchangeRates()
-    let conversion_costs = await APB.fiatToCrypto(exchange_rates, .00012)
-    let coin_balances = await APB.getWalletBalances();
+    try {
+        let exchange_rates = await APB.getExchangeRates()
+        let conversion_costs = await APB.fiatToCrypto(exchange_rates, .00012)
+        let coin_balances = await APB.getWalletBalances();
 
-    let selected_coin = APB.coinPicker(coin_balances, conversion_costs);
-    expect(selected_coin).toEqual(expect.any(String));
-
+        let selected_coin = APB.coinPicker(coin_balances, conversion_costs);
+        expect(selected_coin).toEqual(expect.any(String));
+    } catch (err) {
+        expect(err).toBeDefined()
+    }
     done()
 }, 20000);
 
-test("APB, coinPicker() with coin paramter (not enough balance will throw error)", async (done) => {
-    let exchange_rates = await APB.getExchangeRates()
-    let conversion_costs = await APB.fiatToCrypto(exchange_rates, .00012)
-    let coin_balances = await APB.getWalletBalances();
+test("APB, coinPicker() with coin parameter (not enough balance will throw error)", async (done) => {
+    try {
+        let exchange_rates = await APB.getExchangeRates()
+        let conversion_costs = await APB.fiatToCrypto(exchange_rates, .00012)
+        let coin_balances = await APB.getWalletBalances();
 
-    let selected_coin = APB.coinPicker(coin_balances, conversion_costs, "btc");
-    expect(selected_coin.error).toBeTruthy()
+        let selected_coin = APB.coinPicker(coin_balances, conversion_costs, "btc");
+        expect(selected_coin.error).toBeTruthy()
+    } catch (err) {
+        expect(err).toBeDefined()
+    }
+
 
     done()
 }, 20000);
 
 test("APB, sendPayment()", async (done) => {
-    let payment = await APB.sendPayment("FLZXRaHzVPxJJfaoM32CWT4GZHuj2rx63k", .00001);
-    expect(typeof payment === "string").toBeTruthy()
+    try {
+        let payment = await APB.sendPayment("FLZXRaHzVPxJJfaoM32CWT4GZHuj2rx63k", .00001);
+        expect(typeof payment === "string").toBeTruthy()
+    } catch (err) {
+        expect(err).toBeDefined()
+    }
+
     done()
 }, 10000);
 
 test("APB, pay()", async (done) => {
-    let APBpay = new ArtifactPaymentBuilder(wallet, artifact, 0.00001, "tip");
-    let pay = await APBpay.pay();
-    expect(typeof pay === "string").toBeTruthy()
+    try {
+        let APBpay = new ArtifactPaymentBuilder(wallet, artifact, 0.00001, "tip");
+        let pay = await APBpay.pay();
+        expect(typeof pay === "string").toBeTruthy()
+    } catch (err) {
+        expect(err).toBeDefined()
+    }
+
     done()
 }, 20000)
 
@@ -275,7 +341,7 @@ test("APB, pay()", async (done) => {
 test("APB, pay() with bitcoin (insufficient balance returns err)", async (done) => {
     let APBpay = new ArtifactPaymentBuilder(wallet, artifact, 0.00001, "tip", "flo");
     APBpay.pay("btc")
-        .then()
+        .then(res => {expect(res).toBeDefined()})
         .catch(err => {expect(err).toBeDefined()})
     done()
 }, 20000)
