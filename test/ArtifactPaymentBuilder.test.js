@@ -207,10 +207,8 @@ test("APB, getWalletBalances(): without coin parameters", async (done) => {
         expect(typeof b.flo === "number").toBeTruthy()
         expect(typeof b.bitcoin === "number" || typeof b.bitcoin === "string").toBeTruthy()
         expect(typeof b.litecoin === "number").toBeTruthy()
-        console.log(b)
         done()
     } catch(err) {
-        console.log("err, ", err)
         expect(err).toBeDefined()
         done()
     }
