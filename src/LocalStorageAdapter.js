@@ -5,7 +5,7 @@ if (typeof window === "undefined" || typeof window.localStorage === "undefined")
         var LocalStorage = require('node-localstorage').LocalStorage;
         var localStorage = new LocalStorage('./localStorage');
     }
-}
+} else {localStorage = window.localStorage}
 
 /**
  * LocalStorageAdapter allows saving of Wallets to the users local computer if they don't wish to store it on a Keystore server.
