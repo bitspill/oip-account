@@ -202,17 +202,12 @@ test("APB, fiatToCrypto", async (done) => {
 
 test("APB, getWalletBalances(): without coin parameters", async (done) => {
     let apb = new ArtifactPaymentBuilder(wallet);
-    try {
-        let b = await apb.getWalletBalances()
-        expect(typeof b.flo === "number").toBeTruthy()
-        expect(typeof b.bitcoin === "number" || typeof b.bitcoin === "string").toBeTruthy()
-        expect(typeof b.litecoin === "number").toBeTruthy()
-        done()
-    } catch(err) {
-        expect(err).toBeDefined()
-        done()
-    }
+    let b = await apb.getWalletBalances()
+    expect(typeof b.flo === "number").toBeTruthy()
+    expect(typeof b.bitcoin === "number" || typeof b.bitcoin === "string").toBeTruthy()
+    expect(typeof b.litecoin === "number").toBeTruthy()
 
+    done()
 }, 30000);
 
 test("APB, getWalletBalances(): with string parameter ", async (done) => {
@@ -222,24 +217,18 @@ test("APB, getWalletBalances(): with string parameter ", async (done) => {
 }, 20000);
 
 
-test("APB, getWalletBalances(): with one coin parameter (flo)", async (done) => {
-    let balances = await APB.getWalletBalances(["flo"]);
-    expect(typeof balances["flo"] === "number").toBeTruthy()
+test("APB, getWalletBalances(): with one coin parameter (litecoin)", async (done) => {
+    let balances = await APB.getWalletBalances(["litecoin"]);
+    expect(typeof balances["litecoin"] === "number").toBeTruthy()
     done()
 }, 20000);
 
 test("APB, getWalletBalances(): with two coin parameters (flo, bitcoin)", async (done) => {
-    try {
-        let b = await APB.getWalletBalances(["bitcoin", "flo"])
-        expect(typeof b["flo"] === "number").toBeTruthy()
-        expect(typeof b.bitcoin === "number" || typeof b.bitcoin === "string").toBeTruthy()
-        done()
-    } catch (err) {
-        let error = false;
-        if (err) {error = true}
-        expect(error).toBeTruthy()
-        done()
-    }
+    let b = await APB.getWalletBalances(["bitcoin", "flo"])
+    expect(typeof b["flo"] === "number").toBeTruthy()
+    expect(typeof b.bitcoin === "number" || typeof b.bitcoin === "string").toBeTruthy()
+    console.log(b)
+    done()
 }, 20000);
 
 test("APB, coinPicker()", async (done) => {
@@ -253,7 +242,7 @@ test("APB, coinPicker()", async (done) => {
     done()
 }, 20000);
 
-test("APB, coinPicker() with coin paramter (not enough balance will throw error)", async (done) => {
+test("APB, coinPicker() with coin parameter (not enough balance will throw error)", async (done) => {
     let exchange_rates = await APB.getExchangeRates()
     let conversion_costs = await APB.fiatToCrypto(exchange_rates, .00012)
     let coin_balances = await APB.getWalletBalances();
@@ -271,16 +260,16 @@ test("APB, sendPayment()", async (done) => {
 }, 10000);
 
 test("APB, pay()", async (done) => {
-    let APBpay = new ArtifactPaymentBuilder(wallet, artifact, 0.00001, "tip");
-    let pay = await APBpay.pay();
+    let apb = new ArtifactPaymentBuilder(wallet, artifact, 0.00001, "tip");
+    let pay = await apb.pay();
     expect(typeof pay === "string").toBeTruthy()
     done()
 }, 20000)
 
 
 test("APB, pay() with bitcoin (insufficient balance returns err)", async (done) => {
-    let APBpay = new ArtifactPaymentBuilder(wallet, artifact, 0.00001, "tip", "flo");
-    APBpay.pay("btc")
+    let apb = new ArtifactPaymentBuilder(wallet, artifact, 0.00001, "tip", "flo");
+    apb.pay("btc")
         .then()
         .catch(err => {expect(err).toBeDefined()})
     done()
