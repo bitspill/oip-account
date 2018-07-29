@@ -225,63 +225,68 @@ test("APB, fiatToCrypto", async (done) => {
 }, 10000)
 
 test("APB, getWalletBalances(): without coin parameters", async (done) => {
-    try {
-        let b = await APB.getWalletBalances()
-        expect(typeof b.flo === "number").toBeTruthy()
-        expect(typeof b.bitcoin === "number" || typeof b.bitcoin === "string").toBeTruthy()
-        expect(typeof b.litecoin === "number").toBeTruthy()
-    } catch (err) {
-        expect(err).toBeDefined()
-    }
-
-    done()
-}, 30000);
+        APB.getWalletBalances()
+            .then( b => {
+                expect(typeof b.flo === "number").toBeTruthy()
+                expect(typeof b.bitcoin === "number" || typeof b.bitcoin === "string").toBeTruthy()
+                expect(typeof b.litecoin === "number").toBeTruthy()
+                done()
+            })
+            .catch( err => {
+                expect(err).toBeDefined()
+                done()
+            })
+}, 20000);
 
 test("APB, getWalletBalances(): with string parameter ", async (done) => {
-    try {
-        let balances = await APB.getWalletBalances("bitcoin");
-        let b = balances["bitcoin"]
-        expect(typeof b === "number" || typeof b === "string").toBeTruthy()
-    } catch (err) {
-        expect(err).toBeDefined()
-    }
-
-    done()
+        APB.getWalletBalances("bitcoin")
+            .then( b => {
+                expect(typeof b["bitcoin"] === "number" || typeof b["bitcoin"] === "string").toBeTruthy()
+                done()
+            })
+            .catch( err => {
+                expect(err).toBeDefined()
+                done()
+            })
 }, 20000);
 
 
 test("APB, getWalletBalances(): with one coin parameter (flo)", async (done) => {
-    try {
-        let balances = await APB.getWalletBalances(["flo"]);
-        expect(typeof balances["flo"] === "number").toBeTruthy()
-    } catch (err) {
-        expect(err).toBeDefined()
-    }
-
-    done()
+        APB.getWalletBalances(["flo"])
+            .then( balances => {
+                expect(typeof balances["flo"] === "number").toBeTruthy()
+                done()
+            })
+            .catch( err => {
+                expect(err).toBeDefined()
+                done()
+            })
 }, 20000);
 
 test("APB, getWalletBalances(): with two coin parameters (flo, bitcoin)", async (done) => {
-    try {
-        let b = await APB.getWalletBalances(["flo", "bitcoin"]);
-        expect(typeof b.flo === "number").toBeTruthy()
-        expect(typeof b.bitcoin === "number" || typeof b.bitcoin === "string").toBeTruthy()
-    } catch (err) {
-        expect(err).toBeDefined()
-    }
-    done()
+        APB.getWalletBalances(["flo", "bitcoin"])
+            .then(b => {
+                expect(typeof b.flo === "number").toBeTruthy()
+                expect(typeof b.bitcoin === "number" || typeof b.bitcoin === "string").toBeTruthy()
+                done()
+            })
+            .catch(err => {
+                expect(err).toBeDefined()
+                done()
+            })
 }, 20000);
 
 test("APB, getWalletBalances(): ticker to name (flo, btc)", async (done) => {
-    try {
-        let b = await APB.getWalletBalances(APB.tickerToName(["flo", "btc"]));
-        expect(typeof b.flo === "number").toBeTruthy()
-        expect(typeof b.bitcoin === "number" || typeof b.bitcoin === "string").toBeTruthy()
-    } catch(err) {
-        expect(err).toBeDefined()
-    }
-
-    done()
+        APB.getWalletBalances(APB.tickerToName(["flo", "btc"]))
+            .then( b => {
+                expect(typeof b.flo === "number").toBeTruthy()
+                expect(typeof b.bitcoin === "number" || typeof b.bitcoin === "string").toBeTruthy()
+                done()
+            })
+            .catch( err => {
+                expect(err).toBeDefined()
+                done()
+            });
 }, 20000);
 
 test("APB, coinPicker()", async (done) => {
