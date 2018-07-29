@@ -105,6 +105,22 @@ test("APB, getPaymentAddress() multiple coins", async (done) => {
     done()
 }, 10000)
 
+test("APB, nameToTicker() single string param", () => {
+    expect(APB.nameToTicker("bitcoin")).toEqual("btc")
+})
+
+test("APB, nameToTicker() array param", () => {
+    expect(APB.nameToTicker(["bitcoin", "litecoin", "flo"])).toEqual(["btc", "ltc", "flo"])
+})
+
+test("APB, tickerToName() single string param", () => {
+    expect(APB.tickerToName("btc")).toEqual("bitcoin")
+})
+
+test("APB, tickerToName() array param", () => {
+    expect(APB.tickerToName(["btc", "ltc", "flo"])).toEqual(["bitcoin", "litecoin", "flo"])
+})
+
 test("APB, getSupportedCoins() ",  () => {
     let test = new ArtifactPaymentBuilder();
     expect(test.getSupportedCoins(artifact)).toEqual(["btc", "ltc", "flo"])
@@ -185,17 +201,17 @@ test("APB, fiatToCrypto", async (done) => {
 }, 10000)
 
 test("APB, getWalletBalances(): without coin parameters", async (done) => {
-    let apb = new ArtifactPaymentBuilder(wallet);
-    let b = await apb.getWalletBalances()
+    let b = await APB.getWalletBalances()
     expect(typeof b.flo === "number").toBeTruthy()
-    expect(typeof b.bitcoin === "number").toBeTruthy()
+    expect(typeof b.bitcoin === "number" || typeof b.bitcoin === "string").toBeTruthy()
     expect(typeof b.litecoin === "number").toBeTruthy()
     done()
 }, 30000);
 
 test("APB, getWalletBalances(): with string parameter ", async (done) => {
-    let balances = await APB.getWalletBalances("flo");
-    expect(typeof balances["flo"] === "number").toBeTruthy()
+    let balances = await APB.getWalletBalances("bitcoin");
+    let b = balances["bitcoin"]
+    expect(typeof b === "number" || typeof b === "string").toBeTruthy()
     done()
 }, 20000);
 
@@ -207,9 +223,16 @@ test("APB, getWalletBalances(): with one coin parameter (flo)", async (done) => 
 }, 20000);
 
 test("APB, getWalletBalances(): with two coin parameters (flo, bitcoin)", async (done) => {
-    let balances = await APB.getWalletBalances(["flo", "bitcoin"]);
-    expect(balances).toHaveProperty("flo");
-    expect(balances).toHaveProperty("bitcoin");
+    let b = await APB.getWalletBalances(["flo", "bitcoin"]);
+    expect(typeof b.flo === "number").toBeTruthy()
+    expect(typeof b.bitcoin === "number" || typeof b.bitcoin === "string").toBeTruthy()
+    done()
+}, 20000);
+
+test("APB, getWalletBalances(): ticker to name (flo, btc)", async (done) => {
+    let b = await APB.getWalletBalances(APB.tickerToName(["flo", "btc"]));
+    expect(typeof b.flo === "number").toBeTruthy()
+    expect(typeof b.bitcoin === "number" || typeof b.bitcoin === "string").toBeTruthy()
     done()
 }, 20000);
 

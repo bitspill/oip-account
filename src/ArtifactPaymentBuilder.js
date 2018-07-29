@@ -77,6 +77,64 @@ class ArtifactPaymentBuilder {
         return artifact ? artifact.getPaymentAddress(coins) : this._artifact.getPaymentAddress(coins)
     }
     /**
+     * Name to Ticker (only supports bitcoin, litecoin, and flo currently
+     * @param {(string|Array.<string>)} coin_names - Names of coins
+     * @return {(string|Array.<string>)}
+     */
+    nameToTicker(coin_names){
+        let switchNames = (name) => {
+            switch(name) {
+                case "bitcoin":
+                    return "btc"
+                case "litecoin":
+                    return "ltc"
+                case "flo":
+                    return "flo"
+                default:
+                    return name
+            }
+        }
+        let coin_array = []
+        if (Array.isArray(coin_names)) {
+            for (let name of coin_names) {
+                coin_array.push(switchNames(name))
+            }
+            return coin_array
+        }
+        return switchNames(coin_names)
+    }
+
+    /**
+     * Ticker to name (only supports btc, ltc, and flo currently
+     * @param {(string|Array.<string>)} coin_tickers - Coin tickers
+     * @return {(string|Array.<string>)}
+     */
+    tickerToName(coin_tickers){
+        let switchNames = (ticker) => {
+            switch(ticker) {
+                case "btc":
+                    return "bitcoin"
+                case "ltc":
+                    return "litecoin"
+                case "flo":
+                    return "flo"
+                default:
+                    return ticker
+            }
+        }
+        let coin_array = []
+        if (Array.isArray(coin_tickers)) {
+            for (let ticker of coin_tickers) {
+                coin_array.push(switchNames(ticker))
+            }
+            return coin_array
+        }
+        return switchNames(coin_tickers)
+
+    }
+
+
+    /**
      * getSupportedCoins retrieves the coins the Artifact accepts as payment
      * @param {(Object|Artifact)} [artifact] - Either an object of [coin][addrs] or an Artifact to get the addresses from. If nothing is passed in, it will attempt to use the constructor's Artifact
      * @param {(string|Array.<string>)} [coins] - An array of coins you want to check support for
@@ -146,11 +204,10 @@ class ArtifactPaymentBuilder {
                 rates[coin] = rate;
             } catch (err) {
                 rates[coin] = "error fetching rate";
-                console.log(`Error while trying to resolve the rxchange rate of ${coin}: ${err}`)
 
-                if (err.response && err.response.statusText) {
-                    console.log("error response statusText: ", err.response.statusText)
-                }
+                // if (err.response && err.response.statusText) {
+                //     console.log("error response statusText: ", err.response.statusText)
+                // }
             }
         }
         // console.log(`Exchange rates: ${JSON.stringify(rates, null, 4)}`)
@@ -203,36 +260,27 @@ class ArtifactPaymentBuilder {
         let coins = coin_array || Object.keys(this._wallet.getCoins());
         if (typeof coin_array === "string") {coins = [coin_array]}
         let walletCoins = this._wallet.getCoins();
-        // console.log(`Check to see coin_array: ${coins_array} -- ${coins} -- ${_coins}`)
+
         let coinPromises = {};
         let coin_balances = {};
 
         for (let coin of coins) {
-            try {
-                if (walletCoins[coin]) {
-                    coinPromises[coin] = walletCoins[coin].getBalance({discover: true})
-                } else {console.log(`${coin} not in wallet.getCoins()`)}
-            } catch (err) {
-                coinPromises[coin] = `${err}`;
-                // console.log(`Error on fetching promise for ${coin}: ${err}`)
+            if (walletCoins[coin]) {
+                coinPromises[coin] = walletCoins[coin].getBalance({discover: true})
             }
         }
 
         for (let coin in coinPromises) {
             try {
                 coin_balances[coin] = await coinPromises[coin];
-                // console.log(`${coin}: resolved balance: ${coin_balances[coin]}`)
-
             } catch (err) {
                 coin_balances[coin] = "error fetching balance";
-                console.log(`Error while trying to resolve the balance of ${coin}: ${err}`)
 
                 if (err.response && err.response.statusText) {
-                    console.log("error response statusText: ", err.response.statusText)
+                    coin_balances[coin] = `Status code ${err.response.status}: ${err.response.statusText}`
                 }
             }
         }
-        // console.log(`Coin balances: ${JSON.stringify(coin_balances, null, 4)}`);
         return coin_balances
     }
 
@@ -280,7 +328,6 @@ class ArtifactPaymentBuilder {
             }
             selected_coin = coinWithHighestAmount;
         }
-        // console.log(`Usable coin(s): ${usableCoins}. \n The selectedCoin: ${selected_coin}`);
         return selected_coin
     }
 
@@ -291,16 +338,13 @@ class ArtifactPaymentBuilder {
      * @returns {Promise.<string>} A promise that resolves to a txid if the tx went through or an error if it didn't
      */
     async pay(coin){
-        console.log("coin: ", coin)
         //Step 1.a: Determine amount to pay
         let payment_amount
          try {
             payment_amount = await this.getPaymentAmount();
          } catch (err) {throw new Error("Could not get amount to pay")}
-        console.log(`payment_amount: ${payment_amount}`)
 
         let supported_coins = this.getSupportedCoins(this._artifact, coin);
-        console.log(`supported_coins: ${supported_coins}, ${Array.isArray(supported_coins)}`)
 
         if (!supported_coins.length)
             throw new Error("Coin(s) not supported. Artifact may not support coin parameter")
@@ -310,33 +354,26 @@ class ArtifactPaymentBuilder {
         try {
             exchange_rates = await this.getExchangeRates(supported_coins);
         } catch (err) {throw new Error(`Could not get exchange rates for ${supported_coins}`)}
-        console.log(`exchange_rates: ${JSON.stringify(exchange_rates, null, 4)}`)
-
 
         // Step 3: Convert the file/tip costs using the exchange_rates
         let conversion_costs
         try {
             conversion_costs = await this.fiatToCrypto(exchange_rates, payment_amount);
         } catch (err) {throw new Error("Could not get conversion costs for artifact file")}
-        console.log(`conversion_costs: ${JSON.stringify(conversion_costs)}`)
 
         // Step 4 (this step can be running while Step 3 is running)
         let coin_balances
         try {
-            coin_balances = await this.getWalletBalances(supported_coins);
+            coin_balances = await this.getWalletBalances(this.tickerToName(supported_coins));
         } catch (err) {throw new Error("Could not get coin_balances")}
-        console.log(`coin_balances: ${JSON.stringify(coin_balances, null, 4)}`)
 
         // Step 5
         let payment_coin = this.coinPicker(coin_balances, conversion_costs, coin)
         if (payment_coin.error) {throw new Error("Insufficient funds")}
-        console.log(`payment_coin: ${payment_coin}`)
 
         let payment_address = this.getPaymentAddress(payment_coin)
-        console.log(`payment_address: ${JSON.stringify(payment_address, null, 4)}`)
 
         const amount_to_pay = conversion_costs[payment_coin];
-        console.log(`amount_to_pay: ${amount_to_pay}`)
 
         return await this.sendPayment(payment_address, amount_to_pay, payment_coin)
     }
