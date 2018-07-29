@@ -29,7 +29,7 @@ class ArtifactPaymentBuilder {
      * Get Payment Amount. Uses constructor variables to get payment amount based off ArtifactFile or amount parameter.
      * @return {Number} payment_amount
      */
-    async getPaymentAmount(){
+    getPaymentAmount(){
         switch (this._type) {
             case "view":
                 if (this._amount instanceof ArtifactFile) {
