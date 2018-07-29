@@ -1,16 +1,16 @@
 language: node_js
 node_js:
-#  - "6.14.1"
-#    env:
-#        JEST_FLAGS="--coverage"
+  - "6.14.1"
+    env:
+  -      JEST_FLAGS="--coverage"
   - "8.10.0"
   - "8.11.2"
   - "9.11.1"
   - "10.6.0"
 
-#env:
-#  global:
-#    JEST_FLAGS="--coverage --detectOpenHandles"
-#
-#script:
-#  - node ./test/rm-test-data.js && jest ${JEST_FLAGS}
+env:
+  global:
+  -  JEST_FLAGS="--coverage --detectOpenHandles"
+
+script:
+  - node ./test/rm-test-data.js && jest ${JEST_FLAGS}
