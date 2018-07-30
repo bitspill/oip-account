@@ -274,8 +274,18 @@ test("APB, sendPayment()", async (done) => {
 
 test("APB, pay()", async (done) => {
     let apb = new ArtifactPaymentBuilder(wallet, artifact, 0.00001, "tip");
-    let pay = await apb.pay();
-    expect(typeof pay === "string").toBeTruthy()
+    apb.pay()
+        .then( pay => {
+            expect(typeof pay === "string").toBeTruthy()
+            done()
+        })
+        .catch( err => {
+            let error = false;
+            if (err)
+                error = true;
+            expect(error).toBeTruthy()
+            done()
+        })
     done()
 }, 20000)
 
