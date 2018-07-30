@@ -136,11 +136,11 @@ class ArtifactPaymentBuilder {
 
     /**
      * getSupportedCoins retrieves the coins the Artifact accepts as payment
-     * @param {(Object|Artifact)} [artifact] - Either an object of [coin][addrs] or an Artifact to get the addresses from. If nothing is passed in, it will attempt to use the constructor's Artifact
      * @param {(string|Array.<string>)} [coins] - An array of coins you want to check support for
-     * @returns {Array} An array of coins that the Artifact accepts as payment. If Artifact does not support coin input, an empty array will be returned
+     * @param {(Object|Artifact)} [artifact] - Either an object of [coin][addrs] or an Artifact to get the addresses from. If nothing is passed in, it will attempt to use the constructor's Artifact
+     * @returns {(string|Array.<string>)} An array of coins that the Artifact accepts as payment. If Artifact does not support coin input, an empty array will be returned
      */
-    getSupportedCoins(artifact, coins) {
+    getSupportedCoins(coins, artifact) {
         let addrs = artifact || this._artifact
         let supported_coins = [];
         if (addrs instanceof Artifact) {
@@ -163,8 +163,9 @@ class ArtifactPaymentBuilder {
                 }
                 return _coins
             } else if (typeof coins === "string") {
-                if (supported_coins.includes(coins)) {return [coins]}
-            } else { return []}
+                if (supported_coins.includes(coins)) {return coins}
+                else { return ""}
+            }
         }
 
         return supported_coins
