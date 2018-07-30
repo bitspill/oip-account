@@ -278,10 +278,8 @@ class ArtifactPaymentBuilder {
             try {
                 coin_balances[coin] = await coinPromises[coin];
             } catch (err) {
-                coin_balances[coin] = "error fetching balance";
-
-                if (err.response && err.response.statusText) {
-                    coin_balances[coin] = `${err.response.status} +${err.response.statusText}`
+                if (err) {
+                    coin_balances[coin] = err.message;
                 }
             }
         }
