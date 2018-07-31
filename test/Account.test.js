@@ -1,4 +1,5 @@
 import Account from '../src/Account';
+import ArtifactPaymentBuilder from '../src/ArtifactPaymentBuilder'
 
 test("Create new Account MemoryStorage!", (done) => {
 	var acc = new Account(undefined, undefined, {store_memory: true, discover: false});
@@ -77,4 +78,11 @@ test("Create Account (no email) (localStorage)", async (done) => {
 	expect(account_info.email).toBeUndefined()
 	expect(account_info.wallet.mnemonic).toBeDefined()
 	done()
+})
+
+test("Instantiate a payment builder", () => {
+	let account = new Account();
+	let apb = account.getPaymentBuilder()
+	let pass = apb instanceof ArtifactPaymentBuilder
+	expect(pass).toBeTruthy()
 })

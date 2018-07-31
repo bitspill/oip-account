@@ -180,6 +180,20 @@ class Account {
 			builder.pay().then(resolve).catch(reject)
 		})
 	}
+
+    /**
+     * Instantiate and Artifact payment builder so you can do cool stuff! All params are optional. Include what you need to use. Put undefined for those you don't need.
+     * @param {Wallet} [wallet] - oip-HDMW
+     * @param {Artifact} [artifact] - oip-Artifact
+     * @param {(ArtifactFile)|number} [file] - an oip-ArtifactFile or the amount you want to pat
+     * @param {string} [type] - 'view', 'buy', or 'tip'
+     * @param {string} [coin] - the coin you prefer to pay with (currently only supports one coin
+     * @param {string} [fiat="usd"] - the fiat currency you deal with
+     * @returns {ArtifactPaymentBuilder}
+     */
+	getPaymentBuilder(wallet, artifact, file, type, coin, fiat) {
+	    return new ArtifactPaymentBuilder(wallet, artifact, file, type, coin, fiat)
+    }
 }
 
 module.exports = Account
