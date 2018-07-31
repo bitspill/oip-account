@@ -173,7 +173,7 @@ class ArtifactPaymentBuilder {
     
     /**
      * Calculate Exchange Rate (only for the supported coins) (this is so that we can know how much to pay in the cryptocurrency to the Artifact/ArtifactFile)
-     * @param  {Array.<String>} [coin_array=this._wallet.getCoins()]    - An array of coins you want to get exchange rates for. If none are given, an array of all available coins will be used.
+     * @param  {(string|Array.<String>)} [coin_array=this._wallet.getCoins()]    - An array of coins or the string name of a coin you want to get exchange rates for. If none are given, an array of all available coins will be used.
      * @param  {string} [fiat="usd"]     - The fiat currency you wish to check against. If none is given, "usd" is defaulted.
      * @return {Object} exchange_rates
      * @example
@@ -244,7 +244,7 @@ class ArtifactPaymentBuilder {
 
     /**
      * Get Balances for each coin that is supported (The supported coins that the Artifact accepts)
-     * @param  {Array.<string>} [coin_array=this._wallet.getCoins()]    - FULL NAMES OF COINS REQUIRED: An array of coins you want to get balances for. If no coins are given, an array of all available coins will be used.
+     * @param  {(string|Array.<string>)} [coin_array=this._wallet.getCoins()]    - FULL NAMES OF COINS REQUIRED: An array of coins you want to get balances for. If no coins are given, an array of all available coins will be used.
      * @return {Promise.<Object>} coin_balances
      * @example
      * let APB = new ArtifactPaymentBuilder(wallet, artifact, artifactFile, "view")
@@ -333,6 +333,38 @@ class ArtifactPaymentBuilder {
         return selected_coin
     }
 
+    /**
+     * Return coins that have a sufficient balance to pay with (similiar to coinPicker but gets the exchange rates for you)
+     * @param {(string|Array.<string>)} supported_coins=this.getSupportedCoins() - Default is the return of getSupportedCoins()
+     * @param {Object} balances - Coin balances
+     * @param {number} cost=this.getPaymentAmount - Cost of file. Default the return of getPaymentAmount()
+     * @returns {Promise<(Array.<string>|string)>} - the coins that have enough of a balance to proceed with the payment
+     */
+    async getCoinsWithSufficientBalance(supported_coins = this.getSupportedCoins(), balances, cost = this.getPaymentAmount()) {
+        let _coins = supported_coins;
+        let _balances = balances;
+        let _cost = cost;
+        let xr, cc, sufficient_coins = [];
+        try {
+            xr = await this.getExchangeRates(_coins)
+        } catch (err) {
+            throw {error: err, message: "failed to get exchange rates"}
+        }
+
+        cc = this.fiatToCrypto(xr, _cost);
+        for (let coin_b in _balances) {
+            for (let coin_c in cc) {
+                if (coin_b === coin_c) {
+                    if (_balances[coin_b] > cc[coin_c]) {
+                        sufficient_coins.push(coin_b)
+                    }
+                }
+            }
+        }
+        return sufficient_coins;
+
+
+    }
 
     /**
      * Pay is the overall function that runs a series of methods to calculate balances, addresses, and execute payment

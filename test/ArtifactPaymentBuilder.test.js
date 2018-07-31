@@ -294,6 +294,15 @@ test("APB, coinPicker() with coin parameter (not enough balance will throw error
     done()
 }, 20000);
 
+test("APB, getCoinsWithSufficientBalance()", async (done) => {
+    let apb = new ArtifactPaymentBuilder(wallet, artifact, artifactFile, "buy")
+    try {
+        let coins = await apb.getCoinsWithSufficientBalance(["flo", "btc", "ltc"], {flo: .0010, btc: 1}, 0.10);
+        console.log("coins: ", coins)
+        done()
+    } catch(err) {console.log("err", err); done()}
+}, 10000)
+
 test("APB, sendPayment()", async (done) => {
     try {
         let payment = await APB.sendPayment("FLZXRaHzVPxJJfaoM32CWT4GZHuj2rx63k", .00001);
