@@ -335,14 +335,14 @@ class ArtifactPaymentBuilder {
 
     /**
      * Return coins that have a sufficient balance to pay with (similiar to coinPicker but gets the exchange rates for you)
-     * @param {(string|Array.<string>)} supported_coins=this.getSupportedCoins() - Default is the return of getSupportedCoins()
      * @param {Object} balances - Coin balances
+     * @param {(string|Array.<string>)} supported_coins=this.getSupportedCoins() - Default is the return of getSupportedCoins()
      * @param {number} cost=this.getPaymentAmount - Cost of file. Default the return of getPaymentAmount()
      * @returns {Promise<(Array.<string>|string)>} - the coins that have enough of a balance to proceed with the payment
      */
-    async getCoinsWithSufficientBalance(supported_coins = this.getSupportedCoins(), balances, cost = this.getPaymentAmount()) {
-        let _coins = supported_coins;
+    async getCoinsWithSufficientBalance(balances, supported_coins = this.getSupportedCoins(), cost = this.getPaymentAmount()) {
         let _balances = balances;
+        let _coins = supported_coins;
         let _cost = cost;
         let xr, cc, sufficient_coins = [];
         try {
