@@ -298,9 +298,14 @@ test("APB, getCoinsWithSufficientBalance()", async (done) => {
     let apb = new ArtifactPaymentBuilder(wallet, artifact, artifactFile, "buy")
     try {
         let coins = await apb.getCoinsWithSufficientBalance(["flo", "btc", "ltc"], {flo: .0010, btc: 1}, 0.10);
-        console.log("coins: ", coins)
+        except(Array.isArray(coins)).toBeTruthy()
         done()
-    } catch(err) {console.log("err", err); done()}
+    } catch(err) {
+        let pass = false;
+        if (err) {pass = true}
+        expect(pass).toBeTruthy()
+        done()
+    }
 }, 10000)
 
 test("APB, sendPayment()", async (done) => {
