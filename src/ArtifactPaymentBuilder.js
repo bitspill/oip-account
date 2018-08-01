@@ -350,6 +350,10 @@ class ArtifactPaymentBuilder {
      */
     async getCoinsWithSufficientBalance(balances, supported_coins = this.getSupportedCoins(), cost = this.getPaymentAmount(),
                                         options = {cc: false, fc: false, cb: false, fb: false, rb: false, xr: false, all: false}) {
+        
+        supported_coins = supported_coins || this.getSupportedCoins();
+        cost = cost || this.getPaymentAmount();
+
         if (options.all) {
             options.cc = true;
             options.cb = true;
@@ -366,27 +370,42 @@ class ArtifactPaymentBuilder {
         let _coins = supported_coins;
         let _cost = cost;
         let xr, cc, sufficient_coins = [];
+
+        let newBalanceObj = {};
+        let keysArray = [];
+        keysArray = Object.keys(_balances)
+        keysArray = this.nameToTicker(keysArray);
+
+        for (let coinTicker of keysArray){
+            for (let coin in _balances) {
+                if (this.nameToTicker(coin) === coinTicker) {
+                    newBalanceObj[this.nameToTicker(coin)] = _balances[coin]
+                }
+            }
+        }
+
         try {
             xr = await this.getExchangeRates(_coins)
         } catch (err) {
             throw {error: err, message: "failed to get exchange rates"}
         }
 
-        let ret = {}
+        let ret = {};
         cc = this.fiatToCrypto(xr, _cost);
-        for (let coin_b in _balances) {
+
+        for (let coin_b in newBalanceObj) {
             for (let coin_c in cc) {
                 if (coin_b === coin_c) {
-                    if (_balances[coin_b] > cc[coin_c]) {
+                    if (newBalanceObj[coin_b] > cc[coin_c]) {
 
                         if (options.on) {
                             ret[coin_b] = {};
-                            if (options.cb) {ret[coin_b].currentCryptoBalance = _balances[coin_b]}
-                            if (options.fb) {ret[coin_b].currentFiatBalance = (_balances[coin_b] * xr[coin_b])}
+                            if (options.cb) {ret[coin_b].currentCryptoBalance = newBalanceObj[coin_b]}
+                            if (options.fb) {ret[coin_b].currentFiatBalance = (newBalanceObj[coin_b] * xr[coin_b])}
                             if (options.xr) {ret[coin_b].exchangeRate = xr[coin_c]}
                             if (options.fc) {ret[coin_b].fiatFileCost = _cost}
                             if (options.cc) {ret[coin_b].cryptoFileCost = cc[coin_c]}
-                            if (options.rb) {ret[coin_b].remainingBalance = (_balances[coin_b] - cc[coin_c])}
+                            if (options.rb) {ret[coin_b].remainingBalance = (newBalanceObj[coin_b] - cc[coin_c])}
                         } else {
                             sufficient_coins.push(coin_b)
                         }
