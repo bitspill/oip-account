@@ -338,9 +338,30 @@ class ArtifactPaymentBuilder {
      * @param {Object} balances - Coin balances
      * @param {(string|Array.<string>)} supported_coins=this.getSupportedCoins() - Default is the return of getSupportedCoins()
      * @param {number} cost=this.getPaymentAmount - Cost of file. Default the return of getPaymentAmount()
-     * @returns {Promise<(Array.<string>|string)>} - the coins that have enough of a balance to proceed with the payment
+     * @param {Object} [options] - Options to return additional values. If options are selected, function will return an object and not an array
+     * @param {boolean} [options.cc=false] - Return the crypto cost of the file (the amount actually sent)
+     * @param {boolean} [options.fc=false] - Return the fiat cost of the file
+     * @param {boolean} [options.cb=false] - Return the current balance of the coins as well
+     * @param {boolean} [options.fb=false] - Return the fiat balance of your coins
+     * @param {boolean} [options.rb=false] - Return what would be the remaining balances if the tx went through
+     * @param {boolean} [options.xr=false] - Return the exchange rates as well
+     * @param {boolean} [options.all=false] - Set all of the option parameters to true
+     * @returns {Promise<(Array.<string>|Object)>} - the coins that have enough of a balance to proceed with the payment
      */
-    async getCoinsWithSufficientBalance(balances, supported_coins = this.getSupportedCoins(), cost = this.getPaymentAmount()) {
+    async getCoinsWithSufficientBalance(balances, supported_coins = this.getSupportedCoins(), cost = this.getPaymentAmount(),
+                                        options = {cc: false, fc: false, cb: false, fb: false, rb: false, xr: false, all: false}) {
+        if (options.all) {
+            options.cc = true;
+            options.cb = true;
+            options.rb = true;
+            options.xr = true;
+            options.fc = true;
+            options.fb = true;
+        }
+        if (options.cc || options.cb || options.rb || options.xr || options.fc || options.fb) {
+            options["on"] = true;
+        }
+
         let _balances = balances;
         let _coins = supported_coins;
         let _cost = cost;
@@ -351,19 +372,29 @@ class ArtifactPaymentBuilder {
             throw {error: err, message: "failed to get exchange rates"}
         }
 
+        let ret = {}
         cc = this.fiatToCrypto(xr, _cost);
         for (let coin_b in _balances) {
             for (let coin_c in cc) {
                 if (coin_b === coin_c) {
                     if (_balances[coin_b] > cc[coin_c]) {
-                        sufficient_coins.push(coin_b)
+
+                        if (options.on) {
+                            ret[coin_b] = {};
+                            if (options.cb) {ret[coin_b].currentCryptoBalance = _balances[coin_b]}
+                            if (options.fb) {ret[coin_b].currentFiatBalance = (_balances[coin_b] * xr[coin_b])}
+                            if (options.xr) {ret[coin_b].exchangeRate = xr[coin_c]}
+                            if (options.fc) {ret[coin_b].fiatFileCost = _cost}
+                            if (options.cc) {ret[coin_b].cryptoFileCost = cc[coin_c]}
+                            if (options.rb) {ret[coin_b].remainingBalance = (_balances[coin_b] - cc[coin_c])}
+                        } else {
+                            sufficient_coins.push(coin_b)
+                        }
                     }
                 }
             }
         }
-        return sufficient_coins;
-
-
+        return options.on ? ret : sufficient_coins
     }
 
     /**
