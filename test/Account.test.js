@@ -6,7 +6,7 @@ test("Create new Account MemoryStorage!", (done) => {
 
 	acc.create().then((account_info) => {
 		expect(account_info.identifier).toBeDefined()
-		expect(account_info.wallet.mnemonic).toBeDefined()
+		expect(account_info.wallet.seed).toBeDefined()
 		done()
 	})
 })
@@ -16,7 +16,7 @@ test("Create Account from Mnemonic MemoryStorage!", (done) => {
 
 	acc.login().then((account_info) => {
 		expect(account_info.identifier).toBeDefined()
-		expect(account_info.wallet.mnemonic).toBe("abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about")
+		expect(account_info.wallet.seed).toBe("abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about")
 		expect(acc.wallet.getMnemonic()).toBe("abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about")
 		done()
 	})
@@ -27,7 +27,7 @@ test("Create Account from Mnemonic (localStorage)", (done) => {
 
 	acc.create().then((account_info) => {
 		expect(account_info.identifier).toBeDefined()
-		expect(account_info.wallet.mnemonic).toBe("abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about")
+		expect(account_info.wallet.seed).toBe("abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about")
 		expect(acc.wallet.getMnemonic()).toBe("abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about")
 		done()
 	})
@@ -49,7 +49,7 @@ test("Create Account (email) (localStorage)", async (done) => {
 
 	expect(account_info.identifier).toBeDefined()
 	expect(account_info.email).toBe("test@me.com")
-	expect(account_info.wallet.mnemonic).toBeDefined()
+	expect(account_info.wallet.seed).toBeDefined()
 
 	var acc2 = new Account("test@me.com", "password", {discover: false})
 
@@ -76,7 +76,7 @@ test("Create Account (no email) (localStorage)", async (done) => {
 
 	expect(account_info.identifier).toBeDefined()
 	expect(account_info.email).toBeUndefined()
-	expect(account_info.wallet.mnemonic).toBeDefined()
+	expect(account_info.wallet.seed).toBeDefined()
 	done()
 })
 

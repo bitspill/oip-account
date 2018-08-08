@@ -39,7 +39,7 @@ class Account {
 		};
 
 		if (util.isMnemonic(this._username)){
-			this._account.wallet.mnemonic = this._username;
+			this._account.wallet.seed = this._username;
 			this._username = undefined
 		}
 
@@ -75,9 +75,9 @@ class Account {
 		} catch (e) {
 
 			// If an error was thrown in `check()` then it means the account does not exist, go ahead and create it then
-			this.wallet = new Wallet(this._account.wallet.mnemonic, {discover: this.discover });
+			this.wallet = new Wallet(this._account.wallet.seed, {discover: this.discover});
 
-			this._account.wallet.mnemonic = this.wallet.getMnemonic()
+			this._account.wallet = this.wallet.serialize()
 
 			var account_data = await this._storageAdapter.create(this._account, this._account.email)
 
@@ -98,10 +98,15 @@ class Account {
 
 		this._account = account_info;
 
-		if (!this._account.wallet.mnemonic)
-		    throw new Error("Accounts not containing a Wallet Mnemonic are NOT SUPPORTED!")
+		if (!this._account.wallet.seed)
+		    throw new Error("Accounts not containing a Wallet Seed are NOT SUPPORTED!")
 
-		this.wallet = new Wallet(this._account.wallet.mnemonic, {discover: this.discover})
+		this.wallet = new Wallet(this._account.wallet.seed, {
+			discover: this.discover,
+			serialized_data: this._account.wallet
+		})
+
+		this._account.wallet = this.wallet.serialize()
 
 		return JSON.parse(JSON.stringify(this._account))
 	}
