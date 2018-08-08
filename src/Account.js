@@ -1,4 +1,6 @@
 import { Wallet, util } from 'oip-hdmw';
+import EventEmitter from 'eventemitter3'
+
 import ArtifactPaymentBuilder from './ArtifactPaymentBuilder';
 import { isValidEmail, isValidIdentifier, isValidSharedKey } from './util';
 
@@ -58,6 +60,8 @@ class Account {
 			this._storageAdapter = new LocalStorageAdapter(this._username, this._password);
 		}
 
+		this.event_emitter = new EventEmitter()
+
 		this.discover = true;
 
 		if (options && options.discover !== undefined)
@@ -76,6 +80,9 @@ class Account {
 
 			// If an error was thrown in `check()` then it means the account does not exist, go ahead and create it then
 			this.wallet = new Wallet(this._account.wallet.seed, {discover: this.discover});
+
+			// Subscribe to Websocket Updates
+			this.wallet.onWebsocketUpdate(this._handleWalletWebsocketUpdate.bind(this))
 
 			this._account.wallet = this.wallet.serialize()
 
@@ -107,6 +114,8 @@ class Account {
 		})
 
 		this._account.wallet = this.wallet.serialize()
+
+		this.wallet.onWebsocketUpdate(this._handleWalletWebsocketUpdate.bind(this))
 
 		return JSON.parse(JSON.stringify(this._account))
 	}
@@ -153,6 +162,23 @@ class Account {
 			throw new Error("setting_node is a required parameter!")
 
 		return this._account.settings[setting_node]
+	}
+	/**
+	 * Internal function used to handle Websocket updates streaming in from the Wallet
+	 * @param  {Address} address - The Address that was updated
+	 */
+	_handleWalletWebsocketUpdate(address){
+		this.event_emitter.emit("wallet_websocket_update", this, address)
+
+		this._account.wallet = this.wallet.serialize()
+		this.store()
+	}
+	/**
+	 * Subscribe to Wallet Websocket updates
+	 * @param  {function} subscriberFunction - The function you want called when a Websocket update happens
+	 */
+	onWalletWebsocketUpdate(subscriberFunction){
+		this.event_emitter.on("wallet_websocket_update", subscriberFunction)
 	}
 	/**
 	 * Pay to View or Buy and Artifact File. This makes the purchase as well as saving that info to the wallet.
