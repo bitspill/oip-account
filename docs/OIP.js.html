@@ -1,3 +1,5 @@
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -6,7 +8,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <title>
-      Global - Documentation
+      OIP.js - Documentation
   </title>
 
   <link href="https://www.braintreepayments.com/images/favicon-ccda0b14.png" rel="icon" type="image/png">
@@ -80,207 +82,201 @@
   <div id="main">
     
       <h1 class="page-title">
-        Global
+        OIP.js
       </h1>
     
 
     
+      
 
 <section>
-  <header>
-    
-      <h2>
-        
-        
-        
-      </h2>
-
-      
-    
-  </header>
-
   <article>
-    <div class="container-overview">
-      
-        
+    <pre class="prettyprint source linenums"><code>import { Artifact, Multipart } from "oip-index"
+
+const CHOP_MAX_LEN = 900;
+const FLODATA_MAX_LEN = 1040;
+
+/** Easily broadcast OIP messages */
+class OIP {
+	/**
+	 * Create a new OIP Broadcaster
+	 * @param  {Wallet} wallet - The Wallet that should broadcast the messages
+	 * @param  {Address} address - The Address you wish to sign and broadcast with
+	 */
+	constructor(wallet, address){
+		this._wallet = wallet
+		this._address = address
+	}
+	async sendTransaction(data){
+		let send_to = {}
+		send_to[this._address.getPublicAddress()] = 0.0001
+
+		let txid
+		try {
+			txid = await this._wallet.sendPayment({
+				discover: false,
+				to: send_to,
+				from: this._address.getPublicAddress(),
+				floData: data
+			})
+		} catch (e) {
+			throw new Error("Unable to send floData Transaction! \n" + e)
+		}
+
+		return txid
+	}
+	async broadcastMessage(json_to_broadcast){
+		let broadcast_json = { oip042: json_to_broadcast }
+		let broadcast_string = JSON.stringify(broadcast_json)
+
+		if (broadcast_string.length &lt;= FLODATA_MAX_LEN){
+			let txid
+			try {
+				txid = await this.sendTransaction(broadcast_string)
+			} catch (e) {
+				throw new Error("Unable to Broadcast Message! \n" + e)
+			}
+
+			return txid
+		} else {
+			let txids
+			try {
+				txids = await this.broadcastMultiparts(this.getMultiparts(broadcast_string))
+			} catch(e) {
+				throw new Error("Unable to Broadcast Message! \n" + e)
+			}
+
+			return txids
+		}
+	}
+	async broadcastMultiparts(multiparts){
+		let tmp_multiparts
+		let txids = []
+
+		for (var multipart of multiparts){
+			if (txids.length > 0){
+				multipart.setFirstPartTXID(txids[0])
+				multipart.sign(this._address)
+			}
+
+			try {
+				let txid = await this.sendTransaction(multipart.toString())
+				txids.push(txid)
+			} catch(e) {
+				throw new Error("Unable to Broadcast Multiparts! \n" + e)
+			}
+		}
+
+		return txids
+	}
+	/**
+	 * Get the Multiparts for a specific message
+	 * @param  {String} message - The string you wish to create multiparts from
+	 * @return {Array.&lt;Multipart>}         [description]
+	 */
+	getMultiparts(message){
+		// Check if we can just broadcast all the data in `floData`
+		if (message.length &lt;= FLODATA_MAX_LEN)
+			throw new Error("Message can fit in only one Transaction, Multiparts are thus not allowed!")
+
+		let multiparts = [];
+
+		var tmpMessage = message.slice(0)
+		var chunks = [];
+
+		while (tmpMessage.length > CHOP_MAX_LEN) {
+			chunks[chunks.length] = tmpMessage.slice(0, CHOP_MAX_LEN);
+			tmpMessage = tmpMessage.slice(CHOP_MAX_LEN);
+		}
+		chunks[chunks.length] = tmpMessage;
+
+		for (var c in chunks){
+			var mp = new Multipart();
 
-        
+			mp.setPartNumber(parseInt(c));
+			mp.setTotalParts(chunks.length - 1);
+			mp.setPublisherAddress(this._address.getPublicAddress());
+			mp.setChoppedStringData(chunks[c]);
+			mp.is_valid = mp.isValid().success;
 
-<dl class="details">
+			// If we are the first multipart, then sign right now, for all others, sign after the first tx has broadcast.
+			if (c == 0){
+                mp.is_first_part = true;
+                mp.hasJSONPrefix = true;
+                
+                mp.sign(this._address);
+			}
 
-  
+			multiparts.push(mp);
+		}
 
-  
+		return multiparts
+	}
+	async publish(item){
+		let pub_message = {}
 
-  
+		// Get the sub-object key
+		let publish_type = "register"
 
-  
+		if (item instanceof Artifact)
+			publish_type = "publish"
 
-  
+		// Set it up to be blank
+		pub_message[publish_type] = {}
 
-  
+		// Set the timestamp of the item
+		item.setTimestamp(Date.now())
 
-  
+		let item_json = item.toJSON()
 
-  
+		// Remove the version from the returned json, we don't want to publish it twice.
+		item_json = item_json.oip042
 
-  
+		pub_message[publish_type] = item_json
 
-  
+		// Create signature preimages
+		let signature_preimage
 
-  
+		if (item instanceof Artifact)
+			signature_preimage = `${item.getLocation()}-${item.getMainAddress()}-${item.getTimestamp()}`
 
-  
+		// if (item instanceof Publisher)
+		// 	signature_preimage = `${item.getAlias()}-${item.getMainAddress()}-${item.getTimestamp()}`
 
-  
+		let signature
+		try {
+			signature = this._address.signMessage(signature_preimage)
+		} catch(e) {
+			throw new Error("Unable to create signature preimage! \n" + e)
+		}
 
-  
+		pub_message[publish_type][item.getClassName().toLowerCase()].signature = signature
 
-  
+		let txid
+		try {
+			txid = await this.broadcastMessage(pub_message)
+		} catch(e) {
+			throw new Error(`Unable to Publish ${item.getClassName()}! \n` + e)
+		}
 
-  
-</dl>
+		return txid
+	}
+	edit(){
 
+	}
+	transfer(){
 
-        
-      
-    </div>
+	}
+	deactivate(){
 
-    
+	}
+}
 
-    
-
-    
-
-     
-
-    
-
-    
-
-    
-
-    
-      <h3 class="subsection-title">Type Definitions</h3>
-
-      
-          
-
-<br />
-<br />
-<hr />
-
-
-  
-
-  <span class='name-container'>
-    <a class="link-icon" href="#Identifier">
-      <svg height="20" width="20" style="fill: black;">
-        <use xlink:href="#linkIcon"></use>
-      </svg>
-    </a>
-    <h4 class="name" id="Identifier">
-      <span class="type-signature"></span>Identifier<span class="type-signature"> :string</span>
-    </h4>
-  </span>
-
-  
-
-
-
-  <div class="description">
-    <p>A Unique identifier for the user. This is a set of characters seperated by dashes.</p>
-  </div>
-
-
-
-
-
-
-
-
-
-
-<dl class="details">
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source">
-      <ul class="dummy">
-        <li>
-          <a href="StorageAdapter.js.html">StorageAdapter.js</a>, <a href="StorageAdapter.js.html#line12">line 12</a>
-        </li>
-      </ul>
-    </dd>
-  
-
-  
-
-  
-
-  
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-  <div class="example-container">
-    <a class="link-icon" href="#Identifier-examples">
-      <svg height="20" width="20" style="fill: black;">
-        <use xlink:href="#linkIcon"></use>
-      </svg>
-    </a>
-    <h5 id="Identifier-examples">Example</h5>
-    
-
-  <pre class="prettyprint"><code>e7c7a45-8aac7317-b2b0098-2c7a046</code></pre>
-
-
-  </div>
-
-
-
-
-        
-
-    
+module.exports = OIP</code></pre>
   </article>
 </section>
 
-
+    
 
 
   </div>
