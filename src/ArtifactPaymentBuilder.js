@@ -227,7 +227,7 @@ class ArtifactPaymentBuilder {
      * Picks a coin with enough balance in our wallet to spend (default to flo, then litecoin, then bitcoin last)
      * @param  {object} coin_balances    - Key value pairs [coin][balance]. See: getBalances()
      * @param  {object} conversion_costs    - Key value pairs [coin][conversion cost]. See: convertCosts()
-     * @param {string} [coin] - Preferred coin to pay with
+     * @param {string} [preferred_coin] - Preferred coin to pay with
      * @return {string|Object} - A string with the selected coin that has enough balance to pay with or an object containing an error status and response
      * @example
      * let APB = new ArtifactPaymentBuilder(wallet, artifact, artifactFile, "view")
@@ -236,123 +236,55 @@ class ArtifactPaymentBuilder {
      * //returns
      * "flo" || {error: true, response: "function coinPicker could not get coin with sufficient balance"}
      */
-    coinPicker(coin_balances, conversion_costs, coin){
-	    let selected_coin;
+    coinPicker(coin_balances, conversion_costs, preferred_coin){
+        let selected_coin;
         let usableCoins = [];
+
+        // Get coins that we can use to send
         for (let coin in coin_balances) {
-            if (typeof coin_balances[coin] === "number" && typeof conversion_costs[coin] ==="number") {
+            if (typeof coin_balances[coin] === "number" && typeof conversion_costs[coin] === "number") {
                 if (coin_balances[coin] >= conversion_costs[coin]) {
                     usableCoins.push(coin)
-                } else {
-                    // console.log(`${coin} has insufficient funds: either error or amount <= ${conversion_costs[coin]}`)
                 }
             }
         }
 
-        if (!usableCoins.length || (coin && !usableCoins.includes(coin))) {
-           return {error: true, response: "function coinPicker could not get coin with sufficient balance"}
-        }
-        if (usableCoins.includes(coin)) {return coin}
-        else if (usableCoins.includes("flo")) {return "flo"}
-        else if (usableCoins.includes("litecoin")) {return "litecoin"}
-        else if (usableCoins.includes("bitcoin")) {return "bitcoin"}
-        else {
-            let highestAmount = 0;
-            let coinWithHighestAmount;
-            for (let coin of usableCoins) {
-                if (coin_balances[coin] >= highestAmount) {
-                    highestAmount = coin_balances[coin];
-                    coinWithHighestAmount = coin;
-                }
+        // If no coins were matched, then return an error
+        if (!usableCoins.length) {
+            return {
+            	error: true, 
+            	response: "Unable to find coins that we can pay with!"
             }
-            selected_coin = coinWithHighestAmount;
         }
+
+        // If we are able to use the selected coin, pass back that for use
+        if (usableCoins.includes(preferred_coin)) {
+        	return preferred_coin
+        }
+
+        // Next, try to match based on preference order
+        let coin_preferences = ["flo", "litecoin", "bitcoin"]
+
+        for (let coin_preference of coin_preferences){
+        	if (usableCoins.includes(coin_preference))
+        		return coin_preference
+        }
+
+        // If we still haven't matched the coin yet, then just use the coin with the highest balance
+        let highestAmount = 0;
+        let coinWithHighestAmount;
+
+        for (let coin of usableCoins) {
+            if (coin_balances[coin] >= highestAmount) {
+                highestAmount = coin_balances[coin];
+                coinWithHighestAmount = coin;
+            }
+        }
+
+        selected_coin = coinWithHighestAmount;
+
         return selected_coin
     }
-
-    /**
-     * Return coins that have a sufficient balance to pay with (similiar to coinPicker but gets the exchange rates for you)
-     * @param {Object} balances - Coin balances
-     * @param {(string|Array.<string>)} supported_coins=this.getSupportedCoins() - Default is the return of getSupportedCoins()
-     * @param {number} cost=this.getPaymentAmount - Cost of file. Default the return of getPaymentAmount()
-     * @param {Object} [options] - Options to return additional values. If options are selected, function will return an object and not an array
-     * @param {boolean} [options.cc=false] - Return the crypto cost of the file (the amount actually sent)
-     * @param {boolean} [options.fc=false] - Return the fiat cost of the file
-     * @param {boolean} [options.cb=false] - Return the current balance of the coins as well
-     * @param {boolean} [options.fb=false] - Return the fiat balance of your coins
-     * @param {boolean} [options.rb=false] - Return what would be the remaining balances if the tx went through
-     * @param {boolean} [options.xr=false] - Return the exchange rates as well
-     * @param {boolean} [options.all=false] - Set all of the option parameters to true
-     * @returns {Promise<(Array.<string>|Object)>} - the coins that have enough of a balance to proceed with the payment
-     */
-    async getCoinsWithSufficientBalance(balances, supported_coins = this.getSupportedCoins(), cost = this.getPaymentAmount(),
-                                        options = {cc: false, fc: false, cb: false, fb: false, rb: false, xr: false, all: false}) {
-        
-        supported_coins = supported_coins || this.getSupportedCoins();
-        cost = cost || this.getPaymentAmount();
-
-        if (options.all) {
-            options.cc = true;
-            options.cb = true;
-            options.rb = true;
-            options.xr = true;
-            options.fc = true;
-            options.fb = true;
-        }
-        if (options.cc || options.cb || options.rb || options.xr || options.fc || options.fb) {
-            options["on"] = true;
-        }
-
-        let _balances = balances;
-        let _coins = supported_coins;
-        let _cost = cost;
-        let xr, cc, sufficient_coins = [];
-
-        let newBalanceObj = {};
-        let keysArray = [];
-        keysArray = Object.keys(_balances)
-        keysArray = this.nameToTicker(keysArray);
-
-        for (let coinTicker of keysArray){
-            for (let coin in _balances) {
-                if (this.nameToTicker(coin) === coinTicker) {
-                    newBalanceObj[this.nameToTicker(coin)] = _balances[coin]
-                }
-            }
-        }
-
-        try {
-            xr = await this.getExchangeRates(_coins)
-        } catch (err) {
-            throw {error: err, message: "failed to get exchange rates"}
-        }
-
-        let ret = {};
-        cc = this.fiatToCrypto(xr, _cost);
-
-        for (let coin_b in newBalanceObj) {
-            for (let coin_c in cc) {
-                if (coin_b === coin_c) {
-                    if (newBalanceObj[coin_b] > cc[coin_c]) {
-
-                        if (options.on) {
-                            ret[coin_b] = {};
-                            if (options.cb) {ret[coin_b].currentCryptoBalance = newBalanceObj[coin_b]}
-                            if (options.fb) {ret[coin_b].currentFiatBalance = (newBalanceObj[coin_b] * xr[coin_b])}
-                            if (options.xr) {ret[coin_b].exchangeRate = xr[coin_c]}
-                            if (options.fc) {ret[coin_b].fiatFileCost = _cost}
-                            if (options.cc) {ret[coin_b].cryptoFileCost = cc[coin_c]}
-                            if (options.rb) {ret[coin_b].remainingBalance = (newBalanceObj[coin_b] - cc[coin_c])}
-                        } else {
-                            sufficient_coins.push(coin_b)
-                        }
-                    }
-                }
-            }
-        }
-        return options.on ? ret : sufficient_coins
-    }
-
     /**
      * Pay is the overall function that runs a series of methods to calculate balances, addresses, and execute payment
      * @param {string} [coin] - The coin you want to pay with
