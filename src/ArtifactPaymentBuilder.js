@@ -5,17 +5,17 @@ const {Artifact} = require("oip-index")
  * A payment builder that calculates exchange rates, balances, conversion costs, and which coin to use for payment
  */
 class ArtifactPaymentBuilder {
-	/**
-	 * Create a new ArtifactPaymentBuilder
-	 * @param  {Wallet} wallet   - A live OIP-HDMW logged in wallet
-	 * @param  {Artifact} artifact - The Artifact related to the Payment you wish to make
-     * @param  {ArtifactFile|number} amount	- The amount you wish to pay (`tip`), or the ArtifactFile you wish to pay for (`view` & `buy`)
+    /**
+     * Create a new ArtifactPaymentBuilder
+     * @param  {Wallet} wallet   - A live OIP-HDMW logged in wallet
+     * @param  {Artifact} artifact - The Artifact related to the Payment you wish to make
+     * @param  {ArtifactFile|number} amount - The amount you wish to pay (`tip`), or the ArtifactFile you wish to pay for (`view` & `buy`)
      * @param  {string} type     - The type of the purchase, either `tip`, `view`, or `buy`
      * @param  {string} [coin=undefined]   - The Coin you wish to pay with
      * @param  {string} [fiat="usd"]   - The Fiat you wish to `tip` in (if amount was a number and NOT an ArtifactFile) default: "usd"
-	 * @return {ArtifactPaymentBuilder}
-	 */
-	constructor(wallet, artifact, amount, type, coin = undefined, fiat = "usd"){
+     * @return {ArtifactPaymentBuilder}
+     */
+    constructor(wallet, artifact, amount, type, coin = undefined, fiat = "usd"){
         this._wallet = wallet;
         this._type = type;
         this._artifact = artifact;
@@ -32,17 +32,23 @@ class ArtifactPaymentBuilder {
             case "view":
                 if (this._amount instanceof ArtifactFile) {
                     return this._amount.getSuggestedPlayCost()
-                } else throw new Error("Must provide valid ArtifactFile");
+                } else { 
+                	throw new Error("Must provide valid ArtifactFile");
+                }
             case "buy":
                 if (this._amount instanceof ArtifactFile) {
                     return this._amount.getSuggestedBuyCost()
-                } else throw new Error("Must provide valid ArtifactFile");
+                } else {
+                	throw new Error("Must provide valid ArtifactFile");
+                }
             case "tip":
                 if (typeof this._amount === "number") {
                     return this._amount;
-                } else throw new Error("Amount must be valid number");
+                } else {
+                	throw new Error("Amount must be valid number");
+            	}
             default:
-                throw new Error("Must have type either 'buy', 'view', or 'tip'")
+                throw new Error("Must have type of either 'buy', 'view', or 'tip'")
         }
     }
     /**
@@ -197,8 +203,8 @@ class ArtifactPaymentBuilder {
     }
     /**
      * Convert fiat price to crypto price using live exchange_rates
-     * @param {Object} exchange_rates           - see getExchangeRates()
-     * @param {number} fiat_amount          - the amount you wish to get the conversion cost for
+     * @param {Object} exchange_rates - The exchange rates retreived from the Wallet 
+     * @param {number} fiat_amount    - The amount you wish to get the conversion cost for
      * @returns {Object} conversion_costs
      * @example
      *  let exchange_rates = await APB.getExchangeRates(wallet)
@@ -218,7 +224,7 @@ class ArtifactPaymentBuilder {
                 conversion_costs[coin] = fiat_amount / exchange_rates[coin];
             }
         }
-        // console.log(`Conversion costs: ${JSON.stringify(conversion_costs, null, 4)}`)
+       
         return conversion_costs
     }
     /**
