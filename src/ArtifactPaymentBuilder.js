@@ -77,63 +77,70 @@ class ArtifactPaymentBuilder {
         return artifact ? artifact.getPaymentAddress(coins) : this._artifact.getPaymentAddress(coins)
     }
     /**
+     * Internal function used for both nameToTicker and tickerToName
+     * @param  {String|Array.<String>} coins - The Coins names/tickers you would like to swap
+     * @param  {String} from_type - Either "ticker" or "name"
+     * @param  {String} to_type - Either "ticker" or "name"
+     * @return {String|Array.<String>} Returns the converted tickers/names
+     */
+    _swapCoinTickerName(coins, from_type, to_type){
+    	// Get all coins supported by the wallet
+    	let wallet_coins = this._wallet.getCoins()
+
+    	// Get all of the networks from those coins
+    	let coin_networks = []
+        for (let w_coin in wallet_coins){
+        	coin_networks.push(wallet_coins[w_coin].getCoinInfo())
+        }
+
+        // Create name/ticker pairs from the networks
+        let name_pairs = coin_networks.map((network) => {
+            return {
+                name: network.name.toLowerCase(), 
+                ticker: network.ticker.toLowerCase()
+            }
+        })
+
+        // Function to swap ticker/name
+        let swap = (coin) => {
+            for (let pair of name_pairs){
+                if (pair[from_type] === coin)
+                    return pair[to_type]
+            }
+
+            return coin
+        }
+
+        // Handle if `coins` is an array
+        if (Array.isArray(coins)) {
+        	let swapped_array = []
+
+            for (let coin of coins) {
+                swapped_array.push(swap(coin))
+            }
+
+            return swapped_array
+        }
+
+        // Handle if `coins` is only a string
+        return swap(coins)
+    }
+    /**
      * Name to Ticker (only supports bitcoin, litecoin, and flo currently
      * @param {(string|Array.<string>)} coin_names - Names of coins
      * @return {(string|Array.<string>)}
      */
     nameToTicker(coin_names){
-        let switchNames = (name) => {
-            switch(name) {
-                case "bitcoin":
-                    return "btc"
-                case "litecoin":
-                    return "ltc"
-                case "flo":
-                    return "flo"
-                default:
-                    return name
-            }
-        }
-        let coin_array = []
-        if (Array.isArray(coin_names)) {
-            for (let name of coin_names) {
-                coin_array.push(switchNames(name))
-            }
-            return coin_array
-        }
-        return switchNames(coin_names)
+       return this._swapCoinTickerName(coin_names, "name", "ticker")
     }
-
     /**
      * Ticker to name (only supports btc, ltc, and flo currently
      * @param {(string|Array.<string>)} coin_tickers - Coin tickers
      * @return {(string|Array.<string>)}
      */
     tickerToName(coin_tickers){
-        let switchNames = (ticker) => {
-            switch(ticker) {
-                case "btc":
-                    return "bitcoin"
-                case "ltc":
-                    return "litecoin"
-                case "flo":
-                    return "flo"
-                default:
-                    return ticker
-            }
-        }
-        let coin_array = []
-        if (Array.isArray(coin_tickers)) {
-            for (let ticker of coin_tickers) {
-                coin_array.push(switchNames(ticker))
-            }
-            return coin_array
-        }
-        return switchNames(coin_tickers)
-
+        return this._swapCoinTickerName(coin_tickers, "ticker", "name")
     }
-
-
     /**
      * getSupportedCoins retrieves the coins the Artifact accepts as payment
      * @param {(string|Array.<string>)} [coins] - An array of coins you want to check support for
