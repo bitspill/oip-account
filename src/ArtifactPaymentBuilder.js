@@ -397,19 +397,28 @@ class ArtifactPaymentBuilder {
      * @returns {Promise} A promise that resolves to a txid if the tx went through or an error if it didn't
      */
     async sendPayment(payment_address, amount_to_pay, selected_coin){
-        // payment_address = "FLZXRaHzVPxJJfaoM32CWT4GZHuj2rx63k"
-        // amount = 1.154
+    	// Don't discover since we already did that in the previous methods
+        let payment_options = {
+        	discover: false
+        }
 
-        let payment_options = {}, to ={};
-        to[payment_address] = amount_to_pay;
-        payment_options.to = to;
-        if (selected_coin) {payment_options.coin = selected_coin};
+        let send_to = {};
+        send_to[payment_address] = amount_to_pay;
 
-        // console.log(`payment_options: ${JSON.stringify(payment_options, null, 4)}`)
-        return await this._wallet.sendPayment(payment_options)
+        payment_options.to = send_to
+
+        if (selected_coin) 
+        	payment_options.coin = selected_coin
+
+        let txid
+        try {
+        	txid = await this._wallet.sendPayment(payment_options)
+        } catch (err) {
+        	throw new Error("Unable to send payment! \n" + err)
+        }
+
+        return txid
     }
 }
-
-
 
 export default ArtifactPaymentBuilder;
