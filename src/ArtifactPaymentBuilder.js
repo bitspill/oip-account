@@ -1,6 +1,5 @@
 const {ArtifactFile} = require("oip-index")
 const {Artifact} = require("oip-index")
-const Exchange = require("oip-exchange-rate");
 
 /**
  * A payment builder that calculates exchange rates, balances, conversion costs, and which coin to use for payment
@@ -23,8 +22,7 @@ class ArtifactPaymentBuilder {
         this._amount = amount;
         this._coin = coin;
         this._fiat = fiat;
-        this._exchange = new Exchange();
-	}
+    }
     /**
      * Get Payment Amount. Uses constructor variables to get payment amount based off ArtifactFile or amount parameter.
      * @return {Number} payment_amount
