@@ -1,10 +1,10 @@
 import StorageAdapter from './StorageAdapter'
 
 if (typeof window === "undefined" || typeof window.localStorage === "undefined") {
-    if (typeof localStorage === "undefined") {
-        var LocalStorage = require('node-localstorage').LocalStorage;
-        var localStorage = new LocalStorage('./localStorage');
-    }
+	if (typeof localStorage === "undefined") {
+		var LocalStorage = require('node-localstorage').LocalStorage;
+		var localStorage = new LocalStorage('./localStorage');
+	}
 } else {localStorage = window.localStorage}
 
 /**

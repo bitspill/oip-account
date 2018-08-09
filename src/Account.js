@@ -15,10 +15,10 @@ class Account {
 	 * @param  {string} password - Your Accounts password
 	 * @param  {Object} [options]  - Options about the Account being spawned
 	 * @param  {Boolean} [options.store_memory=false] - If the wallet should be stored only in the Memory and wiped completely on logout
-     * @param  {Boolean} [options.store_in_keystore=false] - If the wallet should be stored on a Keystore server
+	 * @param  {Boolean} [options.store_in_keystore=false] - If the wallet should be stored on a Keystore server
 	 * @param  {string} [options.keystore_url="https://keystore.oip.li/"] - Keystore to use to store the Account
-     * @param  {Boolean} [options.discover=false] - set discovery
-     * @return {Account}
+	 * @param  {Boolean} [options.discover=false] - set discovery
+	 * @return {Account}
 	 */
 	constructor(username, password, options){
 		this._username = username
@@ -46,10 +46,10 @@ class Account {
 		}
 
 		if (isValidEmail(this._username))
-		    this._account.email = this._username
+			this._account.email = this._username
 
-        if (isValidIdentifier(this._username))
-            this._account.identifier = this._username
+		if (isValidIdentifier(this._username))
+			this._account.identifier = this._username
 
 		// Detect what kind of Username we are being passed.
 		if (options && options.store_memory) {
@@ -106,7 +106,7 @@ class Account {
 		this._account = account_info;
 
 		if (!this._account.wallet.seed)
-		    throw new Error("Accounts not containing a Wallet Seed are NOT SUPPORTED!")
+			throw new Error("Accounts not containing a Wallet Seed are NOT SUPPORTED!")
 
 		this.wallet = new Wallet(this._account.wallet.seed, {
 			discover: this.discover,
@@ -185,9 +185,9 @@ class Account {
 	 * @param  {Artifact} artifact      - The Artifact from which you got the ArtifactFile from. This is used to lookup payment percentage information.
 	 * @param  {ArtifactFile} artifact_file - The specific ArtifactFile that you wish to pay for
 	 * @param  {string} purchase_type - Either `view` or `buy`
-     * @param  {string} [coin]   - The Coin you wish to pay with
-     * @param  {string} [fiat]     - A string containing information about the users source currency (i.e. "usd")
-     * @return {Promise<Transaction>} Returns a Promise that will resolve to the payment transaction, or rejects if there is a payment error.
+	 * @param  {string} [coin]   - The Coin you wish to pay with
+	 * @param  {string} [fiat]     - A string containing information about the users source currency (i.e. "usd")
+	 * @return {Promise<Transaction>} Returns a Promise that will resolve to the payment transaction, or rejects if there is a payment error.
 	 */
 	payForArtifactFile(artifact, artifact_file, purchase_type, coin, fiat){
 		return new Promise((resolve, reject) => {
@@ -200,9 +200,9 @@ class Account {
 	 * Send a tip to the Publisher for a specific Artifact
 	 * @param  {Artifact} artifact - The Artifact you wish to tip
 	 * @param  {number} amount   - The Amount in `fiat` you wish to tip
-     * @param  {string} [coin]   - The Coin you wish to pay with
-     * @param  {string} [fiat="usd"]     - A string containing information about the users source currency (i.e. "usd")
-     * @return {Promise<Transaction>} Returns a Promise that will resolve to the payment transaction, or rejects if there is a payment error.
+	 * @param  {string} [coin]   - The Coin you wish to pay with
+	 * @param  {string} [fiat="usd"]     - A string containing information about the users source currency (i.e. "usd")
+	 * @return {Promise<Transaction>} Returns a Promise that will resolve to the payment transaction, or rejects if there is a payment error.
 	 */
 	sendArtifactTip(artifact, amount, coin, fiat){
 		return new Promise((resolve, reject) => {
@@ -212,19 +212,19 @@ class Account {
 		})
 	}
 
-    /**
-     * Instantiate and Artifact payment builder so you can do cool stuff! All params are optional. Include what you need to use. Put undefined for those you don't need.
-     * @param {Wallet} [wallet] - oip-HDMW
-     * @param {Artifact} [artifact] - oip-Artifact
-     * @param {(ArtifactFile|number)} [file] - an oip-ArtifactFile or the amount you want to pat
-     * @param {string} [type] - 'view', 'buy', or 'tip'
-     * @param {string} [coin] - the coin you prefer to pay with (currently only supports one coin
-     * @param {string} [fiat="usd"] - the fiat currency you deal with
-     * @returns {ArtifactPaymentBuilder}
-     */
+	/**
+	 * Instantiate and Artifact payment builder so you can do cool stuff! All params are optional. Include what you need to use. Put undefined for those you don't need.
+	 * @param {Wallet} [wallet] - oip-HDMW
+	 * @param {Artifact} [artifact] - oip-Artifact
+	 * @param {(ArtifactFile|number)} [file] - an oip-ArtifactFile or the amount you want to pat
+	 * @param {string} [type] - 'view', 'buy', or 'tip'
+	 * @param {string} [coin] - the coin you prefer to pay with (currently only supports one coin
+	 * @param {string} [fiat="usd"] - the fiat currency you deal with
+	 * @returns {ArtifactPaymentBuilder}
+	 */
 	getPaymentBuilder(wallet, artifact, file, type, coin, fiat) {
-	    return new ArtifactPaymentBuilder(wallet, artifact, file, type, coin, fiat)
-    }
+		return new ArtifactPaymentBuilder(wallet, artifact, file, type, coin, fiat)
+	}
 }
 
 module.exports = Account
