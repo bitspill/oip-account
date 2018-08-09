@@ -292,27 +292,46 @@ class ArtifactPaymentBuilder {
      */
     async pay(coin){
         //Step 1.a: Determine amount to pay
+        
+        // Get the Artifact payment cost
         let payment_amount
-         try {
-            payment_amount = await this.getPaymentAmount();
-         } catch (err) {throw new Error("Could not get amount to pay")}
+        try {
+            payment_amount = this.getPaymentAmount();
+        } catch (err) {
+        	throw new Error("Unable to get amount to pay! \n" + err)
+        }
 
-        let supported_coins = this.getSupportedCoins(this._artifact, coin);
+        // Check what coins are supported by the Artifact
+        let supported_coins 
+        try {
+	        supported_coins = this.getSupportedCoins(this._artifact, coin);
+        } catch(err) {
+        	throw new Error("Unable to get Supported Coins! \n" + err)
+        }
 
+        // Throw an error if we were unable to get supported coins for the Artifact
         if (!supported_coins.length)
-            throw new Error("Coin(s) not supported. Artifact may not support coin parameter")
+            throw new Error("No Coins supported by passed Artifact")
 
         // Step 2: Get exchange rates for supported_coins
         let exchange_rates
+
         try {
-            exchange_rates = await this.getExchangeRates(supported_coins);
-        } catch (err) {throw new Error(`Could not get exchange rates for ${supported_coins}`)}
+            exchange_rates = await this._wallet.getExchangeRates({
+            	fiat: this._fiat,
+            	coins: supported_coins
+            })
+        } catch (err) {
+        	throw new Error(`Could not get exchange rates from wallet for ${supported_coins} \n` + err)
+        }
 
         // Step 3: Convert the file/tip costs using the exchange_rates
         let conversion_costs
         try {
             conversion_costs = await this.fiatToCrypto(exchange_rates, payment_amount);
-        } catch (err) {throw new Error("Could not get conversion costs for artifact file")}
+        } catch (err) {
+        	throw new Error("Could not get conversion costs for artifact file \n" + err)
+        }
 
         // Step 4 (this step can be running while Step 3 is running)
         let coin_balances
@@ -327,15 +346,25 @@ class ArtifactPaymentBuilder {
         	throw new Error("Could not get current balances from Wallet! \n" + err)
         }
 
-        // Step 5
+        // Step 5: Select a coin that the Artifact supports, and that we have enough
+        // wallet balance for.
         let payment_coin = this.coinPicker(coin_balances, conversion_costs, coin)
         if (payment_coin.error) {throw new Error("Insufficient funds")}
 
         let payment_address = this.getPaymentAddress(payment_coin)
 
+        // Grab the amount that we should pay in the specific crypto
         const amount_to_pay = conversion_costs[payment_coin];
 
-        return await this.sendPayment(payment_address, amount_to_pay, payment_coin)
+        // Try to send the payment using what we have now calculated.
+        let txid
+        try {
+        	txid = await this.sendPayment(payment_address, amount_to_pay, payment_coin)
+        } catch(err) {
+        	throw new Error(`Unable to send payment to ${payment_address} for ${amount_to_pay} using ${payment_coin}! \n` + err)
+        }
+
+        return txid
     }
     /**
      * Send the Payment to the Payment Addresses using the selected coin from coinPicker() for the amount calculated
