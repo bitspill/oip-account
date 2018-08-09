@@ -223,51 +223,6 @@ class ArtifactPaymentBuilder {
         // console.log(`Conversion costs: ${JSON.stringify(conversion_costs, null, 4)}`)
         return conversion_costs
     }
-
-    /**
-     * Get Balances for each coin that is supported (The supported coins that the Artifact accepts)
-     * @param  {(string|Array.<string>)} [coin_array=this._wallet.getCoins()]    - FULL NAMES OF COINS REQUIRED: An array of coins you want to get balances for. If no coins are given, an array of all available coins will be used.
-     * @return {Promise.<Object>} coin_balances
-     * @example
-     * let APB = new ArtifactPaymentBuilder(wallet, artifact, artifactFile, "view")
-     * APB.getBalances(["flo", "bitcoin", "litecoin"])
-     *
-     * //returns
-     * {
-     *      "flo": 2.16216,
-     *      "bitcoin": "error fetching balance",
-     *      "litecoin": 3.32211
-     * }
-     */
-    async getWalletBalances(coin_array){
-        let coins = coin_array || Object.keys(this._wallet.getCoins());
-        if (typeof coin_array === "string") {coins = [coin_array]}
-        let walletCoins = this._wallet.getCoins();
-
-        let coinPromises = {};
-        for (let coin of coins) {
-            try {
-                if (walletCoins[coin]) {
-                    coinPromises[coin] = walletCoins[coin].getBalance({discover: true})
-                }
-            } catch (err) {
-                coinPromises[coin] = `${err}`;
-            }
-        }
-
-        let coin_balances = {};
-        for (let coin in coinPromises) {
-            try {
-                coin_balances[coin] = await coinPromises[coin];
-            } catch (err) {
-                if (err) {
-                    coin_balances[coin] = err.message;
-                }
-            }
-        }
-        return coin_balances
-    }
-
     /**
      * Picks a coin with enough balance in our wallet to spend (default to flo, then litecoin, then bitcoin last)
      * @param  {object} coin_balances    - Key value pairs [coin][balance]. See: getBalances()
@@ -430,8 +385,15 @@ class ArtifactPaymentBuilder {
         // Step 4 (this step can be running while Step 3 is running)
         let coin_balances
         try {
-            coin_balances = await this.getWalletBalances(this.tickerToName(supported_coins));
-        } catch (err) {throw new Error("Could not get coin_balances")}
+        	// First attempt to check if we have sufficient balance based on what
+        	// has already been discovered.
+            coin_balances = await this._wallet.getCoinBalances({
+            	discover: false,
+            	coins: this.tickerToName(supported_coins)
+            });
+        } catch (err) {
+        	throw new Error("Could not get current balances from Wallet! \n" + err)
+        }
 
         // Step 5
         let payment_coin = this.coinPicker(coin_balances, conversion_costs, coin)
