@@ -143,85 +143,60 @@ class ArtifactPaymentBuilder {
     }
     /**
      * getSupportedCoins retrieves the coins the Artifact accepts as payment
-     * @param {(string|Array.<string>)} [coins] - An array of coins you want to check support for
-     * @param {(Object|Artifact)} [artifact] - Either an object of [coin][addrs] or an Artifact to get the addresses from. If nothing is passed in, it will attempt to use the constructor's Artifact
-     * @returns {(string|Array.<string>)} An array of coins that the Artifact accepts as payment. If Artifact does not support coin input, an empty array will be returned
+     * @param {string|Array.<string>} [preferred_coins] - An array of coins you would prefer to use
+     * @param {Artifact} [artifact] - An Artifact to get the addresses from. If nothing is passed in, it will attempt to use the constructor's Artifact.
+     * @returns {string|Array.<string>} An array of coins that the Artifact accepts as payment. If Artifact does not support coin input, an empty array will be returned
      */
-    getSupportedCoins(coins, artifact) {
-        let addrs = artifact || this._artifact
-        let supported_coins = [];
-        if (addrs instanceof Artifact) {
-            addrs = addrs.getPaymentAddresses()
-        }
-        if (typeof addrs === "object") {
-            for (let coin in addrs) {
-                supported_coins.push(coin)
-            }
-        } else { throw new Error("Invalid parameter. Expecting an Array of Objects: [{[coin][addr]},]")}
+    getSupportedCoins(preferred_coins, artifact) {
+        let artifact_to_use = artifact || this._artifact
+        let artifact_payment_addresses
+        let artifact_supported_coins = [];
 
-        if (coins) {
-            if (Array.isArray(coins)) {
-                let _coins = []
-                for (let my_coin of coins) {
-                    for (let sup_coin of supported_coins) {
-                        if (my_coin === sup_coin)
-                            _coins.push(my_coin)
+        // Get the artifact payment addresses
+        if (artifact_to_use instanceof Artifact) {
+            artifact_payment_addresses = artifact_to_use.getPaymentAddresses()
+        }
+
+        // Make sure that we get the correct response back
+        if (typeof artifact_payment_addresses === "object") {
+            for (let coin in artifact_payment_addresses) {
+                artifact_supported_coins.push(coin)
+            }
+        } else { 
+        	throw new Error("Invalid parameter. Expecting an Array of Objects: [{[coin][addr]},]")
+        }
+
+        // If we are passed preferred_coins to try to select, attempt to grab them
+        if (preferred_coins) {
+        	// The preferred_coins param might be an array
+            if (Array.isArray(preferred_coins)) {
+                let matched_preferred_coins = []
+
+                // Match coins that are supported by the artifact, as well as the
+                // preferred coins
+                for (let preferred_coin of preferred_coins) {
+                    for (let supported_coin of artifact_supported_coins) {
+                        if (preferred_coin === supported_coin)
+                            matched_preferred_coins.push(preferred_coin)
                     }
                 }
-                return _coins
-            } else if (typeof coins === "string") {
-                if (supported_coins.includes(coins)) {return coins}
-                else { return ""}
+
+                // Check if we matched to preferred coins
+                if (matched_preferred_coins.length > 0)
+	                return matched_preferred_coins
+            } else if (typeof preferred_coins === "string") {
+            	// See if the preferred coin can be selected
+                if (artifact_supported_coins.includes(preferred_coins)) {
+                	// If we matched, return it
+                	return preferred_coins
+                }
             }
         }
 
-        return supported_coins
+        // If we didn't match to the preferred coins, then just return 
+        // all the found artifact supported coins
+        return artifact_supported_coins
     }
-    
-    /**
-     * Calculate Exchange Rate (only for the supported coins) (this is so that we can know how much to pay in the cryptocurrency to the Artifact/ArtifactFile)
-     * @param  {(string|Array.<String>)} [coin_array=this._wallet.getCoins()]    - An array of coins or the string name of a coin you want to get exchange rates for. If none are given, an array of all available coins will be used.
-     * @param  {string} [fiat="usd"]     - The fiat currency you wish to check against. If none is given, "usd" is defaulted.
-     * @return {Object} exchange_rates
-     * @example
-     * let APB = new ArtifactPaymentBuilder(wallet, artifact, artifactFile, "view")
-     * APB.getExchangeRates(["flo", "bitcoin", "litecoin"], "usd")
-     *
-     * //returns
-     * {
-     *      "flo": expect.any(Number) || "error",
-     *      "bitcoin": expect.any(Number) || "error",
-     *      "litecoin": expect.any(Number) || "error"
-     * }
-     */
-    async getExchangeRates(coin_array, fiat = this._fiat){
-        let coins =  coin_array || Object.keys(this._wallet.getCoins());
-        if (typeof coin_array === "string") {coins = [coin_array]}
-        let rates = {};
-        let promiseArray = {};
-
-        if (!coins) throw new Error("No coins found to fetch exchange rates. Check coin_array parameter or constructor");
-
-        for (let coin of coins) {
-            promiseArray[coin] = this._exchange.getExchangeRate(coin, fiat);
-        }
-
-        for (let coin in promiseArray) {
-            try {
-                let rate = await promiseArray[coin];
-                rates[coin] = rate;
-            } catch (err) {
-                rates[coin] = "error fetching rate";
-
-                // if (err.response && err.response.statusText) {
-                //     console.log("error response statusText: ", err.response.statusText)
-                // }
-            }
-        }
-        // console.log(`Exchange rates: ${JSON.stringify(rates, null, 4)}`)
-        return rates;
-    }
-
     /**
      * Convert fiat price to crypto price using live exchange_rates
      * @param {Object} exchange_rates           - see getExchangeRates()
