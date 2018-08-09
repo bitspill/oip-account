@@ -349,8 +349,31 @@ class ArtifactPaymentBuilder {
         // Step 5: Select a coin that the Artifact supports, and that we have enough
         // wallet balance for.
         let payment_coin = this.coinPicker(coin_balances, conversion_costs, coin)
-        if (payment_coin.error) {throw new Error("Insufficient funds")}
 
+        // Check if we failed to select a coin
+        if (payment_coin.error) {
+        	try {
+	        	// If we failed to select a coin based on the already discovered balance, 
+	        	// then do a new discovery for the wallet balance
+	            coin_balances = await this._wallet.getCoinBalances({
+	            	discover: true,
+	            	coins: this.tickerToName(supported_coins)
+	            });
+	        } catch (err) {
+	        	throw new Error("Unable to discover balances from Wallet! \n" + err)
+	        }
+
+	        // Using the new coin_balances grabbed, try to get a coin to use again
+	        payment_coin = this.coinPicker(coin_balances, conversion_costs, coin)
+
+	        // Check if there is still an error trying to pay
+	        if (payment_coin.error) {
+	        	throw new Error(payment_coin.response)
+	        }
+        }
+
+        // If we were able to select a coin to pay with, grab the matching address
+        // from the Artifact
         let payment_address = this.getPaymentAddress(payment_coin)
 
         // Grab the amount that we should pay in the specific crypto
