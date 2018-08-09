@@ -2,7 +2,6 @@ import { Artifact, ArtifactFile } from 'oip-index'
 import { Wallet } from 'oip-hdmw'
 import OIP from "../src/OIP";
 
-/*
 test("Publish single tx Artifact", async (done) => {
 	let wallet = new Wallet('00000000000000000000000000000000', {
 		discover: false,
@@ -33,6 +32,7 @@ test("Publish single tx Artifact", async (done) => {
 	done()
 })
 
+/*
 test("Publish Multipart Artifact", async (done) => {
 	let wallet = new Wallet('00000000000000000000000000000000', {
 		discover: false,
