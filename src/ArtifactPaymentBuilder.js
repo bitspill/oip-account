@@ -294,7 +294,7 @@ class ArtifactPaymentBuilder {
 	 * @param {string} [coin] - The coin you want to pay with
 	 * @returns {Promise.<Object>} Returns a Promise that resolves to the payment address, payment amount, and payment coin. If it fails, it will return an object with `success: false`, and the error.
 	 */
-	async getPaymentAdddressAndAmount(coin){
+	async getPaymentAddressAndAmount(coin){
 		// @ToDo: Save variables to local state
 		// @ToDo: Return error objects {error: true, err: e, msg: "message for error"}
 
