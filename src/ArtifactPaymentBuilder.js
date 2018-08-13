@@ -464,7 +464,7 @@ class ArtifactPaymentBuilder {
 	async pay(){
 		if (!this.payment_address && !this.amount_to_pay && !this.payment_coin){
 			try {
-				let response = await getPaymentAdddressAndAmount()
+				let response = await this.getPaymentAddressAndAmount()
 
 				if (!response.success){
 					throw response.err
