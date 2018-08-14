@@ -287,7 +287,7 @@ class ArtifactPaymentBuilder {
 
 		selected_coin = coinWithHighestAmount;
 
-		return selected_con
+		return selected_coin
 	}
 	/**
 	 * This function is used to get the proper payment address, payment amount (in crypto cost), and the coin to use to pay.
@@ -332,7 +332,7 @@ class ArtifactPaymentBuilder {
 				success: false,
 				error_type: "ARTIFACT_NO_PAYMENT_COINS",
 				msg: "No Coins supported by passed Artifact!",
-				err: new Error("No Coins supported by passed Artifact! \n" + err)
+				err: new Error("No Coins supported by passed Artifact!")
 			}
 		}
 
@@ -415,7 +415,7 @@ class ArtifactPaymentBuilder {
 					success: false,
 					error_type: "PAYMENT_COIN_SELECT",
 					msg: payment_coin.response,
-					err: new Error(payment_coin.response + " \n" + err)
+					err: new Error(payment_coin.response)
 				}
 			}
 		}
@@ -429,7 +429,7 @@ class ArtifactPaymentBuilder {
 				success: false,
 				error_type: "NO_PAYMENT_ADDRESS",
 				msg: `Unable to get payment address for ${payment_coin}`,
-				err: new Error(`Unable to get payment address for ${payment_coin} \n` + err)
+				err: new Error(`Unable to get payment address for ${payment_coin}`)
 			}
 		}
 
@@ -441,7 +441,7 @@ class ArtifactPaymentBuilder {
 				success: false,
 				error_type: "NO_AMOUNT_TO_PAY",
 				msg: `Unable to get payment amount for ${payment_coin} from ${conversion_costs}`,
-				err: new Error(`Unable to get payment amount for ${payment_coin} from ${conversion_costs} \n` + err)
+				err: new Error(`Unable to get payment amount for ${payment_coin} from ${conversion_costs}`)
 			}
 		}
 
