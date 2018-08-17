@@ -187,19 +187,19 @@ class ArtifactPaymentBuilder {
 
 				// Check if we matched to preferred coins
 				if (matched_preferred_coins.length > 0)
-					return matched_preferred_coins
+					return this.tickerToName(matched_preferred_coins)
 			} else if (typeof preferred_coins === "string") {
 				// See if the preferred coin can be selected
 				if (artifact_supported_coins.includes(preferred_coins)) {
 					// If we matched, return it
-					return preferred_coins
+					return this.tickerToName(preferred_coins)
 				}
 			}
 		}
 
 		// If we didn't match to the preferred coins, then just return 
 		// all the found artifact supported coins
-		return artifact_supported_coins
+		return this.tickerToName(artifact_supported_coins)
 	}
 	/**
 	 * Convert fiat price to crypto price using live exchange_rates
@@ -211,7 +211,7 @@ class ArtifactPaymentBuilder {
 	 *  let conversion_costs = await APB.fiatToCrypto(exchange_rates, .00012);
 	 * //returns
 	 * {
-	 *      "coin": expect.any(Number),
+	 *      "full_coin_name": expect.any(Number),
 	 *      ...
 	 * }
 	 */
@@ -238,7 +238,7 @@ class ArtifactPaymentBuilder {
 	 * APB.coinPicker(coin_balances, conversion_costs)
 	 *
 	 * //returns
-	 * "flo" || {error: true, response: "function coinPicker could not get coin with sufficient balance"}
+	 * "bitcoin" || {error: true, response: "function coinPicker could not get coin with sufficient balance"}
 	 */
 	coinPicker(coin_balances, conversion_costs, preferred_coin){
 		let selected_coin;
@@ -313,6 +313,7 @@ class ArtifactPaymentBuilder {
 			}
 		}
 
+
 		// Check what coins are supported by the Artifact
 		let supported_coins 
 		try {
@@ -325,6 +326,8 @@ class ArtifactPaymentBuilder {
 				err: new Error("Unable to get Supported Coins! \n" + err)
 			}
 		}
+
+		//@ToDo: convert from ticker to name for supported_coins
 
 		// Throw an error if we were unable to get supported coins for the Artifact
 		if (!supported_coins.length){
@@ -422,8 +425,8 @@ class ArtifactPaymentBuilder {
 
 		// If we were able to select a coin to pay with, grab the matching address
 		// from the Artifact
-		let payment_address_object = this.getPaymentAddress(payment_coin)
-		let payment_address = payment_address_object[payment_coin]
+        let payment_address_object = this.getPaymentAddress(this.nameToTicker(payment_coin));
+        let payment_address = payment_address_object[this.nameToTicker(payment_coin)];
 
 		if (!payment_address){
 			return {
