@@ -316,7 +316,7 @@ class ArtifactPaymentBuilder {
 		// Check what coins are supported by the Artifact
 		let supported_coins 
 		try {
-			supported_coins = this.getSupportedCoins(this._artifact, coin);
+			supported_coins = this.getSupportedCoins(coin, this._artifact);
 		} catch(err) {
 			return {
 				success: false,
