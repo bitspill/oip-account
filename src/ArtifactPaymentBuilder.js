@@ -482,7 +482,7 @@ class ArtifactPaymentBuilder {
 		try {
 			txid = await this.sendPayment(this.payment_address, this.amount_to_pay, this.payment_coin)
 		} catch(err) {
-			throw new Error(`Unable to send payment to ${payment_address} for ${amount_to_pay} using ${payment_coin}! \n` + err)
+			throw new Error(`Unable to send payment to ${this.payment_address} for ${this.amount_to_pay} using ${this.payment_coin}! \n` + err)
 		}
 
 		return txid
