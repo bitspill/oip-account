@@ -131,6 +131,9 @@ class Account {
 	 * @return {Promise<Object>} Returns a Promise that will resolve to the Account Data if the account is saved successfully, or rejects if there was an error storing.
 	 */
 	async store(){
+		// Always save the latest wallet state :)
+		this._account.wallet = this.wallet.serialize()
+
 		return await this._storageAdapter.save(this._account, this._account.identifier)
 	}
 	/**
