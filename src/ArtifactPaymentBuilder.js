@@ -422,7 +422,8 @@ class ArtifactPaymentBuilder {
 
 		// If we were able to select a coin to pay with, grab the matching address
 		// from the Artifact
-		let payment_address = this.getPaymentAddress(payment_coin)
+		let payment_address_object = this.getPaymentAddress(payment_coin)
+		let payment_address = payment_address_object[payment_coin]
 
 		if (!payment_address){
 			return {
