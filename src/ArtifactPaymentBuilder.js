@@ -60,10 +60,22 @@ class ArtifactPaymentBuilder {
 	 * APB.getPaymentAddresses()
 	 *
 	 * //returns
-	 * { flo: "FLZXRaHzVPxJJfaoM32CWT4GZHuj2rx63k" }
+	 * { bitcoin: "19HuaNprtc8MpG6bmiPoZigjaEu9xccxps" }
 	 */
 	getPaymentAddresses(artifact){
-		return artifact ? artifact.getPaymentAddresses() : this._artifact.getPaymentAddresses()
+		let art = artifact || this._artifact
+
+		let ticker_payment_addresses = art.getPaymentAddresses()
+
+		let name_payment_addresses = {}
+
+		for (let ticker in ticker_payment_addresses){
+			let name = this.tickerToName(ticker)
+
+			name_payment_addresses[name] = ticker_payment_addresses[ticker]
+		}
+
+		return name_payment_addresses
 	}
 	/**
 	 * Get Artifact Payment Address
@@ -72,13 +84,25 @@ class ArtifactPaymentBuilder {
 	 * @return {Object}
 	 * @example
 	 * let APB = new ArtifactPaymentBuilder(undefined, artifact)
-	 * APB.getPaymentAddresses(["btc"])
+	 * APB.getPaymentAddress(["bitcoin"])
 	 *
 	 * //returns
-	 * { btc: "FLZXRaHzVPxJJfaoM32CWT4GZHuj2rx63k" }
+	 * { bitcoin: "19HuaNprtc8MpG6bmiPoZigjaEu9xccxps" }
 	 */
 	getPaymentAddress(coins, artifact){
-		return artifact ? artifact.getPaymentAddress(coins) : this._artifact.getPaymentAddress(coins)
+		let art = artifact || this._artifact
+
+		let ticker_payment_address = art.getPaymentAddress(this.nameToTicker(coins))
+
+		let name_payment_address = {}
+
+		for (let ticker in ticker_payment_address){
+			let name = this.tickerToName(ticker)
+
+			name_payment_address[name] = ticker_payment_address[ticker]
+		}
+
+		return name_payment_address
 	}
 	/**
 	 * Internal function used for both nameToTicker and tickerToName
@@ -152,54 +176,32 @@ class ArtifactPaymentBuilder {
 	 * @returns {string|Array.<string>} An array of coins that the Artifact accepts as payment. If Artifact does not support coin input, an empty array will be returned
 	 */
 	getSupportedCoins(preferred_coins, artifact) {
-		let artifact_to_use = artifact || this._artifact
-		let artifact_payment_addresses
+		let artifact_payment_addresses = this.getPaymentAddresses(artifact)
+
 		let artifact_supported_coins = [];
 
-		// Get the artifact payment addresses
-		if (artifact_to_use instanceof Artifact) {
-			artifact_payment_addresses = artifact_to_use.getPaymentAddresses()
+		// Add all the coin names to the array
+		for (let coin in artifact_payment_addresses) {
+			artifact_supported_coins.push(coin)
 		}
 
-		// Make sure that we get the correct response back
-		if (typeof artifact_payment_addresses === "object") {
-			for (let coin in artifact_payment_addresses) {
-				artifact_supported_coins.push(coin)
-			}
-		} else { 
-			throw new Error("Invalid parameter. Expecting an Array of Objects: [{[coin][addr]},]")
+		if (typeof preferred_coins === "string"){
+			// Check if the preferred coin is in the supported coins array, if so, return it
+			if (artifact_supported_coins.indexOf(preferred_coins) !== -1)
+				return preferred_coins
+		} else if (Array.isArray(preferred_coins)){
+			// Match preferred coins array
+			let supported_preferred = []
+
+			for (let coinname of preferred_coins)
+				if (artifact_supported_coins.indexOf(coinname) !== -1)
+					supported_preferred.push(coinname)
+			
+			if (supported_preferred.length >= 1)
+				return supported_preferred
 		}
 
-		// If we are passed preferred_coins to try to select, attempt to grab them
-		if (preferred_coins) {
-			// The preferred_coins param might be an array
-			if (Array.isArray(preferred_coins)) {
-				let matched_preferred_coins = []
-
-				// Match coins that are supported by the artifact, as well as the
-				// preferred coins
-				for (let preferred_coin of preferred_coins) {
-					for (let supported_coin of artifact_supported_coins) {
-						if (preferred_coin === supported_coin)
-							matched_preferred_coins.push(preferred_coin)
-					}
-				}
-
-				// Check if we matched to preferred coins
-				if (matched_preferred_coins.length > 0)
-					return this.tickerToName(matched_preferred_coins)
-			} else if (typeof preferred_coins === "string") {
-				// See if the preferred coin can be selected
-				if (artifact_supported_coins.includes(preferred_coins)) {
-					// If we matched, return it
-					return this.tickerToName(preferred_coins)
-				}
-			}
-		}
-
-		// If we didn't match to the preferred coins, then just return 
-		// all the found artifact supported coins
-		return this.tickerToName(artifact_supported_coins)
+		return artifact_supported_coins
 	}
 	/**
 	 * Convert fiat price to crypto price using live exchange_rates
@@ -211,7 +213,7 @@ class ArtifactPaymentBuilder {
 	 *  let conversion_costs = await APB.fiatToCrypto(exchange_rates, .00012);
 	 * //returns
 	 * {
-	 *      "full_coin_name": expect.any(Number),
+	 *      "coin_name": expect.any(Number),
 	 *      ...
 	 * }
 	 */
@@ -313,7 +315,6 @@ class ArtifactPaymentBuilder {
 			}
 		}
 
-
 		// Check what coins are supported by the Artifact
 		let supported_coins 
 		try {
@@ -326,8 +327,6 @@ class ArtifactPaymentBuilder {
 				err: new Error("Unable to get Supported Coins! \n" + err)
 			}
 		}
-
-		//@ToDo: convert from ticker to name for supported_coins
 
 		// Throw an error if we were unable to get supported coins for the Artifact
 		if (!supported_coins.length){
@@ -376,7 +375,7 @@ class ArtifactPaymentBuilder {
 			// has already been discovered.
 			coin_balances = await this._wallet.getCoinBalances({
 				discover: false,
-				coins: this.tickerToName(supported_coins)
+				coins: supported_coins
 			});
 		} catch (err) {
 			return {
@@ -398,7 +397,7 @@ class ArtifactPaymentBuilder {
 				// then do a new discovery for the wallet balance
 				coin_balances = await this._wallet.getCoinBalances({
 					discover: true,
-					coins: this.tickerToName(supported_coins)
+					coins: supported_coins
 				});
 			} catch (err) {
 				return {
@@ -425,8 +424,8 @@ class ArtifactPaymentBuilder {
 
 		// If we were able to select a coin to pay with, grab the matching address
 		// from the Artifact
-        let payment_address_object = this.getPaymentAddress(this.nameToTicker(payment_coin));
-        let payment_address = payment_address_object[this.nameToTicker(payment_coin)];
+		let payment_address_object = this.getPaymentAddress(payment_coin)
+		let payment_address = payment_address_object[payment_coin]
 
 		if (!payment_address){
 			return {

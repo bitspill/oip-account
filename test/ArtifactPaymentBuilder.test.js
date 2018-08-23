@@ -63,33 +63,33 @@ test("APB, getPaymentAmount(): buy", () => {
 
 test("APB, getPaymentAddresses()", () => {
     expect(APB.getPaymentAddresses()).toEqual({
-        btc: "19HuaNprtc8MpG6bmiPoZigjaEu9xccxps",
-        ltc: "LbpjYYPwYBjoPQ44PrNZr7nTq7HkYgcoXN",
+        bitcoin: "19HuaNprtc8MpG6bmiPoZigjaEu9xccxps",
+        litecoin: "LbpjYYPwYBjoPQ44PrNZr7nTq7HkYgcoXN",
         flo: "F6esyn5opgUDcEdJpujxS9WLfu8Zj9XUZQ"
     })
 }, 10000)
 
 test("APB, getPaymentAddresses() with artifact argument", () => {
-    let test = new ArtifactPaymentBuilder();
+    let test = new ArtifactPaymentBuilder(wallet);
     expect(test.getPaymentAddresses(artifact)).toEqual({
-        btc: "19HuaNprtc8MpG6bmiPoZigjaEu9xccxps",
-        ltc: "LbpjYYPwYBjoPQ44PrNZr7nTq7HkYgcoXN",
+        bitcoin: "19HuaNprtc8MpG6bmiPoZigjaEu9xccxps",
+        litecoin: "LbpjYYPwYBjoPQ44PrNZr7nTq7HkYgcoXN",
         flo: "F6esyn5opgUDcEdJpujxS9WLfu8Zj9XUZQ"
     })
 }, 10000)
 
 test("APB, getPaymentAddress()", () => {
-    let test = new ArtifactPaymentBuilder(undefined, artifact);
-    expect(test.getPaymentAddress(["btc"])).toEqual({
-        btc: "19HuaNprtc8MpG6bmiPoZigjaEu9xccxps",
+    let test = new ArtifactPaymentBuilder(wallet, artifact);
+    expect(test.getPaymentAddress(["bitcoin"])).toEqual({
+        bitcoin: "19HuaNprtc8MpG6bmiPoZigjaEu9xccxps",
     })
 }, 10000)
 
 test("APB, getPaymentAddress() multiple coins", (done) => {
-    let test = new ArtifactPaymentBuilder(undefined, artifact);
-    expect(test.getPaymentAddress(["btc", "ltc"])).toEqual({
-        btc: "19HuaNprtc8MpG6bmiPoZigjaEu9xccxps",
-        ltc: "LbpjYYPwYBjoPQ44PrNZr7nTq7HkYgcoXN"
+    let test = new ArtifactPaymentBuilder(wallet, artifact);
+    expect(test.getPaymentAddress(["bitcoin", "litecoin"])).toEqual({
+        bitcoin: "19HuaNprtc8MpG6bmiPoZigjaEu9xccxps",
+        litecoin: "LbpjYYPwYBjoPQ44PrNZr7nTq7HkYgcoXN"
     })
     done()
 }, 10000)
@@ -111,43 +111,43 @@ test("APB, tickerToName() array param", () => {
 })
 
 test("APB, getSupportedCoins() ",  () => {
-    let test = new ArtifactPaymentBuilder();
-    expect(test.getSupportedCoins(undefined, artifact)).toEqual(["btc", "ltc", "flo"])
+    let test = new ArtifactPaymentBuilder(wallet);
+    expect(test.getSupportedCoins(undefined, artifact)).toEqual(["bitcoin", "litecoin", "flo"])
 })
 
 test("APB, getSupportedCoins() with string param and return",  () => {
-    let test = new ArtifactPaymentBuilder(undefined, artifact);
+    let test = new ArtifactPaymentBuilder(wallet, artifact);
     expect(test.getSupportedCoins("flo")).toEqual("flo")
 })
 
 test("APB, getSupportedCoins() with BS string param and return",  () => {
-    let test = new ArtifactPaymentBuilder(undefined, artifact);
-    expect(test.getSupportedCoins("kazy")).toEqual(["btc", "ltc", "flo"])
+    let test = new ArtifactPaymentBuilder(wallet, artifact);
+    expect(test.getSupportedCoins("kazy")).toEqual(["bitcoin", "litecoin", "flo"])
 })
 
 test("APB, getSupportedCoins() from constructor ",  () => {
-    let test = new ArtifactPaymentBuilder(undefined, artifact);
-    expect(test.getSupportedCoins()).toEqual(["btc", "ltc", "flo"])
+    let test = new ArtifactPaymentBuilder(wallet, artifact);
+    expect(test.getSupportedCoins()).toEqual(["bitcoin", "litecoin", "flo"])
 })
 
 test("APB, getSupportedCoins() from parameter ",  () => {
-    let test = new ArtifactPaymentBuilder();
-    expect(test.getSupportedCoins(undefined, artifact)).toEqual(["btc", "ltc", "flo"])
+    let test = new ArtifactPaymentBuilder(wallet);
+    expect(test.getSupportedCoins(undefined, artifact)).toEqual(["bitcoin", "litecoin", "flo"])
 })
 
 test("APB, getSupportedCoins() with custom coin params ",  () => {
-    let test = new ArtifactPaymentBuilder();
+    let test = new ArtifactPaymentBuilder(wallet);
     expect(test.getSupportedCoins(["flo"], artifact)).toEqual(["flo"])
 })
 
 test("APB, getSupportedCoins() with multiple custom coin params ",  () => {
-    let test = new ArtifactPaymentBuilder();
-    expect(test.getSupportedCoins(["flo", "btc"], artifact)).toEqual(["flo", "btc"])
+    let test = new ArtifactPaymentBuilder(wallet);
+    expect(test.getSupportedCoins(["flo", "bitcoin"], artifact)).toEqual(["flo", "bitcoin"])
 })
 
 test("APB, getSupportedCoins() with unsupported custom coin params ",  () => {
-    let test = new ArtifactPaymentBuilder();
-    expect(test.getSupportedCoins(["tron"], artifact)).toEqual(["btc", "ltc", "flo"])
+    let test = new ArtifactPaymentBuilder(wallet);
+    expect(test.getSupportedCoins(["tron"], artifact)).toEqual(["bitcoin", "litecoin", "flo"])
 })
 
 test("APB, fiatToCrypto", () => {
