@@ -36,8 +36,10 @@ class KeystoreStorageAdapter extends StorageAdapter {
 	async create(account_data, email){
 		var clonedAccountData = JSON.parse(JSON.stringify(account_data));
 
+		var create
+
 		try {
-			var create = await this._keystore.post("/create", { email: email })
+			create = await this._keystore.post("/create", { email: email })
 		} catch(e) {
 			if (e.response && e.response.data && e.response.data.type)
 				throw new Error(e.response.data.type)
@@ -68,8 +70,10 @@ class KeystoreStorageAdapter extends StorageAdapter {
 	 * @return {Promise<Object>} Returns a Promise that will resolve to the Decrypted Account Data if successful
 	 */
 	async load(){
+		var load
+
 		try {
-			var load = await this._keystore.post("/load", { identifier: this.storage.identifier || this._username })
+			load = await this._keystore.post("/load", { identifier: this.storage.identifier || this._username })
 		} catch(e) {
 			throw new Error(e.response.data.type)
 		}
@@ -94,8 +98,10 @@ class KeystoreStorageAdapter extends StorageAdapter {
 
 		this.storage.identifier = identifier
 		
+		var saved
+
 		try {
-			var saved = await this._keystore.post("/update", this.storage);
+			saved = await this._keystore.post("/update", this.storage);
 		} catch(e) {
 			throw new Error(e.response.data.type)
 		}
@@ -109,9 +115,10 @@ class KeystoreStorageAdapter extends StorageAdapter {
 	 * @return {Promise<Identifier>} Returns a Promsie that will resolve to the Accounts Identifier if set
 	 */
 	async check(){
+		var exists
 		// If the username is not a valid identifier, try to match it to an email
 		try {
-			var exists = await this._keystore.post("/checkload", { identifier: this._username });
+			exists = await this._keystore.post("/checkload", { identifier: this._username });
 		} catch (e) {
 			throw new Error(e.response.data.type)
 		}
