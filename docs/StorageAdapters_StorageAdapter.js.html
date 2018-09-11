@@ -8,7 +8,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <title>
-      Account.js - Documentation
+      StorageAdapters/StorageAdapter.js - Documentation
   </title>
 
   <link href="https://www.braintreepayments.com/images/favicon-ccda0b14.png" rel="icon" type="image/png">
@@ -82,7 +82,7 @@
   <div id="main">
     
       <h1 class="page-title">
-        Account.js
+        StorageAdapters/StorageAdapter.js
       </h1>
     
 
@@ -91,239 +91,190 @@
 
 <section>
   <article>
-    <pre class="prettyprint source linenums"><code>import { Wallet, util } from 'oip-hdmw';
-import EventEmitter from 'eventemitter3'
+    <pre class="prettyprint source linenums"><code>import CryptoJS from 'crypto-js';
+import crypto from 'crypto';
 
-import ArtifactPaymentBuilder from './ArtifactPaymentBuilder';
-import { isValidEmail, isValidIdentifier, isValidSharedKey } from './util';
+import { isValidEmail, isValidIdentifier } from '../util'
+import { InvalidPassword } from '../Errors'
 
-import MemoryStorageAdapter from './StorageAdapters/MemoryStorageAdapter';
-import LocalStorageAdapter from './StorageAdapters/LocalStorageAdapter';
-import KeystoreStorageAdapter from './StorageAdapters/KeystoreStorageAdapter';
+const AES_CONFIG = {
+	mode: CryptoJS.mode.CTR,
+	padding: CryptoJS.pad.Iso10126,
+	iterations: 5
+}
 
-class Account {
+/**
+ * A Unique identifier for the user. This is a set of characters seperated by dashes.
+ * @typedef {string} Identifier
+ * @example
+ * e7c7a45-8aac7317-b2b0098-2c7a046
+ */
+
+/**
+ * A Generic StorageAdapter class that provides shared functions between all StorageAdapters
+ */
+class StorageAdapter {
 	/**
-	 * Create a new Account
-	 * @param  {string} username - Pass in your Email, Account ID, or a BIP39 Mnemonic
-	 * @param  {string} password - Your Accounts password
-	 * @param  {Object} [options]  - Options about the Account being spawned
-	 * @param  {Boolean} [options.store_memory=false] - If the wallet should be stored only in the Memory and wiped completely on logout
-	 * @param  {Boolean} [options.store_in_keystore=false] - If the wallet should be stored on a Keystore server
-	 * @param  {string} [options.keystore_url="https://keystore.oip.li/"] - Keystore to use to store the Account
-	 * @param  {Boolean} [options.discover=false] - set discovery
-	 * @return {Account}
+	 * Create a new Storage Adapter
+	 * @param  {string} username - The username of the account you wish to use
+	 * @param  {string} password - The password of the account you wish to use
+	 * @return {StorageAdapter}
 	 */
-	constructor(username, password, options){
+	constructor(username, password){
 		this._username = username
-		this._password = password
+		this._password = password || ""
 
-		this._account = {
+		this.storage = {
 			identifier: undefined,
-			wallet: {
-
-			},
-			settings: {
-
-			},
-			history: {
-
-			},
-			paymentHistory: {
-
-			}
-		};
-
-		if (util.isMnemonic(this._username)){
-			this._account.wallet.seed = this._username;
-			this._username = undefined
+			email: undefined,
+			encrypted_data: ""
 		}
 
-		if (isValidEmail(this._username))
-			this._account.email = this._username
+		if (this._username &amp;&amp; !isValidIdentifier(this._username) &amp;&amp; isValidEmail(this._username))
+			this.storage.email = this._username;
 
-		if (isValidIdentifier(this._username))
-			this._account.identifier = this._username
+	}
+	/**
+	 * Create an account using the StorageAdapter
+	 *
+	 * @async
+	 * @param  {Object} account_data - The Account Data you wish to save
+	 * @param  {string} [email]      - The Email you wish to attach to your account
+	 * @return {Promise&lt;Identifier>} The Identifier of the Created Account
+	 */
+	async create(account_data, email){
+		var account_data_copy = JSON.parse(JSON.stringify(account_data));
 
-		// Detect what kind of Username we are being passed.
-		if (options &amp;&amp; options.store_memory) {
-			this._storageAdapter = new MemoryStorageAdapter(this._account);
-		} else if (options &amp;&amp; options.store_in_keystore) {
-			this._storageAdapter = new KeystoreStorageAdapter(this._username, this._password, options.keystore_url);
+		if (email){
+			this.storage.email = email
+			account_data_copy.email = email;
+
+			if (!this._username)
+				this._username = email
 		} else {
-			this._storageAdapter = new LocalStorageAdapter(this._username, this._password);
+			if (isValidEmail(this._username)){
+				this.storage.email = this._username
+				account_data_copy.email = this._username
+			}
 		}
 
-		this.event_emitter = new EventEmitter()
+		var identifier = this.generateIdentifier();
 
-		this.discover = true;
+		account_data_copy.identifier = identifier;
 
-		if (options &amp;&amp; options.discover !== undefined)
-			this.discover = options.discover
+		if (!this._username)
+			this._username = identifier
+
+		return await this.save(account_data_copy, identifier)
 	}
 	/**
-	 * Create a new Wallet and save it to the Storage Adapter
+	 * Save an Account using the StorageAdapter
 	 *
 	 * @async
-	 * @return {Promise&lt;Object>} Returns a Promise that resolves if the wallet is created successfully.
+	 * @param  {Object} account_data - The Account Data you wish to save
+	 * @param  {Identifier} [identifier] - The Identifier of the Account you wish to save to
+	 * @return {Promise&lt;Identifier>} Returns the Identifier of the saved account
 	 */
-	async create(){
+	async save(account_data, identifier){
+		if (identifier){
+			// Save right away
+			return await this._save(account_data, identifier)
+		} else {
+			// Try to match to an ID
+			try {
+				// Check if the account already exists
+				var id = await this.check()
+
+				// If it already exists, then save the account
+				return await this._save(account_data, id)
+			} catch(e) {
+				// If we have an id, and there is an error, pass the error up
+				if (this.storage.identifier &amp;&amp; e.response &amp;&amp; e.response.data &amp;&amp; e.response.data.type)
+					throw new Error(e.response.data.type)
+
+				// No ID, generate new and save
+				return await this.create(account_data)
+			}
+		}
+	}
+	/**
+	 * Load the Wallet from the StorageAdapter, this function is overwritten by sub-classes
+	 *
+	 * @async
+	 * @return {Promise&lt;Object>} Returns the Account Data for the specified account
+	 */
+	async load(){}
+	/**
+	 * Check if the Wallet exists on the StorageAdapter, this function is overwritten by sub-classes
+	 * @return {Promise&lt;Identifier>} Returns the Identifier of the matched wallet (if found)
+	 */
+	async check(){}
+	/**
+	 * Generate a valid Identifier
+	 * @return {Identifier} Returns a newly generated identifier
+	 */
+	generateIdentifier() {
+		var bytes = crypto.randomBytes(16).toString('hex')
+
+		var identifier = bytes.slice(0, 7) + "-" + bytes.slice(8, 16) + "-" + bytes.slice(17, 24) + "-" + bytes.slice(25, 32)
+
+		this.storage.identifier = identifier;
+
+		return identifier
+	}
+	/**
+	 * Decrypt the Account data
+	 * @param  {string} encrypted_data - The Encrypted Data string to Decrypt
+	 * @throws {InvalidPassword} If there is an error decrypting the encrypted data using the Password
+	 * @return {Object} Returns the decrypted data as a JSON Object  
+	 */
+	decrypt(encrypted_data){
+		// Try to decrypt
 		try {
-			var identifier = await this._storageAdapter.check()
+			var decrypted = CryptoJS.AES.decrypt(encrypted_data, this._password, AES_CONFIG);
+			var hydrated_decrypted = JSON.parse(decrypted.toString(CryptoJS.enc.Utf8))
+
+			if (hydrated_decrypted &amp;&amp; hydrated_decrypted.email)
+				this.storage.email = hydrated_decrypted.email
+
+			if (hydrated_decrypted &amp;&amp; hydrated_decrypted.identifier)
+				this.storage.identifier = hydrated_decrypted.identifier
+
+			return hydrated_decrypted
 		} catch (e) {
+			throw new InvalidPassword("Unable to decrypt account!\n" + e)
+		}
+	}
+	/**
+	 * Encrypt the Account data
+	 * @param  {Object} decrypted_data - A JSON object of the data you would like to encrypt
+	 * @return {string} Returns the Encrypted Data as a String
+	 */
+	encrypt(decrypted_data){
+		if (decrypted_data &amp;&amp; !decrypted_data.email &amp;&amp; this.storage.email &amp;&amp; this.storage.email !== "")
+			decrypted_data.email = this.storage.email
 
-			// If an error was thrown in `check()` then it means the account does not exist, go ahead and create it then
-			this.wallet = new Wallet(this._account.wallet.seed, {discover: this.discover});
-
-			// Subscribe to Websocket Updates
-			this.wallet.onWebsocketUpdate(this._handleWalletWebsocketUpdate.bind(this))
-
-			this._account.wallet = this.wallet.serialize()
-
-			var account_data = await this._storageAdapter.create(this._account, this._account.email)
-
-			this._account = account_data
-
-			return this._account	
+		if (decrypted_data &amp;&amp; !decrypted_data.identifier &amp;&amp; this.storage.identifier &amp;&amp; this.storage.identifier !== ""){
+			decrypted_data.identifier = this.storage.identifier
 		}
 
-		throw new Error("Account already exists!")
-	}
-	/**
-	 * Login to the Selected Account. This spawns and creates the oip-hdmw account.
-	 * @return {Promise} Returns a Promise that resolves after logging in successfully.
-	 */
-	async login(){
-		// We pass in this._account to the load() on the StorageAdapter in case we are using the Memory Storage Adapter
-		var account_info = await this._storageAdapter.load(this._account)
+		try {
+			var decrypted_string = JSON.stringify(decrypted_data);
+			var encrypted = CryptoJS.AES.encrypt(decrypted_string, this._password, AES_CONFIG)
+			var encrypted_string = encrypted.toString();
 
-		this._account = account_info;
+			this.storage.encrypted_data = encrypted_string;
 
-		if (!this._account.wallet.seed)
-			throw new Error("Accounts not containing a Wallet Seed are NOT SUPPORTED!")
+			return encrypted_string
+		} catch (e) {
+			return undefined
+		}
 
-		this.wallet = new Wallet(this._account.wallet.seed, {
-			discover: this.discover,
-			serialized_data: this._account.wallet
-		})
-
-		this._account.wallet = this.wallet.serialize()
-
-		this.wallet.onWebsocketUpdate(this._handleWalletWebsocketUpdate.bind(this))
-
-		return JSON.parse(JSON.stringify(this._account))
-	}
-	/**
-	 * Logout of the currently logged in Account
-	 */
-	logout(){
-		this._account.wallet = undefined;
-		this._account = undefined;
-	}
-	/**
-	 * Store changed information about the account to the StorageAdapter
-	 * @return {Promise&lt;Object>} Returns a Promise that will resolve to the Account Data if the account is saved successfully, or rejects if there was an error storing.
-	 */
-	async store(){
-		// Always save the latest wallet state :)
-		this._account.wallet = this.wallet.serialize()
-
-		return await this._storageAdapter.save(this._account, this._account.identifier)
-	}
-	/**
-	 * Set a setting on the Account
-	 *
-	 * @async
-	 * @param {string} setting_node - The Setting you wish to set
-	 * @param {Object} setting_info - What you wish to set the setting to
-	 * @return {Promise&lt;Object>} Returns a Promise that will resolve with the Account Data after the new setting is saved to the StorageAdapter
-	 */
-	async setSetting(setting_node, setting_info){
-		if (!setting_node)
-			throw new Error("setting_node is a required parameter!")
-
-		if (!setting_info &amp;&amp; setting_info !== false)
-			throw new Error("setting_info is a required parameter!")
-
-		this._account.settings[setting_node] = setting_info
-
-		return JSON.parse(JSON.stringify(await this.store()));
-	}
-	/**
-	 * Get a specific setting
-	 * @param {string} setting_node - The Setting you wish to get
-	 * @return {Object} Returns the requested setting_info
-	 */
-	getSetting(setting_node){
-		if (!setting_node)
-			throw new Error("setting_node is a required parameter!")
-
-		return this._account.settings[setting_node]
-	}
-	/**
-	 * Internal function used to handle Websocket updates streaming in from the Wallet
-	 * @param  {Address} address - The Address that was updated
-	 */
-	_handleWalletWebsocketUpdate(address){
-		this.event_emitter.emit("wallet_websocket_update", this, address)
-
-		this._account.wallet = this.wallet.serialize()
-		this.store()
-	}
-	/**
-	 * Subscribe to Wallet Websocket updates
-	 * @param  {function} subscriberFunction - The function you want called when a Websocket update happens
-	 */
-	onWalletWebsocketUpdate(subscriberFunction){
-		this.event_emitter.on("wallet_websocket_update", subscriberFunction)
-	}
-	/**
-	 * Pay to View or Buy and Artifact File. This makes the purchase as well as saving that info to the wallet.
-	 * @param  {Artifact} artifact      - The Artifact from which you got the ArtifactFile from. This is used to lookup payment percentage information.
-	 * @param  {ArtifactFile} artifact_file - The specific ArtifactFile that you wish to pay for
-	 * @param  {string} purchase_type - Either `view` or `buy`
-	 * @param  {string} [coin]   - The Coin you wish to pay with
-	 * @param  {string} [fiat]     - A string containing information about the users source currency (i.e. "usd")
-	 * @return {Promise&lt;Transaction>} Returns a Promise that will resolve to the payment transaction, or rejects if there is a payment error.
-	 */
-	payForArtifactFile(artifact, artifact_file, purchase_type, coin, fiat){
-		return new Promise((resolve, reject) => {
-			let builder = new ArtifactPaymentBuilder(this.wallet, artifact, artifact_file, purchase_type, coin, fiat);
-
-			builder.pay().then(resolve).catch(reject)
-		}) 
-	}
-	/**
-	 * Send a tip to the Publisher for a specific Artifact
-	 * @param  {Artifact} artifact - The Artifact you wish to tip
-	 * @param  {number} amount   - The Amount in `fiat` you wish to tip
-	 * @param  {string} [coin]   - The Coin you wish to pay with
-	 * @param  {string} [fiat="usd"]     - A string containing information about the users source currency (i.e. "usd")
-	 * @return {Promise&lt;Transaction>} Returns a Promise that will resolve to the payment transaction, or rejects if there is a payment error.
-	 */
-	sendArtifactTip(artifact, amount, coin, fiat){
-		return new Promise((resolve, reject) => {
-			let builder = new ArtifactPaymentBuilder(this.wallet, artifact, amount, 'tip', coin, fiat)
-			
-			builder.pay().then(resolve).catch(reject)
-		})
-	}
-
-	/**
-	 * Instantiate and Artifact payment builder so you can do cool stuff! All params are optional. Include what you need to use. Put undefined for those you don't need.
-	 * @param {Wallet} [wallet] - oip-HDMW
-	 * @param {Artifact} [artifact] - oip-Artifact
-	 * @param {(ArtifactFile|number)} [file] - an oip-ArtifactFile or the amount you want to pat
-	 * @param {string} [type] - 'view', 'buy', or 'tip'
-	 * @param {string} [coin] - the coin you prefer to pay with (currently only supports one coin
-	 * @param {string} [fiat="usd"] - the fiat currency you deal with
-	 * @returns {ArtifactPaymentBuilder}
-	 */
-	getPaymentBuilder(wallet, artifact, file, type, coin, fiat) {
-		return new ArtifactPaymentBuilder(wallet, artifact, file, type, coin, fiat)
+		return undefined
 	}
 }
 
-module.exports = Account</code></pre>
+module.exports = StorageAdapter;</code></pre>
   </article>
 </section>
 
