@@ -1,11 +1,12 @@
-var StorageAdapter = require("../src/StorageAdapter")
+let StorageAdapter = require("../src/StorageAdapters/StorageAdapter")
+let { InvalidPassword } = require("../src/Errors")
 
-var encrypted_string;
-var test_encrypt_password = "password"
-var test_encrypt_data = { wallet: "test data", something: { subthing: { hi: "hello!"}}}
+let encrypted_string;
+let test_encrypt_password = "password"
+let test_encrypt_data = { wallet: "test data", something: { subthing: { hi: "hello!"}}}
 
 test("should encrypt", () => {
-	var adapter = new StorageAdapter(undefined, test_encrypt_password);
+	let adapter = new StorageAdapter(undefined, test_encrypt_password);
 
 	encrypted_string = adapter.encrypt(test_encrypt_data)
 
@@ -13,17 +14,23 @@ test("should encrypt", () => {
 })
 
 test("should decrypt", () => {
-	var adapter = new StorageAdapter(undefined, test_encrypt_password);
+	let adapter = new StorageAdapter(undefined, test_encrypt_password);
 
-	var decrypted_data = adapter.decrypt(encrypted_string)
+	let decrypted_data = adapter.decrypt(encrypted_string)
 
 	expect(decrypted_data).toEqual(test_encrypt_data)
 })
 
 test("should NOT decrypt", () => {
-	var adapter = new StorageAdapter(undefined, undefined);
+	let adapter = new StorageAdapter(undefined, undefined);
 
-	var decrypted_data = adapter.decrypt(encrypted_string)
+	let decrypted_data, decrypt_error
+	try {
+		decrypted_data = adapter.decrypt(encrypted_string)
+	} catch (e){
+		decrypt_error = e
+	}
 
 	expect(decrypted_data).toBeUndefined()
+	expect(decrypt_error instanceof InvalidPassword).toBe(true)
 })

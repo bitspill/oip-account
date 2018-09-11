@@ -1,4 +1,4 @@
-var LocalStorageAdapter = require("../src/LocalStorageAdapter")
+var LocalStorageAdapter = require("../src/StorageAdapters/LocalStorageAdapter")
 
 var isValidIdentifier = require("../src/util").isValidIdentifier;
 

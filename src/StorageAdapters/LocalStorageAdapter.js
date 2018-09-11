@@ -1,4 +1,5 @@
 import StorageAdapter from './StorageAdapter'
+import { InvalidPassword, AccountNotFoundError } from '../Errors'
 
 if (typeof window === "undefined" || typeof window.localStorage === "undefined") {
 	if (typeof localStorage === "undefined") {
@@ -25,17 +26,31 @@ class LocalStorageAdapter extends StorageAdapter {
 	 * Load the Account from LocalStorage
 	 *
 	 * @async
+	 * @throws {InvalidPassword} If the password being used for login is invalid
+	 * @throws {AccountNotFoundError} If the Account cannot beb found on the storage server
 	 * @return {Promise<Object>} Returns a Promise that will resolve to the Decrypted Account Data if successful
 	 */
 	async load(){
-		var id = await this.check();
+		var id
+
+		try {
+			id = await this.check();
+		} catch (e){
+			throw new AccountNotFoundError("Unable to get Identifier")
+		}
 
 		var stored_data = localStorage.getItem('oip_account');
 
 		stored_data = JSON.parse(stored_data);
 
 		if (stored_data[id]){
-			var decrypted_data = this.decrypt(stored_data[id].encrypted_data);
+			var decrypted_data
+
+			try {
+				decrypted_data = this.decrypt(stored_data[id].encrypted_data);
+			} catch (e) {
+				throw new InvalidPassword("Password is not Valid\n" + e)
+			}
 
 			if (decrypted_data){
 				if (!decrypted_data.identifier)
@@ -44,7 +59,7 @@ class LocalStorageAdapter extends StorageAdapter {
 				return decrypted_data
 			}
 		} else {
-			throw new Error("Account Not Found for ID!")
+			throw new AccountNotFoundError("Account not found for " + id + " in LocalStorage")
 		}
 
 		throw new Error("Unable to Decrypt Account!")
@@ -87,7 +102,7 @@ class LocalStorageAdapter extends StorageAdapter {
 		stored_data = JSON.parse(stored_data);
 
 		if (!stored_data)
-			throw new Error("Account Not Found!");
+			throw new AccountNotFoundError();
 
 		if (this.storage.identifier !== "" && stored_data[this.storage.identifier])
 			return this.storage.identifier;
@@ -101,7 +116,7 @@ class LocalStorageAdapter extends StorageAdapter {
 				return data;
 		}
 
-		throw new Error("Account Not Found!")
+		throw new AccountNotFoundError()
 	}
 }
 

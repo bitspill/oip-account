@@ -1,6 +1,6 @@
 {
   "name": "oip-account",
-  "version": "1.1.8",
+  "version": "1.2.0",
   "description": "Create and Manage an OIP Account",
   "main": "lib/index.js",
   "dependencies": {

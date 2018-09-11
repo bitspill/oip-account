@@ -1,7 +1,8 @@
 import CryptoJS from 'crypto-js';
 import crypto from 'crypto';
 
-import { isValidEmail, isValidIdentifier } from './util'
+import { isValidEmail, isValidIdentifier } from '../util'
+import { InvalidPassword } from '../Errors'
 
 const AES_CONFIG = {
 	mode: CryptoJS.mode.CTR,
@@ -83,13 +84,18 @@ class StorageAdapter {
 	 */
 	async save(account_data, identifier){
 		if (identifier){
+			// Save right away
 			return await this._save(account_data, identifier)
 		} else {
+			// Try to match to an ID
 			try {
+				// Check if the account already exists
 				var id = await this.check()
 
+				// If it already exists, then save the account
 				return await this._save(account_data, id)
 			} catch(e) {
+				// If we have an id, and there is an error, pass the error up
 				if (this.storage.identifier && e.response && e.response.data && e.response.data.type)
 					throw new Error(e.response.data.type)
 
@@ -126,9 +132,11 @@ class StorageAdapter {
 	/**
 	 * Decrypt the Account data
 	 * @param  {string} encrypted_data - The Encrypted Data string to Decrypt
+	 * @throws {InvalidPassword} If there is an error decrypting the encrypted data using the Password
 	 * @return {Object} Returns the decrypted data as a JSON Object  
 	 */
 	decrypt(encrypted_data){
+		// Try to decrypt
 		try {
 			var decrypted = CryptoJS.AES.decrypt(encrypted_data, this._password, AES_CONFIG);
 			var hydrated_decrypted = JSON.parse(decrypted.toString(CryptoJS.enc.Utf8))
@@ -141,10 +149,8 @@ class StorageAdapter {
 
 			return hydrated_decrypted
 		} catch (e) {
-			return undefined
+			throw new InvalidPassword("Unable to decrypt account!\n" + e)
 		}
-
-		return undefined
 	}
 	/**
 	 * Encrypt the Account data

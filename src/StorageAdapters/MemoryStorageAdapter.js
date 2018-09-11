@@ -1,4 +1,5 @@
 import StorageAdapter from './StorageAdapter'
+import { AccountNotFoundError } from '../Errors'
 
 /**
  * The MemoryStorageAdapter is used when the user only wants their wallet stored in memory for the single session.
@@ -62,13 +63,14 @@ class MemoryStorageAdapter extends StorageAdapter {
 	 * This matches an email to an identifier if the username being used is an email.
 	 *
 	 * @async
+	 * @throws {AccountNotFoundError} If no Account is found
 	 * @return {Promise<Identifier>} Returns a Promsie that will resolve to the Accounts Identifier if set
 	 */
 	async check(){
 		if (this._account.identifier)
 			return this._account.identifier
 		
-		throw new Error("Account Not Found!")
+		throw new AccountNotFoundError("No Account found")
 	}
 }
 

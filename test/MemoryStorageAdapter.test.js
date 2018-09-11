@@ -1,4 +1,4 @@
-var MemoryStorageAdapter = require("../src/MemoryStorageAdapter")
+var MemoryStorageAdapter = require("../src/StorageAdapters/MemoryStorageAdapter")
 
 var isValidIdentifier = require("../src/util").isValidIdentifier;
 

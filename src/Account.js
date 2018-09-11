@@ -4,9 +4,9 @@ import EventEmitter from 'eventemitter3'
 import ArtifactPaymentBuilder from './ArtifactPaymentBuilder';
 import { isValidEmail, isValidIdentifier, isValidSharedKey } from './util';
 
-import MemoryStorageAdapter from './MemoryStorageAdapter';
-import LocalStorageAdapter from './LocalStorageAdapter';
-import KeystoreStorageAdapter from './KeystoreStorageAdapter';
+import MemoryStorageAdapter from './StorageAdapters/MemoryStorageAdapter';
+import LocalStorageAdapter from './StorageAdapters/LocalStorageAdapter';
+import KeystoreStorageAdapter from './StorageAdapters/KeystoreStorageAdapter';
 
 class Account {
 	/**

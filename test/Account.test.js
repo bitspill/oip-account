@@ -1,6 +1,8 @@
 import Account from '../src/Account';
 import ArtifactPaymentBuilder from '../src/ArtifactPaymentBuilder'
 
+import { InvalidPassword, AccountNotFoundError } from '../src/Errors'
+
 test("Create new Account MemoryStorage!", (done) => {
 	var acc = new Account(undefined, undefined, {store_memory: true, discover: false});
 
@@ -33,13 +35,19 @@ test("Create Account from Mnemonic (localStorage)", (done) => {
 	})
 })
 
-test("Can't find account if doesn't exist (localStorage)", (done) => {
+test("Can't find account if doesn't exist (localStorage)", async (done) => {
 	var acc = new Account("test@me.com", "password", {discover: false})
 
-	acc.login().catch((error) => {
-		expect(error).toEqual(new Error("Account Not Found!"))
-		done()
-	})
+	let acc_data, acc_err
+	try {
+		acc_data = await acc.login()
+	} catch (err){
+		acc_err = err
+	}
+
+	expect(acc_err instanceof AccountNotFoundError).toBe(true)
+
+	done()
 }, 10000)
 
 test("Create Account (email) (localStorage)", async (done) => {
@@ -69,6 +77,33 @@ test("Create Account (email) (localStorage)", async (done) => {
 	done()
 })
 
+test("Invalid Password", async (done) => {
+	let acc = new Account("test333@me.com", "password", {discover: false})
+
+	let account_info = await acc.create()
+
+	expect(account_info.identifier).toBeDefined()
+	expect(account_info.email).toBe("test333@me.com")
+	expect(account_info.wallet.seed).toBeDefined()
+
+	let login_error
+
+	try {
+		let acc2 = new Account("test333@me.com", "not-the-right-password", {discover: false})
+
+		// Should throw error on login failure
+		let acc_data = await acc2.login()
+
+		// Should not get here
+		expect(acc_data).toBe({nope: "not-right"})
+	} catch (err) {
+		login_error = err
+	}
+
+	expect(login_error instanceof InvalidPassword).toBe(true)
+	done()
+})
+
 test("Create Account (no email) (localStorage)", async (done) => {
 	var acc = new Account(undefined, "password", {discover: false})
 
@@ -78,11 +113,4 @@ test("Create Account (no email) (localStorage)", async (done) => {
 	expect(account_info.email).toBeUndefined()
 	expect(account_info.wallet.seed).toBeDefined()
 	done()
-})
-
-test("Instantiate a payment builder", () => {
-	let account = new Account();
-	let apb = account.getPaymentBuilder()
-	let pass = apb instanceof ArtifactPaymentBuilder
-	expect(pass).toBeTruthy()
 })

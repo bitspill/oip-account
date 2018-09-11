@@ -1,19 +1,19 @@
 var Keystore = require('oip-keystore')
 
-var KeystoreStorageAdapter = require("../src/KeystoreStorageAdapter")
+var KeystoreStorageAdapter = require("../src/StorageAdapters/KeystoreStorageAdapter")
 
 var isValidIdentifier = require("../src/util").isValidIdentifier;
 
 var test_account_data = { wallet: "test data", something: { subthing: { hi: "hello!"}}}
 var test_account_data_2 = { wallet: "test data", something: { subthing: { hi: "hello!"}}}
 
-var keystore_url = "http://localhost:9196"
+var keystore_url = "http://localhost:9721"
 var password = "password"
 
 var server
 
 beforeAll((done) => {
-	server = Keystore.listen(9196, done)
+	server = Keystore.listen(9721, done)
 })
 
 var queries = {
@@ -29,8 +29,9 @@ var checkIfAllQueriesResolved = function(){
 			allResolved = false
 	}
 
-	if (allResolved)
+	if (allResolved){
 		server.close()
+	}
 }
 
 test("Create new Account & Load (no email)", async (done) => {

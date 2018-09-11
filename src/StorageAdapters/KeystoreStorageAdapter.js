@@ -1,6 +1,7 @@
 import axios from 'axios'
 
 import StorageAdapter from './StorageAdapter'
+import { InvalidPassword, AccountNotFoundError } from '../Errors'
 
 const DEFAULT_KEYSTORE_SERVER = "https://keystore.oip.li/v2/"
 
@@ -43,6 +44,7 @@ class KeystoreStorageAdapter extends StorageAdapter {
 		} catch(e) {
 			if (e.response && e.response.data && e.response.data.type)
 				throw new Error(e.response.data.type)
+
 			throw new Error(e.response)
 		}
 
@@ -67,18 +69,26 @@ class KeystoreStorageAdapter extends StorageAdapter {
 	 * Load an Account from the Keystore Server
 	 *
 	 * @async
+	 * @throws {InvalidPassword} If the password being used for login is invalid
+	 * @throws {AccountNotFoundError} If the Account cannot beb found on the storage server
 	 * @return {Promise<Object>} Returns a Promise that will resolve to the Decrypted Account Data if successful
 	 */
 	async load(){
 		var load
 
+		// Try to load from the keystore server
 		try {
 			load = await this._keystore.post("/load", { identifier: this.storage.identifier || this._username })
 		} catch(e) {
-			throw new Error(e.response.data.type)
+			throw new AccountNotFoundError("Unable to load Account\n" + e.response.data.type)
 		}
 
-		var decrypted = this.decrypt(load.data.encrypted_data)
+		var decrypted
+		try {
+			decrypted = this.decrypt(load.data.encrypted_data)
+		} catch(e) {
+			throw new InvalidPassword("Password is not valid!\n" + e)
+		}
 
 		if (decrypted.shared_key)
 			this.storage.shared_key = decrypted.shared_key
@@ -112,7 +122,8 @@ class KeystoreStorageAdapter extends StorageAdapter {
 	 * Check if the Account exists on the Keystore server. This matches an email to an identifier if the username being used is an email.
 	 *
 	 * @async
-	 * @return {Promise<Identifier>} Returns a Promsie that will resolve to the Accounts Identifier if set
+	 * @throws {AccountNotFoundError} If there is no Identifier that matches the Username passed
+	 * @return {Promise<Identifier>} Returns a Promise that will resolve to the Accounts Identifier if set
 	 */
 	async check(){
 		var exists
@@ -120,7 +131,7 @@ class KeystoreStorageAdapter extends StorageAdapter {
 		try {
 			exists = await this._keystore.post("/checkload", { identifier: this._username });
 		} catch (e) {
-			throw new Error(e.response.data.type)
+			throw new AccountNotFoundError(e.response.data.type)
 		}
 
 		return exists.data.identifier
