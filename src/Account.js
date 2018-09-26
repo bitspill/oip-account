@@ -110,7 +110,7 @@ class Account {
 				try {
 					account_info = await this.create()
 				} catch (err) {
-					throw new Error(`Login failed -> New Account creation failed: ${err}`)
+					throw new Error(`Login and New Account creation failed: ${err}`)
 				}
 			} else {
 				throw new Error(err)
