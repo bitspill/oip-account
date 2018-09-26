@@ -1,5 +1,12 @@
 import StorageAdapter from './StorageAdapter'
 import { InvalidPassword, AccountNotFoundError } from '../Errors'
+import CryptoJS from 'crypto-js';
+
+const AES_CONFIG = {
+	mode: CryptoJS.mode.CTR,
+	padding: CryptoJS.pad.Iso10126,
+	iterations: 5
+};
 
 if (typeof window === "undefined" || typeof window.localStorage === "undefined") {
 	if (typeof localStorage === "undefined") {
@@ -143,9 +150,10 @@ class LocalStorageAdapter extends StorageAdapter {
 
 		for (let data in stored_data){
 			// Check if the Email matches
-			let d = this.decrypt(stored_data[data].encrypted_data)
-			if (d.wallet) {
-				if (d.wallet.seed === this.storage.seed) {
+			let decrypted_data = CryptoJS.AES.encrypt(stored_data[data].encrypted_data, this._password, AES_CONFIG);
+
+			if (decrypted_data.wallet) {
+				if (decrypted_data.wallet.seed === this.storage.seed) {
 					return data
 				}
 			}
