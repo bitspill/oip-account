@@ -7,6 +7,7 @@ import { isValidEmail, isValidIdentifier, isValidSharedKey } from './util';
 import MemoryStorageAdapter from './StorageAdapters/MemoryStorageAdapter';
 import LocalStorageAdapter from './StorageAdapters/LocalStorageAdapter';
 import KeystoreStorageAdapter from './StorageAdapters/KeystoreStorageAdapter';
+import {AccountNotFoundError} from "./Errors";
 
 class Account {
 	/**
@@ -42,7 +43,7 @@ class Account {
 
 		if (util.isMnemonic(this._username)){
 			this._account.wallet.seed = this._username;
-			this._username = undefined
+			this._username = undefined;
 		}
 
 		if (isValidEmail(this._username))
@@ -57,7 +58,7 @@ class Account {
 		} else if (options && options.store_in_keystore) {
 			this._storageAdapter = new KeystoreStorageAdapter(this._username, this._password, options.keystore_url);
 		} else {
-			this._storageAdapter = new LocalStorageAdapter(this._username, this._password);
+			this._storageAdapter = new LocalStorageAdapter(username, this._password);
 		}
 
 		this.event_emitter = new EventEmitter()
@@ -101,7 +102,20 @@ class Account {
 	 */
 	async login(){
 		// We pass in this._account to the load() on the StorageAdapter in case we are using the Memory Storage Adapter
-		var account_info = await this._storageAdapter.load(this._account)
+		let account_info;
+		try {
+			account_info = await this._storageAdapter.load(this._account)
+		} catch (err) {
+			if (err instanceof AccountNotFoundError) {
+				try {
+					account_info = await this.create()
+				} catch (err) {
+					throw new Error(`Login failed -> New Account creation failed: ${err}`)
+				}
+			} else {
+				throw new Error(err)
+			}
+		}
 
 		this._account = account_info;
 
