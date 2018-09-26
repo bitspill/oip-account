@@ -4,7 +4,7 @@ import ArtifactPaymentBuilder from '../src/ArtifactPaymentBuilder'
 import { InvalidPassword, AccountNotFoundError } from '../src/Errors'
 
 test("Create new Account MemoryStorage!", (done) => {
-	var acc = new Account(undefined, undefined, {store_memory: true, discover: false});
+	let acc = new Account(undefined, undefined, {store_memory: true, discover: false});
 
 	acc.create().then((account_info) => {
 		expect(account_info.identifier).toBeDefined()
@@ -14,7 +14,7 @@ test("Create new Account MemoryStorage!", (done) => {
 })
 
 test("Create Account from Mnemonic MemoryStorage!", (done) => {
-	var acc = new Account("abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about", undefined, {store_memory: true, discover: false});
+	let acc = new Account("abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about", undefined, {store_memory: true, discover: false});
 
 	acc.login().then((account_info) => {
 		expect(account_info.identifier).toBeDefined()
@@ -24,8 +24,8 @@ test("Create Account from Mnemonic MemoryStorage!", (done) => {
 	})
 })
 
-test("Create Account from Mnemonic (localStorage)", (done) => {
-	var acc = new Account("abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about", "password", {discover: false});
+test("Create Account from Mnemonic (localStorage)", async (done) => {
+	let acc = new Account("abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about", "password", {discover: false});
 
 	acc.create().then((account_info) => {
 		expect(account_info.identifier).toBeDefined()
@@ -33,12 +33,22 @@ test("Create Account from Mnemonic (localStorage)", (done) => {
 		expect(acc.wallet.getMnemonic()).toBe("abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about")
 		done()
 	})
-})
+});
 
-test("Can't find account if doesn't exist (localStorage)", async (done) => {
-	var acc = new Account("test@me.com", "password", {discover: false})
+test("Create account on login if one has not yet been created (Localstorage)", async () => {
+	let mnemonic = "abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about"
+	let acc = new Account(mnemonic, undefined, {discover: false});
 
-	let acc_data, acc_err
+	let login = await acc.login()
+
+	expect(login.wallet.seed).toEqual(mnemonic)
+}, 10000);
+
+//this functionality no longer exists. If trying to login to an account that does not exist, it will create that account.
+test.skip("Can't find account if doesn't exist (localStorage)", async (done) => {
+	let acc = new Account("test@me.com", "password", {discover: false})
+
+	let acc_data, acc_err;
 	try {
 		acc_data = await acc.login()
 	} catch (err){
@@ -48,26 +58,26 @@ test("Can't find account if doesn't exist (localStorage)", async (done) => {
 	expect(acc_err instanceof AccountNotFoundError).toBe(true)
 
 	done()
-}, 10000)
+}, 10000);
 
 test("Create Account (email) (localStorage)", async (done) => {
-	var acc = new Account("test@me.com", "password", {discover: false})
+	let acc = new Account("test@me.com", "password", {discover: false})
 
-	var account_info = await acc.create()
+	let account_info = await acc.create()
 
 	expect(account_info.identifier).toBeDefined()
 	expect(account_info.email).toBe("test@me.com")
 	expect(account_info.wallet.seed).toBeDefined()
 
-	var acc2 = new Account("test@me.com", "password", {discover: false})
+	let acc2 = new Account("test@me.com", "password", {discover: false})
 
-	var account_info_2 = await acc2.login()
+	let account_info_2 = await acc2.login()
 
 	expect(account_info_2).toEqual(account_info)
 
 	account_info_2.settings.displayNSFW = false;
 
-	var account_info_3 = await acc2.setSetting("displayNSFW", false)
+	let account_info_3 = await acc2.setSetting("displayNSFW", false)
 
 	expect(account_info_3).toEqual(account_info_2)
 
@@ -105,9 +115,9 @@ test("Invalid Password", async (done) => {
 })
 
 test("Create Account (no email) (localStorage)", async (done) => {
-	var acc = new Account(undefined, "password", {discover: false})
+	let acc = new Account(undefined, "password", {discover: false})
 
-	var account_info = await acc.create()
+	let account_info = await acc.create()
 
 	expect(account_info.identifier).toBeDefined()
 	expect(account_info.email).toBeUndefined()
