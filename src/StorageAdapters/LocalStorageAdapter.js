@@ -36,7 +36,7 @@ class LocalStorageAdapter extends StorageAdapter {
 		try {
 			id = await this.check();
 		} catch (e){
-			throw new AccountNotFoundError("Unable to get Identifier")
+			throw new AccountNotFoundError(`Unable to get Identifier ${e}`)
 		}
 
 		var stored_data = localStorage.getItem('oip_account');
@@ -116,7 +116,41 @@ class LocalStorageAdapter extends StorageAdapter {
 				return data;
 		}
 
+		if (this.storage.seed) {
+			try {
+				return await this.checkForMnemonic()
+			} catch(err) {
+				throw err
+			}
+		}
+
 		throw new AccountNotFoundError()
+	}
+
+	/**
+	 * Check if the Account exists in LocalStorage by searching for mnemonic in encrypted data.
+	 *
+	 * @async
+	 * @return {Promise<Identifier>} Returns a Promsie that will resolve to the Accounts Identifier if set
+	 */
+	async checkForMnemonic(){
+		let stored_data = localStorage.getItem('oip_account');
+
+		stored_data = JSON.parse(stored_data);
+
+		if (!stored_data)
+			throw new AccountNotFoundError();
+
+		for (let data in stored_data){
+			// Check if the Email matches
+			let d = this.decrypt(stored_data[data].encrypted_data)
+			if (d.wallet) {
+				if (d.wallet.seed === this.storage.seed) {
+					return data
+				}
+			}
+		}
+		throw new AccountNotFoundError(`Unable to find mnemonic`)
 	}
 }
 
