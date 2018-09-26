@@ -3,6 +3,7 @@ import crypto from 'crypto';
 
 import { isValidEmail, isValidIdentifier } from '../util'
 import { InvalidPassword } from '../Errors'
+import {util} from "oip-hdmw";
 
 const AES_CONFIG = {
 	mode: CryptoJS.mode.CTR,
@@ -35,6 +36,11 @@ class StorageAdapter {
 			identifier: undefined,
 			email: undefined,
 			encrypted_data: ""
+		};
+
+		if (util.isMnemonic(username)){
+			this.storage.seed = username;
+			this._username = undefined
 		}
 
 		if (this._username && !isValidIdentifier(this._username) && isValidEmail(this._username))
