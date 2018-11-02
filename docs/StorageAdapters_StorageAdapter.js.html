@@ -129,11 +129,10 @@ class StorageAdapter {
 			identifier: undefined,
 			email: undefined,
 			encrypted_data: "",
-			seed: undefined
 		};
 
 		if (util.isMnemonic(username)){
-			this.storage.seed = username;
+			this.seed = username;
 			this._username = undefined
 		}
 
@@ -274,10 +273,9 @@ class StorageAdapter {
 
 			return encrypted_string
 		} catch (e) {
+			console.log('failed to encrypt data: ', e)
 			return undefined
 		}
-
-		return undefined
 	}
 }
 
