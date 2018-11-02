@@ -140,7 +140,7 @@ class StorageAdapter {
 	 * Decrypt the Account data
 	 * @param  {string} encrypted_data - The Encrypted Data string to Decrypt
 	 * @throws {InvalidPassword} If there is an error decrypting the encrypted data using the Password
-	 * @return {Object} Returns the decrypted data as a JSON Object  
+	 * @return {Object} Returns the decrypted data as a JSON Object
 	 */
 	decrypt(encrypted_data){
 		// Try to decrypt
