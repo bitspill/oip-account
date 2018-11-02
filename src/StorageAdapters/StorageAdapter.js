@@ -35,7 +35,8 @@ class StorageAdapter {
 		this.storage = {
 			identifier: undefined,
 			email: undefined,
-			encrypted_data: ""
+			encrypted_data: "",
+			seed: undefined
 		};
 
 		if (util.isMnemonic(username)){
