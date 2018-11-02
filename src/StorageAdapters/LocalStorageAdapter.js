@@ -1,5 +1,5 @@
 import StorageAdapter from './StorageAdapter'
-import { InvalidPassword, AccountNotFoundError } from '../Errors'
+import {InvalidPassword, AccountNotFoundError} from '../Errors'
 import CryptoJS from 'crypto-js';
 
 const AES_CONFIG = {
@@ -13,7 +13,9 @@ if (typeof window === "undefined" || typeof window.localStorage === "undefined")
 		var LocalStorage = require('node-localstorage').LocalStorage;
 		var localStorage = new LocalStorage('./localStorage');
 	}
-} else {localStorage = window.localStorage}
+} else {
+	localStorage = window.localStorage
+}
 
 /**
  * LocalStorageAdapter allows saving of Wallets to the users local computer if they don't wish to store it on a Keystore server.
@@ -26,9 +28,10 @@ class LocalStorageAdapter extends StorageAdapter {
 	 * @param  {string} password - The password of the account you wish to use
 	 * @return {LocalStorageAdapter}
 	 */
-	constructor(username, password){
+	constructor(username, password) {
 		super(username, password)
 	}
+
 	/**
 	 * Load the Account from LocalStorage
 	 *
@@ -37,12 +40,12 @@ class LocalStorageAdapter extends StorageAdapter {
 	 * @throws {AccountNotFoundError} If the Account cannot beb found on the storage server
 	 * @return {Promise<Object>} Returns a Promise that will resolve to the Decrypted Account Data if successful
 	 */
-	async load(){
+	async load() {
 		let id
 
 		try {
 			id = await this.check();
-		} catch (e){
+		} catch (e) {
 			throw new AccountNotFoundError(`Unable to get Identifier ${e}`)
 		}
 
@@ -50,7 +53,7 @@ class LocalStorageAdapter extends StorageAdapter {
 
 		stored_data = JSON.parse(stored_data);
 
-		if (stored_data[id]){
+		if (stored_data[id]) {
 			let decrypted_data
 
 			try {
@@ -59,7 +62,7 @@ class LocalStorageAdapter extends StorageAdapter {
 				throw new InvalidPassword("Password is not Valid\n" + e)
 			}
 
-			if (decrypted_data){
+			if (decrypted_data) {
 				if (!decrypted_data.identifier)
 					decrypted_data.identifier = id;
 
@@ -71,6 +74,7 @@ class LocalStorageAdapter extends StorageAdapter {
 
 		throw new Error("Unable to Decrypt Account!")
 	}
+
 	/**
 	 * Internal Save function to Save an Account to LocalStorage
 	 *
@@ -79,7 +83,7 @@ class LocalStorageAdapter extends StorageAdapter {
 	 * @param  {Identifier} identifier - The Identifier of the account you wish to save
 	 * @return {Promise<Object>} Returns a Promise that will resolve to the Account Data of the updated account if successful
 	 */
-	async _save(account_data, identifier){
+	async _save(account_data, identifier) {
 		var stored_data = localStorage.getItem('oip_account');
 
 		if (stored_data)
@@ -92,10 +96,12 @@ class LocalStorageAdapter extends StorageAdapter {
 
 		stored_data[identifier] = this.storage;
 
+
 		localStorage.setItem('oip_account', JSON.stringify(stored_data));
 
 		return account_data
 	}
+
 	/**
 	 * Check if the Account exists in LocalStorage.
 	 * This matches an email to an identifier if the username being used is an email.
@@ -103,7 +109,7 @@ class LocalStorageAdapter extends StorageAdapter {
 	 * @async
 	 * @return {Promise<Identifier>} Returns a Promsie that will resolve to the Accounts Identifier if set
 	 */
-	async check(){
+	async check() {
 		var stored_data = localStorage.getItem('oip_account');
 
 		stored_data = JSON.parse(stored_data);
@@ -117,7 +123,7 @@ class LocalStorageAdapter extends StorageAdapter {
 		if (stored_data[this._username])
 			return this._username;
 
-		for (var data in stored_data){
+		for (var data in stored_data) {
 			// Check if the Email matches
 			if (stored_data[data].email && stored_data[data].email !== "" && this._username && stored_data[data].email === this._username)
 				return data;
@@ -126,7 +132,7 @@ class LocalStorageAdapter extends StorageAdapter {
 		if (this.seed) {
 			try {
 				return await this.checkForMnemonic()
-			} catch(err) {
+			} catch (err) {
 				throw err
 			}
 		}
@@ -140,7 +146,7 @@ class LocalStorageAdapter extends StorageAdapter {
 	 * @async
 	 * @return {Promise<Identifier>} Returns a Promsie that will resolve to the Accounts Identifier if set
 	 */
-	async checkForMnemonic(){
+	async checkForMnemonic() {
 		let stored_data = localStorage.getItem('oip_account');
 
 		stored_data = JSON.parse(stored_data);
@@ -148,7 +154,7 @@ class LocalStorageAdapter extends StorageAdapter {
 		if (!stored_data)
 			throw new AccountNotFoundError();
 
-		for (let identifier in stored_data){
+		for (let identifier in stored_data) {
 			let hydrated_decrypted = {}
 			try {
 				let decrypted_data = CryptoJS.AES.decrypt(stored_data[identifier].encrypted_data, this._password, AES_CONFIG);
