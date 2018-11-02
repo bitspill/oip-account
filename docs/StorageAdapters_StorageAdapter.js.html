@@ -128,7 +128,8 @@ class StorageAdapter {
 		this.storage = {
 			identifier: undefined,
 			email: undefined,
-			encrypted_data: ""
+			encrypted_data: "",
+			seed: undefined
 		};
 
 		if (util.isMnemonic(username)){
@@ -232,7 +233,7 @@ class StorageAdapter {
 	 * Decrypt the Account data
 	 * @param  {string} encrypted_data - The Encrypted Data string to Decrypt
 	 * @throws {InvalidPassword} If there is an error decrypting the encrypted data using the Password
-	 * @return {Object} Returns the decrypted data as a JSON Object  
+	 * @return {Object} Returns the decrypted data as a JSON Object
 	 */
 	decrypt(encrypted_data){
 		// Try to decrypt
@@ -280,7 +281,8 @@ class StorageAdapter {
 	}
 }
 
-module.exports = StorageAdapter;</code></pre>
+module.exports = StorageAdapter;
+</code></pre>
   </article>
 </section>
 
