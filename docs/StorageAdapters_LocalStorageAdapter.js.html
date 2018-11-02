@@ -251,7 +251,7 @@ class LocalStorageAdapter extends StorageAdapter {
 			let hydrated_decrypted = {}
 			try {
 				let decrypted_data = CryptoJS.AES.decrypt(stored_data[identifier].encrypted_data, this._password, AES_CONFIG);
-				hydrated_decrypted = JSON.parse(decrypted_data.toString(_cryptoJs.default.enc.Utf8));
+				hydrated_decrypted = JSON.parse(decrypted_data.toString(CryptoJS.default.enc.Utf8));
 			} catch (err) {
 				throw new InvalidPassword("Unable to decrypt account!\n" + e)
 			}
