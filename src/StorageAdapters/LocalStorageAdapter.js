@@ -148,13 +148,13 @@ class LocalStorageAdapter extends StorageAdapter {
 		if (!stored_data)
 			throw new AccountNotFoundError();
 
-		for (let data in stored_data){
-			// Check if the Email matches
-			let decrypted_data = CryptoJS.AES.encrypt(stored_data[data].encrypted_data, this._password, AES_CONFIG);
+		for (let identifier in stored_data){
+			let decrypted_data = CryptoJS.AES.encrypt(stored_data[identifier].encrypted_data, this._password, AES_CONFIG);
+			let hydrated_decrypted = JSON.parse(decrypted_data.toString(_cryptoJs.default.enc.Utf8));
 
-			if (decrypted_data.wallet) {
-				if (decrypted_data.wallet.seed === this.storage.seed) {
-					return data
+			if (hydrated_decrypted.wallet) {
+				if (hydrated_decrypted.wallet.seed === this.storage.seed) {
+					return identifier
 				}
 			}
 		}
