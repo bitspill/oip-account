@@ -36,11 +36,10 @@ class StorageAdapter {
 			identifier: undefined,
 			email: undefined,
 			encrypted_data: "",
-			seed: undefined
 		};
 
 		if (util.isMnemonic(username)){
-			this.storage.seed = username;
+			this.seed = username;
 			this._username = undefined
 		}
 
