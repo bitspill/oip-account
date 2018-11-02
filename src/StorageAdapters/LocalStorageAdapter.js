@@ -123,7 +123,7 @@ class LocalStorageAdapter extends StorageAdapter {
 				return data;
 		}
 
-		if (this.storage.seed) {
+		if (this.seed) {
 			try {
 				return await this.checkForMnemonic()
 			} catch(err) {
@@ -149,11 +149,17 @@ class LocalStorageAdapter extends StorageAdapter {
 			throw new AccountNotFoundError();
 
 		for (let identifier in stored_data){
-			let decrypted_data = CryptoJS.AES.encrypt(stored_data[identifier].encrypted_data, this._password, AES_CONFIG);
-			let hydrated_decrypted = JSON.parse(decrypted_data.toString(_cryptoJs.default.enc.Utf8));
+			let hydrated_decrypted = {}
+			try {
+				let decrypted_data = CryptoJS.AES.decrypt(stored_data[identifier].encrypted_data, this._password, AES_CONFIG);
+				hydrated_decrypted = JSON.parse(decrypted_data.toString(_cryptoJs.default.enc.Utf8));
+			} catch (err) {
+				throw new InvalidPassword("Unable to decrypt account!\n" + e)
+			}
+
 
 			if (hydrated_decrypted.wallet) {
-				if (hydrated_decrypted.wallet.seed === this.storage.seed) {
+				if (hydrated_decrypted.wallet.seed === this.seed) {
 					return identifier
 				}
 			}
