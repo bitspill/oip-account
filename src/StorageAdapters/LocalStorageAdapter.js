@@ -27,7 +27,7 @@ class LocalStorageAdapter extends StorageAdapter {
 	 * @return {LocalStorageAdapter}
 	 */
 	constructor(username, password){
-		super(username, password)		
+		super(username, password)
 	}
 	/**
 	 * Load the Account from LocalStorage
@@ -38,7 +38,7 @@ class LocalStorageAdapter extends StorageAdapter {
 	 * @return {Promise<Object>} Returns a Promise that will resolve to the Decrypted Account Data if successful
 	 */
 	async load(){
-		var id
+		let id
 
 		try {
 			id = await this.check();
@@ -46,12 +46,12 @@ class LocalStorageAdapter extends StorageAdapter {
 			throw new AccountNotFoundError(`Unable to get Identifier ${e}`)
 		}
 
-		var stored_data = localStorage.getItem('oip_account');
+		let stored_data = localStorage.getItem('oip_account');
 
 		stored_data = JSON.parse(stored_data);
 
 		if (stored_data[id]){
-			var decrypted_data
+			let decrypted_data
 
 			try {
 				decrypted_data = this.decrypt(stored_data[id].encrypted_data);
@@ -82,7 +82,7 @@ class LocalStorageAdapter extends StorageAdapter {
 	async _save(account_data, identifier){
 		var stored_data = localStorage.getItem('oip_account');
 
-		if (stored_data) 
+		if (stored_data)
 			stored_data = JSON.parse(stored_data);
 
 		if (!stored_data)
@@ -97,7 +97,7 @@ class LocalStorageAdapter extends StorageAdapter {
 		return account_data
 	}
 	/**
-	 * Check if the Account exists in LocalStorage. 
+	 * Check if the Account exists in LocalStorage.
 	 * This matches an email to an identifier if the username being used is an email.
 	 *
 	 * @async
