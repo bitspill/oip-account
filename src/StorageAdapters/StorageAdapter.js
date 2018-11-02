@@ -180,10 +180,9 @@ class StorageAdapter {
 
 			return encrypted_string
 		} catch (e) {
+			console.log('failed to encrypt data: ', e)
 			return undefined
 		}
-
-		return undefined
 	}
 }
 
