@@ -1,6 +1,8 @@
 import StorageAdapter from './StorageAdapter'
 import {InvalidPassword, AccountNotFoundError} from '../Errors'
 import CryptoJS from 'crypto-js';
+import crypto from 'crypto'
+const hash = crypto.createHash('sha256');
 
 const AES_CONFIG = {
 	mode: CryptoJS.mode.CTR,
@@ -94,7 +96,7 @@ class LocalStorageAdapter extends StorageAdapter {
 
 		this.encrypt(account_data);
 
-		stored_data[identifier] = this.storage;
+		stored_data[identifier] = {...this.storage, mnemonicHash: hash.update(account_data.wallet.seed).digest('hex')};
 
 
 		localStorage.setItem('oip_account', JSON.stringify(stored_data));
