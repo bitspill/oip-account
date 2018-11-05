@@ -98,7 +98,6 @@ class LocalStorageAdapter extends StorageAdapter {
 
 		stored_data[identifier] = {...this.storage, mnemonicHash: hash.update(account_data.wallet.seed).digest('hex')};
 
-
 		localStorage.setItem('oip_account', JSON.stringify(stored_data));
 
 		return account_data
@@ -125,12 +124,17 @@ class LocalStorageAdapter extends StorageAdapter {
 		if (stored_data[this._username])
 			return this._username;
 
-		for (var data in stored_data) {
+		for (let identifier in stored_data) {
 			// Check if the Email matches
-			if (stored_data[data].email && stored_data[data].email !== "" && this._username && stored_data[data].email === this._username)
-				return data;
+			if (stored_data[identifier].email && stored_data[identifier].email !== "" && this._username && stored_data[identifier].email === this._username)
+				return identifier;
+
+			//toDo: check this code runs
+			if (this.seed && stored_data[identifier].mnemonicHash === hash.update(this.seed).digest('hex'))
+				return identifier
 		}
 
+		//toDo: remove unreachable code if above toDo works
 		if (this.seed) {
 			try {
 				return await this.checkForMnemonic()
