@@ -106,15 +106,16 @@ class Account {
 		try {
 			account_info = await this._storageAdapter.load(this._account)
 		} catch (err) {
-			if (err instanceof AccountNotFoundError) {
-				try {
-					account_info = await this.create()
-				} catch (err) {
-					throw new Error(`Login and New Account creation failed: ${err}`)
-				}
-			} else {
-				throw new Error(err)
-			}
+			throw new Error(err)
+			// if (err instanceof AccountNotFoundError) {
+			// 	try {
+			// 		account_info = await this.create()
+			// 	} catch (err) {
+			// 		throw new Error(`Login and New Account creation failed: ${err}`)
+			// 	}
+			// } else {
+			// 	throw new Error(err)
+			// }
 		}
 
 		this._account = account_info;
